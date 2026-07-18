@@ -1,34 +1,71 @@
+import Link from "next/link";
+
+import { AppHeader } from "@/components/app-header";
+
 export default function Home() {
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f6f3ec] px-5 py-12 text-[#17211d] sm:px-8">
-      <div
-        aria-hidden="true"
-        className="absolute -left-24 top-[-7rem] h-72 w-72 rounded-full bg-[#ef5b2a]/12 blur-3xl"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute -bottom-36 -right-20 h-80 w-80 rounded-full bg-[#1f7a5a]/12 blur-3xl"
-      />
+    <div className="min-h-screen bg-[#f5f2eb] text-[#17231d]">
+      <AppHeader />
+      <main className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-18 lg:py-24">
+        <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.9fr)] lg:gap-18">
+          <section>
+            <p className="inline-flex rounded-full border border-[#c9d8d0] bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#24644a]">
+              Berlin-first bureaucracy navigator
+            </p>
+            <h1 className="mt-6 max-w-3xl text-4xl font-semibold leading-[1.06] tracking-[-0.05em] text-[#142219] text-balance sm:text-6xl">
+              Official letters, turned into a clear route.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-[#536159] sm:text-xl sm:leading-9">
+              BurgerMapper helps you understand what a Berlin authority is asking, what may be urgent, and what to do next.
+            </p>
+            <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+              <Link
+                href="/case"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#1d664b] px-6 py-3 text-base font-semibold text-white shadow-sm outline-none hover:bg-[#15523c] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35"
+              >
+                Start a new case
+                <span aria-hidden="true" className="ms-2">→</span>
+              </Link>
+              <p className="max-w-xs text-sm leading-6 text-[#68736d]">
+                Phase 1 uses a fictional mock analysis. No document is sent anywhere.
+              </p>
+            </div>
+          </section>
 
-      <section className="relative w-full max-w-3xl rounded-[2rem] border border-black/8 bg-white/80 px-6 py-10 shadow-[0_24px_80px_rgba(23,33,29,0.10)] backdrop-blur sm:px-12 sm:py-14">
-        <p className="mb-8 inline-flex rounded-full border border-[#1f7a5a]/20 bg-[#1f7a5a]/8 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#176146]">
-          Build Week foundation
-        </p>
-
-        <h1 className="text-4xl font-semibold tracking-[-0.045em] text-balance sm:text-6xl">
-          BurgerMapper
-        </h1>
-
-        <p className="mt-5 max-w-2xl text-lg leading-8 text-[#47534e] sm:text-xl sm:leading-9">
-          BurgerMapper turns official Berlin letters into clear next steps.
-        </p>
-
-        <div className="mt-10 border-t border-black/8 pt-6">
-          <p className="text-sm leading-6 text-[#66716c]">
-            The interactive workflow will be added in later phases.
-          </p>
+          <aside aria-label="How BurgerMapper works" className="rounded-[1.5rem] border border-[#d5dad6] bg-white p-6 shadow-[0_18px_60px_rgba(29,47,38,0.08)] sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#237b59]">
+              A route, not a chat
+            </p>
+            <ol className="mt-5 space-y-5">
+              <RoutePreview number="1" title="Add the letter" description="Choose a PDF or image, or use the fictional sample." />
+              <RoutePreview number="2" title="Clarify what matters" description="Answer one question only when it can change the route." />
+              <RoutePreview number="3" title="Follow clear next steps" description="See deadlines, documents, uncertainty, and source placeholders in one plan." />
+            </ol>
+          </aside>
         </div>
-      </section>
-    </main>
+      </main>
+    </div>
+  );
+}
+
+function RoutePreview({
+  number,
+  title,
+  description,
+}: {
+  number: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <li className="grid grid-cols-[2.25rem_1fr] gap-3">
+      <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-full bg-[#eef6f2] text-sm font-bold text-[#1f6d50]">
+        {number}
+      </span>
+      <div>
+        <h2 className="font-semibold text-[#223129]">{title}</h2>
+        <p className="mt-1 text-sm leading-6 text-[#68736d]">{description}</p>
+      </div>
+    </li>
   );
 }

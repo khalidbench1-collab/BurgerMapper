@@ -16,3 +16,14 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Require official government sources for changing factual claims | Administrative facts, requirements, and deadlines can change; official sources provide the strongest basis for route guidance and citations. |
 | Target Vercel for deployment | Vercel is a natural operational fit for the Next.js App Router and supports a fast hackathon deployment path. |
 | Use no database initially | The anonymous first MVP can process a session without persistent application data, reducing scope and privacy risk until persistence is clearly justified. |
+
+## Phase 1 implementation decisions
+
+| Decision | Reason |
+| --- | --- |
+| Keep selected files only in browser memory | Phase 1 needs to demonstrate intake without transmitting or persisting sensitive documents. React state drops the `File` object on removal, start-over, refresh, or tab close. |
+| Make the mock service return the future AI output contract | UI components consume a provider-independent `CaseAnalysis`, so a later server-side OpenAI service can replace the mock implementation without redesigning the result interface. |
+| Show one clarification question before route confirmation | Employment status changes the correct income-evidence step in the fictional scenario. Asking only this question demonstrates the rule that a question must materially change the route. |
+| Exclude OCR and PDF extraction from Phase 1 | The phase validates interaction, contract, accessibility, and privacy boundaries first; document parsing needs its own security, accuracy, and fixture work. |
+| Keep one client state boundary in `CaseWorkspace` | A single case route has a short-lived state machine and no cross-route persistence. Central local state with pure leaf components is easier to audit than adding context or a state library. |
+| Split result sections into focused components | Summary, deadline, requirements, clarification, route, sources, and disclaimer have different semantic and visual responsibilities. The suggested structure was followed where it improved clarity; orchestration remains in `AnalysisResult` rather than adding a component for every wrapper. |

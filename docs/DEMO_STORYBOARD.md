@@ -1,39 +1,39 @@
-# Three-minute demo storyboard — draft
+# Three-minute demo storyboard — Phase 1 draft
 
-> Draft only. This storyboard describes the intended demonstration and will evolve with the implementation. Most scenes below are not implemented in Phase 0.
+> Draft based on the working Phase 1 implementation. It will evolve as real extraction, source verification, and AI analysis are added. All current analysis content is a clearly labelled fictional mock.
 
-## 0:00–0:20 — Problem hook
+## 0:00–0:18 — Problem hook
 
-Show the confusion and urgency created by a dense official German letter. Explain that missing one requirement or deadline can have real consequences.
+Show the stress caused by a dense German official letter: the user needs the deadline, requested documents, uncertainty, and a route—not a chat transcript.
 
-## 0:20–0:40 — Upload an official German letter
+## 0:18–0:35 — Start a case
 
-Demonstrate adding a representative letter as a PDF or image. Keep personal information out of the demo asset.
+Open the concise BurgerMapper landing page and select **Start a new case**. Point out the visible mock-mode status.
 
-## 0:40–1:00 — Explanation in simple language
+## 0:35–0:55 — Local document intake
 
-Show BurgerMapper identifying the letter type and explaining its meaning in concise, plain English without overstating certainty.
+On `/case`, show the accepted PDF/image formats and 10 MB limit, then choose **Use the fictional sample letter**. Briefly show the privacy note: Phase 1 keeps a selected file only in browser memory and does not read or send it.
 
-## 1:00–1:18 — Extracted deadline and required action
+## 0:55–1:20 — Run the mock analysis
 
-Highlight the relevant date, what the authority is asking for, and the consequence or uncertainty that deserves attention.
+Keep English selected and run the short deterministic mock analysis. Show the clearly separated extracted-fact panel and plain-language interpretation for the fictional Landesamt für Einwanderung Berlin scenario.
 
-## 1:18–1:35 — One useful clarification question
+## 1:20–1:40 — Deadline, action, and uncertainty
 
-Ask a single question whose answer materially changes the route, then show the route adapting to the answer.
+Highlight the detected 22 July 2026 deadline, high-urgency label, requested passport/insurance/income documents, and the explicit uncertainty about employment status and submission method.
 
-## 1:35–2:05 — Personalized route
+## 1:40–2:00 — One useful clarification
 
-Walk through the ordered next-step plan, including what to prepare, whom to contact, and what to do first.
+Answer **Employed**. Show that the income document changes to employment evidence and step two becomes ready. Explain that BurgerMapper asks this question because the answer changes the route.
 
-## 2:05–2:25 — Official citations
+## 2:00–2:20 — Route and source limitations
 
-Open the supporting official German government sources and connect each changing factual claim to its citation.
+Walk through the four ordered next steps, then show both official-source entries labelled **Placeholder — not verified** and the legal-information disclaimer. Do not describe these as verified citations.
 
-## 2:25–2:40 — Language switch to Arabic
+## 2:20–2:40 — Arabic RTL result
 
-Switch the generated route to Arabic while preserving the same actions, dates, and citations. The surrounding application interface remains English for the MVP.
+Start over, select the fictional sample and Arabic, then run the analysis again. Show the right-to-left result layout while the source domains remain readable left-to-right.
 
-## 2:40–3:00 — Codex and GPT-5.6 contribution
+## 2:40–3:00 — Engineering evidence
 
-Briefly explain, with accurate final evidence, what Codex helped build and test and where GPT-5.6 contributed to the implemented experience. End on the live product and repository provenance rather than an unimplemented claim.
+Briefly show the typed provider-independent analysis contract, focused test result, dated commits, and prior-work disclosure. Explain accurately that Codex supported the Phase 1 architecture, implementation, tests, audit remediation, and documentation; add later GPT-5.6 contributions only when they have occurred and are evidenced.

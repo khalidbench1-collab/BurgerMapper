@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "BurgerMapper",
     short_name: "BurgerMapper",
-    description: "Clear next steps from official Berlin letters.",
+    description: "Turn official Berlin letters into clear, source-aware next steps.",
     start_url: "/",
     display: "standalone",
     background_color: "#f6f3ec",

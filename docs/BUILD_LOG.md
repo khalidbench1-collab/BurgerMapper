@@ -72,4 +72,64 @@ Define and implement Phase 1 only after its requirements and document-processing
 
 ### Codex collaboration notes
 
-Codex inspected the environment, initialized and adapted the current stable Next.js scaffold, created the Phase 0 application and documentation, ran the requested checks, visually inspected the local result, audited the proposed commit contents, and created the initial commit. Future notes will distinguish later Codex and model contributions by phase.
+Codex inspected the environment, initialized and adapted the current stable Next.js scaffold, created the Phase 0 application and documentation, ran the requested checks, verified the local HTTP output, audited the proposed commit contents, and created the initial commit. Future notes will distinguish later Codex and model contributions by phase.
+
+## 2026-07-18 — Phase 1 mock document analysis workflow
+
+### Objective
+
+Build a complete, polished front-end case intake and mock analysis workflow without document parsing, file transmission, persistence, API routes, or real AI calls.
+
+### Implementation details
+
+- Replaced the temporary foundation screen with a concise product landing page and primary action at `/`.
+- Added the `/case` workflow with drag-and-drop, a keyboard file picker, PDF/PNG/JPEG/WebP validation, a 10 MB limit, clear error announcements, removable metadata, and a fictional sample option.
+- Kept a selected `File` only in React state. The implementation reads browser-provided name, MIME type, and size but never reads file bytes.
+- Added explicit idle, validating, file-selected, ready, mock-analyzing, analysis-complete, and error states with a deterministic 900 ms analysis delay.
+- Created hand-written English, German, and Arabic mock analysis data. Arabic result content uses `dir="rtl"`; date elements use automatic direction and source links remain `dir="ltr"`.
+- Built the fictional Landesamt für Einwanderung Berlin residence-renewal scenario with a letter date of 2026-07-08, a detected 2026-07-22 deadline, three requested document groups, employment-status uncertainty, one route-changing question, adaptive income evidence, four next steps, unverified source placeholders, and a legal-information disclaimer.
+- Added print-friendly result rules and visible separation between extracted facts, mock interpretation, uncertainty, requested action, route steps, and sources.
+
+### Architecture choices
+
+- Central domain types live in `src/domain/case.ts`; the `CaseAnalysis` contract is independent of its provider.
+- `MockDocumentAnalysisService` implements `DocumentAnalysisService`, while `analyzeDocument()` exposes the current provider. A future server-side OpenAI adapter can return the same contract.
+- Fictional multilingual data lives in `src/mocks/`, interface/result copy in `src/i18n/`, and validation/date utilities in `src/lib/`.
+- `CaseWorkspace` owns the short-lived client state machine. Focused components render intake, progress, summary, deadline, requirements, clarification, timeline, sources, and disclaimer sections.
+- Clarification adaptation is a pure function, making route changes deterministic and independently testable.
+
+### Tests added
+
+- Added Vitest 4, jsdom, and React Testing Library using the testing approach documented with the installed Next.js release.
+- Four test files contain 13 tests covering all accepted file formats, unsupported type, oversized file, language selection, the structured mock contract in all three languages, clarification adaptation, key result sections, Arabic RTL, and left-to-right source links.
+- `npm test` — passed: 4 files and 13 tests.
+- `npm run lint` — passed with no ESLint findings.
+- `npm run build` — passed on Next.js 16.2.10, including strict TypeScript and static generation of `/`, `/case`, and `/manifest.webmanifest`.
+
+### Dependency audit
+
+- The Phase 0 audit reported two moderate findings representing one transitive issue: direct production dependency `next@16.2.10` bundled transitive `postcss@8.4.31`, affected by GHSA-qx2v-qp2m-jg93 for unsafe `</style>` stringification.
+- npm's advertised fix was a breaking and inappropriate downgrade to `next@9.3.3`; it was not applied.
+- A narrow `overrides.next.postcss` entry now selects patched `postcss@8.5.10`, a same-major remediation. The Tailwind and Vite paths use `postcss@8.5.19`.
+- `npm audit --json` — passed with 0 vulnerabilities in the full dependency tree.
+- `npm audit --omit=dev --json` — passed with 0 production vulnerabilities.
+
+### HTTP and browser verification
+
+- Local HTTP checks passed: `/` returned 200 and the primary action; `/case` returned 200 with upload, privacy, and language content; `/manifest.webmanifest` returned 200 with `application/manifest+json`.
+- In-app browser automation was attempted but remained unavailable because the browser connection could not receive the session sandbox policy. No alternate browser controller was substituted, so visual browser inspection remains a follow-up limitation.
+
+### Problems and fixes
+
+- ESLint initially treated a helper named `useFirstFile` as a React Hook; renaming it to `selectFirstFile` resolved the rule violation.
+- The first UI test found that clarification radio names included both the option and its explanatory text. Adding a concise `aria-label` improved the accessible name and made the behavior testable.
+- Current Vite reported that `vite-tsconfig-paths` was unnecessary. The dependency was removed and native `resolve.tsconfigPaths` support is used instead.
+- The audit endpoint required approved registry access. No forced audit fix was run.
+
+### Codex collaboration notes
+
+Codex reviewed the installed Next.js guidance, designed the typed contract and state boundaries, implemented the mock service and reusable interface, wrote the multilingual scenario and route variants, added and debugged the tests, applied and verified the non-breaking dependency remediation, ran all quality gates, checked local HTTP output, and updated the Build Week record.
+
+### Next phase
+
+Define a safe normalized-document input contract and implement tested PDF text extraction plus image OCR behind a privacy-controlled server boundary, while keeping mock mode and the existing `CaseAnalysis` service contract intact. Do not add real OpenAI calls until extracted input, retention behavior, and evaluation fixtures are agreed.

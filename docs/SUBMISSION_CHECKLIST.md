@@ -1,6 +1,6 @@
 # Build Week submission checklist
 
-Completion is intentionally not claimed during Phase 0. Verify every item against the final competition rules before checking it off.
+Completion of the final submission is not claimed. Phase 1 progress is checked only where the repository already contains the required evidence; verify every item again against the final competition rules.
 
 - [ ] Working project
 - [ ] Chosen category
@@ -9,12 +9,12 @@ Completion is intentionally not claimed during Phase 0. Verify every item agains
 - [ ] Demo audio explains what was built and how Codex and GPT-5.6 were used
 - [ ] Repository URL
 - [ ] Repository access for judges if private
-- [ ] README Codex collaboration section
-- [ ] Dated commit history
-- [ ] Prior-work disclosure
+- [x] README Codex collaboration section
+- [x] Dated commit history
+- [x] Prior-work disclosure
 - [ ] `/feedback` Codex Session ID
 - [ ] Live testable deployment
 - [ ] English submission materials
-- [ ] Testing instructions
+- [x] Testing instructions
 - [ ] Third-party licenses checked
 - [ ] Final deadline verification

@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "BurgerMapper",
-  description: "Clear next steps from official Berlin letters.",
+  description: "Turn official Berlin letters into clear, source-aware next steps.",
 };
 
 export default function RootLayout({

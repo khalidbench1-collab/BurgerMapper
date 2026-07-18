@@ -4,9 +4,21 @@ BurgerMapper is a Berlin-first bureaucracy navigator. Official letters can be di
 
 ## Intended Build Week workflow
 
-The planned workflow will let a user upload an official German letter as a PDF or image, receive a plain-language explanation, see extracted deadlines and requested actions, answer only clarification questions that could change the route, and get personalized next steps backed by official German government sources. The interface will be in English, with generated routes available in English, German, and Arabic.
+The Build Week target is to let a user upload an official German letter as a PDF or image, receive a plain-language explanation, see extracted deadlines and requested actions, answer only clarification questions that could change the route, and get personalized next steps backed by official German government sources. The interface is in English, with generated routes planned in English, German, and Arabic.
 
-This describes the Build Week target, not the current implementation.
+Phase 1 implements this interaction with a fixed fictional scenario. It does not yet extract or analyze the selected document.
+
+## Phase 1 mock workflow
+
+- Concise landing page at `/` and a case workspace at `/case`.
+- Drag-and-drop and keyboard file selection for PDF, PNG, JPEG, and WebP documents up to 10 MB.
+- A fictional sample letter so the workflow can be tested without a personal document.
+- In-memory document metadata, removable selection, deterministic mock-analysis state, and a full start-over path.
+- Hand-written English, German, and Arabic mock results; Arabic results use right-to-left layout while dates and source URLs remain readable.
+- A typed analysis contract covering document facts, plain-language interpretation, deadline and urgency, requested action, required documents, uncertainty, one useful clarification question, adaptive next steps, unverified source placeholders, and a legal-information disclaimer.
+- Print-friendly result styling and clear separation between extracted facts, interpretation, uncertainty, action, and sources.
+
+Mock mode uses one fictional residence-permit renewal scenario. The selected file is never parsed, read, uploaded, or sent to an AI service.
 
 ## Technical stack
 
@@ -15,6 +27,7 @@ This describes the Build Week target, not the current implementation.
 - TypeScript in strict mode
 - Tailwind CSS 4
 - ESLint 9 with the Next.js configuration
+- Vitest, jsdom, and React Testing Library
 - npm
 - Vercel as the planned deployment target
 - OpenAI Responses API through server-side calls in a later phase
@@ -47,21 +60,43 @@ Prerequisites: Node.js 20.9 or newer and npm.
 
 4. Open `http://localhost:3000`.
 
+Run the Phase 1 checks with:
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
 The future server-side AI integration will use this placeholder:
 
 ```text
 OPENAI_API_KEY=
 ```
 
-No API key is required for the current Phase 0 page. `OPENAI_MODEL` and `ENABLE_MOCK_AI` are also documented in `.env.example` for later phases.
+No API key is required for the current Phase 1 workflow. `OPENAI_MODEL` and `ENABLE_MOCK_AI` are documented in `.env.example` for later phases.
 
 ## Current implementation status
 
-Phase 0 is complete: the repository foundation, responsive temporary landing page, PWA manifest baseline, environment template, lint/build configuration, and Build Week documentation are present. Letter uploads, analysis, clarification questions, multilingual routes, official-source retrieval, OpenAI API calls, and the full mock AI path are not implemented yet.
+Phase 1 is complete. The front-end mock intake and analysis workflow, multilingual typed scenario, route-changing clarification, focused tests, PWA manifest baseline, and Build Week documentation are present.
+
+Current limitations:
+
+- No PDF text extraction, OCR, or image inspection.
+- No real document facts are detected; every result comes from the labelled fictional scenario.
+- No OpenAI call, API route, source retrieval, or source verification.
+- No login, database, local storage, analytics, tracking, or deployment.
+- Source links are clearly labelled placeholders and do not support factual reliance yet.
+
+Real OpenAI integration will require a server-only implementation of the existing analysis-service contract, validated structured output, safe document extraction, official-source retrieval and verification, error handling, and a mock fallback. A client-side API key will never be used.
+
+## Privacy behavior
+
+For a user-selected document, the browser keeps the `File` object only in React state for the open case. Phase 1 reads only browser-provided metadata (name, MIME type, and size); it does not read file bytes. Starting over, removing the document, refreshing, or closing the tab drops the selection. Nothing is transmitted or persisted.
 
 ## Security
 
-AI calls will be server-side only. Local `.env*` files are ignored except for the intentionally empty `.env.example`; never commit real credentials or expose an OpenAI API key to browser code.
+Future AI calls will be server-side only. Local `.env*` files are ignored except for the intentionally empty `.env.example`; never commit real credentials or expose an OpenAI API key to browser code. Phase 1 has no API route, analytics, tracking, remote font, or remote application asset.
 
 ## Build Week provenance
 
@@ -69,7 +104,7 @@ The BurgerMapper concept and an earlier, unrelated prototype predated OpenAI Bui
 
 ## How Codex contributed
 
-Placeholder for the final account of how Codex and GPT-5.6 supported planning, implementation, testing, debugging, and documentation. This section will be completed before submission and will not claim work that has not occurred.
+Codex established the Phase 0 repository and helped implement Phase 1: the typed domain contract, local-only file validation and state model, multilingual mock service, reusable interface components, accessibility behavior, route adaptation, test suite, dependency remediation, verification, and documentation. The final submission account will add later-phase evidence and accurately distinguish how Codex and GPT-5.6 were used without claiming unfinished work.
 
 ## Codex `/feedback` Session ID
 
