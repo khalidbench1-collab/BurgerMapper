@@ -113,7 +113,7 @@ export interface CaseAnalysis {
   inputKind: InputKind;
   category: BureaucracyCategory | null;
   mockContext: string;
-  isMock: true;
+  isMock: boolean;
 }
 
 interface BaseCaseInput {

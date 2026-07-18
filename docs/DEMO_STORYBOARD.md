@@ -1,39 +1,39 @@
-# Three-minute demo storyboard — Phase 1.5 draft
+# Three-minute demo storyboard — Phase 2 draft
 
-> Draft based on the working Phase 1.5 implementation. It will evolve as extraction, source verification, and real AI analysis are added. All current analysis content is a clearly labelled fictional mock.
+> Draft based on the working Phase 2 implementation. All analysis remains fictional mock output. No OpenAI request, OCR, source search, or document interpretation occurs yet.
 
 ## 0:00–0:18 — Problem hook
 
-Show the stress caused by a dense German official letter: the user needs its purpose, deadline, requested documents, and a route—not a chat transcript or knowledge of the official procedure name.
+Show why a stressed newcomer needs the purpose, deadline, required documents, uncertainty, and next route from an official letter—not a chat transcript or knowledge of a procedure name.
 
-## 0:18–0:35 — Choose an orientation category
+## 0:18–0:35 — Choose optional context
 
-Open the BurgerMapper landing page and choose **Visa & Immigration**. Show that `/case` opens with that optional category preselected and that it can be changed or cleared. Explain that categories orient the user; they do not decide eligibility.
+Choose **Visa & Immigration** on the landing page. Show the category preselected on `/case`, then note that it can be changed or cleared and never determines eligibility.
 
-## 0:35–0:58 — Paste or upload a letter
+## 0:35–0:57 — Choose one of four inputs
 
-Show **Paste text**, then briefly switch to **Upload document** to demonstrate PDF/image intake. Return to text and paste a fictional official message. Point out that the input stays in browser memory and mock mode does not read, send, persist, or truly interpret it. If time is tight, use **Try sample** instead.
+Show Paste text, PDF/image upload, and Try sample as one calm intake. Use only the fictional sample for the recorded demo. Explain that the active input now goes to the BurgerMapper application server for in-memory validation.
 
-## 0:58–1:22 — Demonstrate the route structure
+## 0:57–1:20 — Privacy-controlled mock request
 
-Run the deterministic mock analysis. State explicitly: the later real version is intended to identify the letter's purpose, but the current build uses the fictional Samira Haddad scenario to demonstrate the expected structured route. Show the separated facts, mock interpretation, uncertainty, and requested action.
+Run the analysis. State that the server validates text length or document MIME/signature, sends nothing to an AI provider, intentionally stores nothing, and reports that temporary input was discarded. Mock mode demonstrates the future route structure without understanding the document.
 
-## 1:22–1:43 — Deadline and one useful clarification
+## 1:20–1:43 — Structured route and one useful question
 
-Highlight the fictional deadline and required documents. Answer **Employed** and show the income-evidence step adapt. Explain that BurgerMapper asks a question only when its answer changes the route.
+Show the separated facts, interpretation, uncertainty, deadline, documents, and ordered next steps. Answer **Employed** and show the income-evidence step adapt because this answer changes the route.
 
-## 1:43–2:08 — Personalized next steps
+## 1:43–2:05 — Typed safety boundary
 
-Walk through the ordered route, responsible party, timing, and status. Emphasize that the route—not a chatbot transcript—is the product.
+Briefly show a safe validation error using a synthetic mismatched file or test evidence. Explain that raw server exceptions and original input never appear in the response.
 
-## 2:08–2:29 — Arabic RTL result
+## 2:05–2:27 — Arabic RTL result
 
-Start over, choose Visa & Immigration again, select the sample and Arabic, then analyze. Show the right-to-left result layout while dates and source URLs remain readable.
+Start over, choose the fictional sample and Arabic, then analyze. Show the right-to-left result while dates and source URLs remain readable.
 
-## 2:29–2:43 — Official-source verification boundary
+## 2:27–2:43 — Honest source limitation
 
-Show entries labelled **Placeholder — not verified** and the legal-information disclaimer. Explain that retrieval and verification of official sources will appear in a later workflow phase; do not present these placeholders as citations.
+Show **Placeholder — not verified** labels and the legal-information disclaimer. Official-source research begins only after a future real case profile is ready.
 
 ## 2:43–3:00 — Engineering evidence
 
-Briefly show the discriminated `CaseInput`, provider-independent `CaseAnalysis`, 33 passing tests, dated commits, and prior-work disclosure. Explain accurately that Codex supported the architecture, implementation, tests, verification, and documentation; add GPT-5.6 contributions only after they occur and are evidenced.
+Show `POST /api/cases/analyze`, the stable `CaseAnalysis`, discriminated client/server inputs, internal future Responses API plan, 59 passing tests, dated commits, and prior-work disclosure. Credit Codex only for evidenced architecture, implementation, testing, verification, and documentation work; add GPT-5.6 contributions after they occur.

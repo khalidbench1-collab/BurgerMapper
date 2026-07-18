@@ -1,4 +1,4 @@
-export const FICTIONAL_SAMPLE_ID = "fictional-residence-renewal-2026";
+export { FICTIONAL_SAMPLE_ID } from "@/domain/samples";
 
 export function SampleInputPanel({
   selected,

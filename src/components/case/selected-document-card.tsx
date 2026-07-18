@@ -38,7 +38,7 @@ export function SelectedDocumentCard({
             </div>
             <div>
               <dt className="sr-only">Processing</dt>
-              <dd>Browser memory only</dd>
+              <dd>In memory only</dd>
             </div>
           </dl>
         </div>

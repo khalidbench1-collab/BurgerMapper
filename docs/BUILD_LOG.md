@@ -181,3 +181,56 @@ Codex reviewed the existing contracts and Next.js routing guidance, implemented 
 ### Next phase
 
 Define Phase 2 as a privacy-controlled server-side extraction layer: normalized PDF text extraction and image OCR with safe file handling, retention limits, typed extraction errors, deterministic fixtures, and evaluations. Keep mock mode and the `CaseInput`/`CaseAnalysis` boundary; do not add OpenAI interpretation until the extraction and privacy boundary is tested and documented.
+
+## 2026-07-18 — Phase 2 secure multimodal analysis boundary
+
+### Objective and starting state
+
+Prove that pasted text, PDF, image, and trusted sample inputs can cross one validated application-server endpoint and return the existing `CaseAnalysis` without OCR, PDF extraction, an API key, or an external request. The worktree was clean on `main` before this phase at commit `aeb7f42033e01d5295ceae5ae6b3367eb87b5cd0`.
+
+### Implementation details
+
+- Added `POST /api/cases/analyze` as a Node.js App Router Route Handler using one centralized `multipart/form-data` field map.
+- Kept client `CaseInput` and every `CaseAnalysis` field backward-compatible. The only public type change widens `isMock` from literal `true` to `boolean`, preserving current values while allowing a future provider to report `false`. Added a server-only discriminated `NormalizedCaseInput` for normalized text, known sample IDs, or sanitized file metadata plus temporary bytes.
+- Added server validation for input kind, optional category, language, text normalization and limits, known sample ID, file presence, non-empty size, 10 MB maximum, allowed MIME type, and matching PDF/PNG/JPEG/WebP magic bytes.
+- Added safe filename sanitization. The route never executes content or writes files to the project, public directory, or another storage location.
+- Added a central typed error contract with the required codes, safe user messages, HTTP status mapping, and per-request UUID. Responses never expose stack traces, paths, environment values, raw exception messages, or original inputs.
+- Added a success envelope containing the unchanged analysis plus `processingMode`, `inputKind`, `receivedAt`, `requestId`, and `retentionStatus`. All responses use `Cache-Control: no-store` and `X-BurgerMapper-Retention: discarded-after-processing`.
+- `ENABLE_MOCK_AI=true` runs the server mock provider. An absent value defaults to mock only outside production. Disabled mock mode returns `API_NOT_CONFIGURED`; Phase 2 never constructs a real provider or sends an OpenAI request.
+- The browser now serializes every input kind to the endpoint. It uses `AbortController`, ignores aborted results, prevents duplicate in-flight submissions, announces status, and renders only locally mapped safe typed errors.
+- Updated privacy copy to explain current app-server validation, no AI-provider transfer, no intentional storage, and request-memory discard. Prepared separate real-mode consent copy without activating it.
+
+### OpenAI-ready planning and injection boundary
+
+- Added an internal, testable future request planner: normalized pasted text and trusted server sample map to `input_text`; PDF maps to `input_file`; PNG/JPEG/WebP map to `input_image`; binary is represented only in the internal plan as a data URL with a default `low` detail setting.
+- A separate textual context block carries the optional category, output language, and reusable untrusted-document instruction.
+- The instruction treats document content as evidence, rejects embedded attempts to override application rules, forbids following document links or commands unless verification is explicitly requested, protects system/developer instructions, avoids unsupported legal certainty, and requires facts, interpretation, uncertainty, action, and source status to remain separate.
+- The OpenAI SDK was not installed. The official documentation connector was registered, but the running session could not load it until a restart; the planner therefore remains an internal description based on the phase's explicit mapping rather than claiming an SDK-exact request body.
+
+### Tests and quality gates
+
+- Expanded the suite from 33 to 59 tests across 10 files; all 59 passed.
+- Added synthetic-only endpoint and validation coverage for text, PDF, PNG, JPEG, WebP, signature mismatch, empty and oversized files, invalid category/language, unknown sample, text normalization and limits, mock contract, disabled real mode, no input reflection, discard metadata/header, request planning, injection instruction, typed UI errors, duplicate submission prevention, and retained file/text/category/clarification/Arabic behavior.
+- `npm run lint` — passed with exit code 0 and no ESLint findings.
+- `npm run build` — passed on Next.js 16.2.10 with strict TypeScript. Routes: static `/` and `/manifest.webmanifest`; dynamic `/case` and `/api/cases/analyze`.
+- `npm audit --json` — passed with 0 vulnerabilities across 543 dependencies: 17 production, 491 development, and 105 optional.
+- No npm dependency or lockfile changes were made in Phase 2.
+
+### HTTP and browser verification
+
+- Local HTTP GET checks passed with 200 for `/`, `/case`, `/case?category=visa-immigration`, and `/manifest.webmanifest`; category preselection rendered and the manifest returned `application/manifest+json`.
+- A synthetic multipart text POST returned 200 with `isMock: true`, `inputKind: text`, discard metadata, and the discard header. A representative invalid-language multipart POST returned 400 with `INVALID_LANGUAGE`.
+- In-app visual browser automation was attempted through the required browser surface but remained unavailable because its connection could not receive the sandbox policy. Automated component tests and local HTTP checks were used instead; no alternate browser controller was substituted.
+
+### Problems and fixes
+
+- Fast mocked server responses exposed a race with the inherited delayed intake-ready timer. Submission now cancels pending intake timers before starting the request so a completed route cannot be overwritten by stale state.
+- The first PowerShell multipart HTTP helper encoded fields incompatibly with the local parser. Verification was repeated with standard `curl -F` multipart requests and produced the expected success and typed-error results.
+
+### Codex collaboration notes
+
+Codex inspected the existing architecture and current Next.js Route Handler guidance, designed and implemented the server normalization and error boundary, magic-byte validation, provider configuration, client transport, cancellation and error UI, future multimodal request planner and injection instruction, synthetic test suite, audit and HTTP checks, and all Phase 2 documentation.
+
+### Next phase
+
+Implement a real server-side OpenAI Responses API provider behind explicit configuration and consent. Use the tested request planner, require strict structured-output validation against `CaseAnalysis`, add adversarial and multilingual evaluation fixtures, preserve the mock fallback and zero-retention disclosures, and keep official-source research out of scope until the real case profile is stable.

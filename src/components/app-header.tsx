@@ -14,7 +14,7 @@ export function AppHeader() {
         </Link>
         <div className="flex items-center gap-3">
           <span className="hidden text-xs font-medium text-[#68736d] sm:inline">
-            Build Week · Phase 1
+            Build Week · Phase 2
           </span>
           <MockModeBadge />
         </div>

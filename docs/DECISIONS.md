@@ -37,3 +37,17 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Keep arbitrary pasted text mock-only | Until a real server-side interpretation pipeline and evaluations exist, returning fictional labelled output is safer than implying the pasted message was legally or factually understood. |
 | Keep pasted text only in browser memory | Official messages may contain sensitive information. React state supports the intake demonstration without storage, logs, analytics, or transmission, and reset removes it immediately. |
 | Confirm before discarding an active input during mode changes | Text and selected files are private user work. An explicit confirmation reduces accidental loss while still enforcing one active input method at a time. |
+
+## Phase 2 server-boundary decisions
+
+| Decision | Reason |
+| --- | --- |
+| Use one multipart endpoint for every input kind | `multipart/form-data` carries text fields and binary files without base64 expansion in the browser and keeps one transport path for text, PDF, image, and sample modes. |
+| Keep `CaseInput` backward-compatible and add `NormalizedCaseInput` on the server | Browser `File` state and validated server bytes have different responsibilities. A separate server union preserves the stable public contract without leaking browser objects into provider code. |
+| Implement the four magic-byte checks without a new package | PDF, PNG, JPEG, and WebP have small deterministic signatures. A focused audited helper materially improves validation without adding a dependency tree. |
+| Default mock mode only in non-production when configuration is absent | Local development remains usable without a key, while production cannot silently present fictional output because an environment variable was forgotten. |
+| Return a typed response envelope around `CaseAnalysis` | Request ID, processing mode, input kind, receipt time, and discard status belong to transport metadata, not the stable analysis contract. |
+| Use AbortController and an in-flight guard in the workspace | Reset and mode changes can cancel abandoned requests, and repeated clicks cannot submit the same sensitive input twice concurrently. |
+| Prepare an internal request plan without installing the OpenAI SDK | Phase 2 can test input mappings and security context without implying an exact SDK payload, constructing a client, or risking an external request. |
+| Keep real-mode consent copy separate and inactive | The mock privacy message must describe current behavior. A separate prepared message avoids falsely implying OpenAI transfer before the real provider and consent step exist. |
+| Widen `CaseAnalysis.isMock` from literal `true` to `boolean` | This backward-compatible type widening preserves every current mock result while allowing the future provider to return the same contract honestly with `isMock: false`. No field name or current runtime value changed. |

@@ -1,4 +1,5 @@
 import { MAX_PASTED_TEXT_CHARACTERS } from "@/lib/text-validation";
+import { MOCK_SERVER_PRIVACY_MESSAGE } from "@/lib/privacy-messages";
 
 export function TextInputPanel({
   value,
@@ -39,7 +40,7 @@ export function TextInputPanel({
         {error}
       </p>
       <p id="text-privacy" className="mt-2 text-sm leading-6 text-[#68736d]">
-        Kept only in this browser tab. BurgerMapper does not interpret, transmit, log, or save pasted text in this mock phase.
+        {MOCK_SERVER_PRIVACY_MESSAGE}
       </p>
     </div>
   );

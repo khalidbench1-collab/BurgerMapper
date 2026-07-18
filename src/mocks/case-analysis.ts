@@ -151,7 +151,7 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
       },
     ],
     disclaimer:
-      "This is fictional mock output for a Build Week prototype. It is not legal advice, the document was not read or uploaded, and the source placeholders have not been verified. Check the original letter and current official guidance before acting.",
+      "This is fictional mock output for a Build Week prototype. It is not legal advice. The input was validated only by the BurgerMapper application server and was not interpreted by AI; the source placeholders have not been verified. Check the original letter and current official guidance before acting.",
   },
   de: {
     documentTitle: "Anforderung weiterer Unterlagen — fiktives Beispiel",
@@ -270,7 +270,7 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
       },
     ],
     disclaimer:
-      "Dies ist eine fiktive Demo-Ausgabe für einen Build-Week-Prototyp. Sie ist keine Rechtsberatung. Das Dokument wurde weder gelesen noch hochgeladen, und die Quellenplatzhalter wurden nicht verifiziert. Prüfen Sie vor jedem Schritt das Originalschreiben und aktuelle offizielle Hinweise.",
+      "Dies ist eine fiktive Demo-Ausgabe für einen Build-Week-Prototyp und keine Rechtsberatung. Die Eingabe wurde nur vom BurgerMapper-Anwendungsserver validiert und nicht durch KI interpretiert; die Quellenplatzhalter wurden nicht verifiziert. Prüfen Sie vor jedem Schritt das Originalschreiben und aktuelle offizielle Hinweise.",
   },
   ar: {
     documentTitle: "طلب مستندات إضافية — نموذج خيالي",
@@ -387,7 +387,7 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
       },
     ],
     disclaimer:
-      "هذه نتيجة خيالية تجريبية لنموذج أولي ضمن Build Week، وليست استشارة قانونية. لم تتم قراءة المستند أو رفعه، ولم يتم التحقق من المصادر المؤقتة. راجع الخطاب الأصلي والإرشادات الرسمية الحالية قبل اتخاذ أي إجراء.",
+      "هذه نتيجة خيالية تجريبية لنموذج أولي ضمن Build Week، وليست استشارة قانونية. تحقّق خادم تطبيق BurgerMapper من المدخلات فقط، ولم يفسرها أي نظام ذكاء اصطناعي، كما لم يتم التحقق من المصادر المؤقتة. راجع الخطاب الأصلي والإرشادات الرسمية الحالية قبل اتخاذ أي إجراء.",
   },
 };
 
@@ -534,18 +534,18 @@ const MOCK_CONTEXT: Record<
   Record<CaseInput["kind"], string>
 > = {
   en: {
-    text: "Mock mode is demonstrating the expected route format. The pasted text was not interpreted or understood.",
-    file: "Mock mode is demonstrating the expected route format. The selected file was not opened, read, or interpreted.",
+    text: "Mock mode is demonstrating the expected route format. The pasted text was validated in memory by the application server but was not interpreted or understood by AI.",
+    file: "Mock mode is demonstrating the expected route format. The selected file was signature-checked in memory by the application server but was not interpreted by AI.",
     sample: "Mock mode is using a fictional sample and does not represent a verified legal assessment.",
   },
   de: {
-    text: "Der Demo-Modus zeigt das erwartete Routenformat. Der eingefügte Text wurde weder interpretiert noch verstanden.",
-    file: "Der Demo-Modus zeigt das erwartete Routenformat. Die ausgewählte Datei wurde nicht geöffnet, gelesen oder interpretiert.",
+    text: "Der Demo-Modus zeigt das erwartete Routenformat. Der eingefügte Text wurde im Arbeitsspeicher des Anwendungsservers validiert, aber nicht durch KI interpretiert oder verstanden.",
+    file: "Der Demo-Modus zeigt das erwartete Routenformat. Die Signatur der ausgewählten Datei wurde im Arbeitsspeicher des Anwendungsservers geprüft, aber die Datei wurde nicht durch KI interpretiert.",
     sample: "Der Demo-Modus verwendet ein fiktives Beispiel und stellt keine verifizierte rechtliche Bewertung dar.",
   },
   ar: {
-    text: "يعرض الوضع التجريبي شكل المسار المتوقع. لم تتم قراءة النص الملصق أو تفسيره أو فهمه.",
-    file: "يعرض الوضع التجريبي شكل المسار المتوقع. لم يتم فتح الملف المحدد أو قراءته أو تفسيره.",
+    text: "يعرض الوضع التجريبي شكل المسار المتوقع. تحقّق خادم التطبيق من النص الملصق في الذاكرة، لكن لم يفسره أو يفهمه أي نظام ذكاء اصطناعي.",
+    file: "يعرض الوضع التجريبي شكل المسار المتوقع. تحقّق خادم التطبيق من توقيع الملف في الذاكرة، لكن لم يفسره أي نظام ذكاء اصطناعي.",
     sample: "يستخدم الوضع التجريبي نموذجًا خياليًا ولا يمثل تقييمًا قانونيًا متحققًا منه.",
   },
 };

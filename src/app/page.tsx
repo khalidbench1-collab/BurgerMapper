@@ -28,7 +28,7 @@ export default function Home() {
                 <span aria-hidden="true" className="ms-2">→</span>
               </Link>
               <p className="max-w-xs text-sm leading-6 text-[#68736d]">
-                Mock mode only. Pasted text and documents stay in this browser tab.
+                Mock mode only. Inputs are validated in memory by the BurgerMapper server, never sent to an AI provider, and discarded after the request.
               </p>
             </div>
           </section>

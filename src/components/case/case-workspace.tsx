@@ -23,6 +23,7 @@ import type {
   InputKind,
   SupportedLanguage,
 } from "@/domain/case";
+import type { CaseAnalysisErrorCode } from "@/domain/analysis-api";
 import {
   createFileCaseInput,
   createSampleCaseInput,
@@ -35,8 +36,19 @@ import {
 import { validatePastedText } from "@/lib/text-validation";
 import {
   adaptAnalysisToClarification,
-  analyzeDocument,
 } from "@/services/document-analysis";
+import {
+  AnalysisApiError,
+  ServerDocumentAnalysisService,
+} from "@/services/server-document-analysis";
+
+const serverAnalysisService = new ServerDocumentAnalysisService();
+
+interface RequestErrorState {
+  code: CaseAnalysisErrorCode;
+  message: string;
+  requestId: string | null;
+}
 
 function createInitialState(
   category: BureaucracyCategory | null = null,
@@ -64,9 +76,14 @@ export function CaseWorkspace({
   );
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
   const requestId = useRef(0);
+  const activeRequestController = useRef<AbortController | null>(null);
+  const [requestError, setRequestError] = useState<RequestErrorState | null>(null);
 
   useEffect(() => {
-    return () => timers.current.forEach((timer) => clearTimeout(timer));
+    return () => {
+      timers.current.forEach((timer) => clearTimeout(timer));
+      activeRequestController.current?.abort();
+    };
   }, []);
 
   function queue(callback: () => void, delayMs: number) {
@@ -78,6 +95,9 @@ export function CaseWorkspace({
     timers.current.forEach((timer) => clearTimeout(timer));
     timers.current = [];
     requestId.current += 1;
+    activeRequestController.current?.abort();
+    activeRequestController.current = null;
+    setRequestError(null);
   }
 
   function handleInputModeChange(nextKind: InputKind) {
@@ -106,6 +126,7 @@ export function CaseWorkspace({
   }
 
   function handleCategoryChange(category: BureaucracyCategory | null) {
+    setRequestError(null);
     setCaseState((current) => ({ ...current, category }));
   }
 
@@ -118,6 +139,7 @@ export function CaseWorkspace({
       analysis: null,
       validationError: null,
     }));
+    setRequestError(null);
   }
 
   function handleFileSelected(file: File) {
@@ -168,6 +190,7 @@ export function CaseWorkspace({
   }
 
   function handleLanguageChange(outputLanguage: SupportedLanguage) {
+    setRequestError(null);
     setCaseState((current) => ({ ...current, outputLanguage }));
   }
 
@@ -231,10 +254,14 @@ export function CaseWorkspace({
   }
 
   async function handleAnalyze() {
-    if (caseState.status === "mock-analyzing") return;
+    if (caseState.status === "mock-analyzing" || activeRequestController.current) return;
     const input = buildActiveInput();
     if (!input) return;
 
+    timers.current.forEach((timer) => clearTimeout(timer));
+    timers.current = [];
+    const controller = new AbortController();
+    activeRequestController.current = controller;
     const activeRequest = requestId.current + 1;
     requestId.current = activeRequest;
     setCaseState((current) => ({
@@ -242,9 +269,13 @@ export function CaseWorkspace({
       status: "mock-analyzing",
       validationError: null,
     }));
+    setRequestError(null);
 
     try {
-      const analysis = await analyzeDocument(input);
+      const analysis = await serverAnalysisService.analyzeDocument(
+        input,
+        controller.signal,
+      );
       if (requestId.current !== activeRequest) return;
 
       setCaseState((current) => ({
@@ -252,14 +283,27 @@ export function CaseWorkspace({
         status: "analysis-complete",
         analysis,
       }));
-    } catch {
+    } catch (error) {
+      if (controller.signal.aborted) return;
       if (requestId.current !== activeRequest) return;
+      const apiError =
+        error instanceof AnalysisApiError
+          ? error
+          : new AnalysisApiError("INTERNAL_ERROR", null);
+      setRequestError({
+        code: apiError.code,
+        message: apiError.message,
+        requestId: apiError.requestId,
+      });
       setCaseState((current) => ({
         ...current,
         status: "error",
-        validationError:
-          "The mock analysis could not be created. Please try again.",
+        validationError: null,
       }));
+    } finally {
+      if (activeRequestController.current === controller) {
+        activeRequestController.current = null;
+      }
     }
   }
 
@@ -274,7 +318,7 @@ export function CaseWorkspace({
     );
   }
 
-  const liveMessage = getLiveMessage(caseState);
+  const liveMessage = requestError?.message ?? getLiveMessage(caseState);
   const isBusy =
     caseState.status === "validating" ||
     caseState.status === "mock-analyzing";
@@ -384,6 +428,21 @@ export function CaseWorkspace({
               />
 
               <div className="border-t border-[#e0e4e0] pt-5">
+                {requestError ? (
+                  <div
+                    role="alert"
+                    data-testid="analysis-api-error"
+                    className="mb-4 rounded-xl border border-[#e3b4a8] bg-[#fff7f4] p-4 text-sm text-[#7d3325]"
+                  >
+                    <p className="font-semibold">{requestError.message}</p>
+                    <p className="mt-1 text-xs">
+                      Error code: {requestError.code}
+                      {requestError.requestId
+                        ? ` · Request reference: ${requestError.requestId}`
+                        : ""}
+                    </p>
+                  </div>
+                ) : null}
                 {caseState.status === "mock-analyzing" ? (
                   <AnalysisLoadingState />
                 ) : (
@@ -399,8 +458,8 @@ export function CaseWorkspace({
                   </button>
                 )}
                 <p className="mt-3 text-center text-xs leading-5 text-[#737d77]">
-                  Mock mode demonstrates the route format. No content is
-                  interpreted and no AI call is made.
+                  The application server validates and discards the input in
+                  memory. Mock mode makes no AI-provider call.
                 </p>
               </div>
             </aside>

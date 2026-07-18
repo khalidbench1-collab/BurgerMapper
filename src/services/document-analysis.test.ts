@@ -67,7 +67,10 @@ describe("MockDocumentAnalysisService", () => {
       category: "arrival-registration",
       documentType: "Anmeldung follow-up",
     });
-    expect(result.mockContext).toContain("pasted text was not interpreted");
+    expect(result.mockContext).toContain(
+      "pasted text was validated in memory by the application server",
+    );
+    expect(result.mockContext).toContain("not interpreted or understood by AI");
     expect(result.summary).toContain("No pasted text or uploaded file was interpreted");
   });
 

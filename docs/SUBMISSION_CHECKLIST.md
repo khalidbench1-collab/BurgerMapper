@@ -1,6 +1,6 @@
 # Build Week submission checklist
 
-Completion of the final submission is not claimed. Phase 1 progress is checked only where the repository already contains the required evidence; verify every item again against the final competition rules.
+Completion of the final submission is not claimed. Phase 2 now provides a locally tested server analysis boundary and 59 automated tests, but submission-wide items remain unchecked until their final deliverables exist. Verify every item again against the final competition rules.
 
 - [ ] Working project
 - [ ] Chosen category

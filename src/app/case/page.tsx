@@ -6,7 +6,7 @@ import { isBureaucracyCategory } from "@/domain/categories";
 
 export const metadata: Metadata = {
   title: "New case | BurgerMapper",
-  description: "Build a local mock route from a German official letter.",
+  description: "Build an in-memory mock route from a German official letter.",
 };
 
 export default async function CasePage({
@@ -34,7 +34,7 @@ export default async function CasePage({
             Build a clear route from your letter
           </h1>
           <p className="mt-3 text-base leading-7 text-[#5f6c65]">
-            Choose an optional topic, add text or a document, and select the output language. Mock mode demonstrates the route without interpreting your content.
+            Choose an optional topic, add text or a document, and select the output language. The application server validates it in memory; mock mode does not interpret it or send it to an AI provider.
           </p>
         </header>
         <CaseWorkspace initialCategory={initialCategory} />

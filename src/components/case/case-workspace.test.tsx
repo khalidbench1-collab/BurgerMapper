@@ -1,11 +1,27 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CaseWorkspace } from "@/components/case/case-workspace";
+import { CASE_FORM_FIELDS } from "@/domain/analysis-api";
+import { isBureaucracyCategory } from "@/domain/categories";
+import type { CaseInput, SupportedLanguage } from "@/domain/case";
+import { MockDocumentAnalysisService } from "@/services/document-analysis";
 
 const VALID_TEXT =
   "This is a copied fictional official message with enough useful content for the mock route.";
+
+let fetchMock: ReturnType<typeof vi.fn>;
+
+beforeEach(() => {
+  fetchMock = vi.fn(mockSuccessfulAnalyzeFetch);
+  vi.stubGlobal("fetch", fetchMock);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 async function selectSampleAndWaitUntilReady(
   user: ReturnType<typeof userEvent.setup>,
@@ -86,7 +102,9 @@ describe("CaseWorkspace", () => {
     expect(result).toHaveTextContent(
       "Case category: Arrival & Registration",
     );
-    expect(result).toHaveTextContent("The pasted text was not interpreted");
+    expect(result).toHaveTextContent(
+      "The pasted text was validated in memory by the application server but was not interpreted or understood by AI",
+    );
     expect(
       screen.getByRole("heading", {
         name: "Request to complete address registration — fictional sample",
@@ -164,7 +182,9 @@ describe("CaseWorkspace", () => {
     );
 
     const result = await runCurrentMockAnalysis(user);
-    expect(result).toHaveTextContent("The selected file was not opened, read, or interpreted");
+    expect(result).toHaveTextContent(
+      "The selected file was signature-checked in memory by the application server but was not interpreted by AI",
+    );
   });
 
   it("uses RTL for Arabic and adapts the existing visa route", async () => {
@@ -192,4 +212,140 @@ describe("CaseWorkspace", () => {
       screen.getByLabelText("Paste the letter, email, or official message here"),
     ).toHaveAttribute("maxLength", "20000");
   });
+
+  it("displays typed server errors without rendering raw exceptions", async () => {
+    const user = userEvent.setup();
+    fetchMock.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({
+        error: {
+          code: "FILE_SIGNATURE_MISMATCH",
+          message: "<script>raw server exception</script>",
+          requestId: "request-ui-safe-001",
+        },
+      }),
+    } as Response);
+    render(<CaseWorkspace />);
+    await user.type(
+      screen.getByLabelText("Paste the letter, email, or official message here"),
+      VALID_TEXT,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Run mock analysis" }));
+
+    const alert = await screen.findByTestId("analysis-api-error");
+    expect(alert).toHaveTextContent(
+      "The file contents do not match the selected document type.",
+    );
+    expect(alert).toHaveTextContent("FILE_SIGNATURE_MISMATCH");
+    expect(alert).toHaveTextContent("request-ui-safe-001");
+    expect(alert).not.toHaveTextContent("raw server exception");
+    expect(document.querySelector("script")).toBeNull();
+  });
+
+  it("prevents duplicate analysis requests while one is active", async () => {
+    const user = userEvent.setup();
+    let resolveRequest!: (response: Response) => void;
+    fetchMock.mockImplementationOnce(
+      () =>
+        new Promise<Response>((resolve) => {
+          resolveRequest = resolve;
+        }),
+    );
+    render(<CaseWorkspace />);
+    await user.type(
+      screen.getByLabelText("Paste the letter, email, or official message here"),
+      VALID_TEXT,
+    );
+    const button = screen.getByRole("button", { name: "Run mock analysis" });
+
+    fireEvent.click(button);
+    fireEvent.click(button);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    resolveRequest(await successfulResponseForText());
+    expect(await screen.findByTestId("analysis-result")).toBeInTheDocument();
+  });
 });
+
+async function mockSuccessfulAnalyzeFetch(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> {
+  expect(input).toBe("/api/cases/analyze");
+  const formData = init?.body as FormData;
+  const caseInput = caseInputFromFormData(formData);
+  const analysis = await new MockDocumentAnalysisService(0).analyzeDocument(
+    caseInput,
+  );
+  return {
+    ok: true,
+    json: async () => ({
+      analysis,
+      metadata: {
+        requestId: "request-ui-mock",
+        processingMode: "mock",
+        inputKind: caseInput.kind,
+        receivedAt: "2026-07-18T12:00:00.000Z",
+        retentionStatus: "discarded-after-processing",
+      },
+    }),
+  } as Response;
+}
+
+function caseInputFromFormData(formData: FormData): CaseInput {
+  const kind = String(formData.get(CASE_FORM_FIELDS.kind));
+  const outputLanguage = String(
+    formData.get(CASE_FORM_FIELDS.outputLanguage),
+  ) as SupportedLanguage;
+  const categoryValue = formData.get(CASE_FORM_FIELDS.category);
+  const category =
+    typeof categoryValue === "string" && isBureaucracyCategory(categoryValue)
+      ? categoryValue
+      : undefined;
+
+  if (kind === "text") {
+    return {
+      kind,
+      text: String(formData.get(CASE_FORM_FIELDS.text)),
+      outputLanguage,
+      ...(category ? { category } : {}),
+    };
+  }
+  if (kind === "sample") {
+    return {
+      kind,
+      sampleId: String(formData.get(CASE_FORM_FIELDS.sampleId)),
+      outputLanguage,
+      ...(category ? { category } : {}),
+    };
+  }
+  const file = formData.get(CASE_FORM_FIELDS.file) as File;
+  return {
+    kind: "file",
+    outputLanguage,
+    ...(category ? { category } : {}),
+    document: {
+      id: "synthetic-ui-file",
+      file,
+      metadata: {
+        name: file.name,
+        mimeType: file.type,
+        sizeBytes: file.size,
+        selectedAt: "2026-07-18T12:00:00.000Z",
+        source: "upload",
+      },
+    },
+  };
+}
+
+async function successfulResponseForText(): Promise<Response> {
+  const formData = new FormData();
+  formData.set(CASE_FORM_FIELDS.kind, "text");
+  formData.set(CASE_FORM_FIELDS.outputLanguage, "en");
+  formData.set(CASE_FORM_FIELDS.text, VALID_TEXT);
+  return mockSuccessfulAnalyzeFetch("/api/cases/analyze", {
+    method: "POST",
+    body: formData,
+  });
+}

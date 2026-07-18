@@ -8,7 +8,7 @@ export function AnalysisLoadingState() {
             Building your mock route
           </h2>
           <p className="mt-2 text-sm leading-6 text-[#68736d]">
-            Applying the fictional scenario and your language choice. No document content is being read or sent.
+            The BurgerMapper server is validating the input in memory and applying the fictional scenario. Nothing is sent to an AI provider.
           </p>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 
 import { FILE_PICKER_ACCEPT } from "@/lib/file-validation";
+import { MOCK_SERVER_PRIVACY_MESSAGE } from "@/lib/privacy-messages";
 
 interface DocumentDropzoneProps {
   disabled?: boolean;
@@ -90,9 +91,9 @@ export function DocumentDropzone({
       </p>
 
       <aside id="document-privacy" className="rounded-xl border border-[#d9ddd7] bg-white p-4">
-        <p className="text-sm font-semibold text-[#26362e]">Private in this prototype</p>
+        <p className="text-sm font-semibold text-[#26362e]">In-memory mock processing</p>
         <p className="mt-1 text-sm leading-6 text-[#68736d]">
-          Phase 1 keeps your selected file only in this browser tab&apos;s memory. It does not read the file, send it to a server, or save it after you start over or close the tab.
+          {MOCK_SERVER_PRIVACY_MESSAGE}
         </p>
       </aside>
     </div>
