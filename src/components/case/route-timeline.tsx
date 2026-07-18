@@ -3,6 +3,8 @@ import { RESULT_COPY } from "@/i18n/case-copy";
 
 export function RouteTimeline({ analysis }: { analysis: CaseAnalysis }) {
   const copy = RESULT_COPY[analysis.outputLanguage];
+  const claims = new Map((analysis.routeClaims ?? []).map((claim) => [claim.id, claim]));
+  const sources = new Map(analysis.officialSources.map((source) => [source.id, source]));
 
   return (
     <section aria-labelledby="route-heading" className="rounded-2xl border border-[#cbd7d0] bg-[#f5f9f7] p-5 sm:p-6">
@@ -29,6 +31,30 @@ export function RouteTimeline({ analysis }: { analysis: CaseAnalysis }) {
                 </span>
               </div>
               <p className="mt-2 text-sm leading-6 text-[#637068]">{step.description}</p>
+              {(step.claimIds ?? []).map((claimId) => {
+                const claim = claims.get(claimId);
+                if (!claim) return null;
+                return (
+                  <div key={claimId} className="mt-3 rounded-lg border border-[#dce4df] bg-[#f8faf8] p-3 text-xs leading-5 text-[#526158]">
+                    <p>
+                      <span className="font-semibold">{claimKindLabel(claim.kind, analysis.outputLanguage)}: </span>
+                      {claim.text}
+                    </p>
+                    {claim.sourceIds.length ? (
+                      <p className="mt-1 flex flex-wrap gap-x-2 gap-y-1">
+                        {claim.sourceIds.map((sourceId, index) => {
+                          const source = sources.get(sourceId);
+                          return source ? (
+                            <a key={sourceId} href={source.url} target="_blank" rel="noopener noreferrer" dir="ltr" className="font-semibold text-[#176447] underline underline-offset-3 outline-none focus-visible:ring-3 focus-visible:ring-[#176b4d]/35">
+                              [{index + 1}] {source.publisher}<span className="sr-only"> (opens in a new tab)</span>
+                            </a>
+                          ) : null;
+                        })}
+                      </p>
+                    ) : null}
+                  </div>
+                );
+              })}
               <dl className="mt-3 grid gap-2 text-xs text-[#66726b] sm:grid-cols-2">
                 <div>
                   <dt className="font-semibold text-[#45534b]">{copy.responsible}</dt>
@@ -45,4 +71,13 @@ export function RouteTimeline({ analysis }: { analysis: CaseAnalysis }) {
       </ol>
     </section>
   );
+}
+
+function claimKindLabel(kind: NonNullable<CaseAnalysis["routeClaims"]>[number]["kind"], language: CaseAnalysis["outputLanguage"]): string {
+  const labels = {
+    en: { law: "Law", "official-service-guidance": "Official service guidance", "local-administrative-practice": "Berlin administrative practice", "document-fact": "Document fact", "model-inference": "Interpretation", "unresolved-uncertainty": "Unresolved" },
+    de: { law: "Gesetz", "official-service-guidance": "Offizielle Dienstleistungshinweise", "local-administrative-practice": "Berliner Verwaltungspraxis", "document-fact": "Dokumentangabe", "model-inference": "Einordnung", "unresolved-uncertainty": "Ungeklärt" },
+    ar: { law: "قانون", "official-service-guidance": "إرشادات خدمة رسمية", "local-administrative-practice": "ممارسة إدارية في برلين", "document-fact": "حقيقة من المستند", "model-inference": "تفسير", "unresolved-uncertainty": "غير محسوم" },
+  } as const;
+  return labels[language][kind];
 }

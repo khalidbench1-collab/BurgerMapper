@@ -43,6 +43,11 @@ import {
 } from "@/services/case-builder";
 import { AnalysisApiError } from "@/services/server-document-analysis";
 import { ServerDocumentAnalysisService } from "@/services/server-document-analysis";
+import {
+  applyResearchToAnalysis,
+  markResearchUnavailable,
+  ServerSourceResearchService,
+} from "@/services/source-research";
 
 interface RequestErrorState {
   code: CaseAnalysisErrorCode;
@@ -76,12 +81,14 @@ export function CaseWorkspace({
     () => new ServerCaseBuilderService(new ServerDocumentAnalysisService(analysisMode === "openai")),
     [analysisMode],
   );
+  const sourceResearchService = useMemo(() => new ServerSourceResearchService(), []);
   const [caseState, setCaseState] = useState<CaseState>(() => createInitialState(initialCategory));
   const [builderResult, setBuilderResult] = useState<CaseBuilderResult | null>(null);
   const [showQuestion, setShowQuestion] = useState(false);
   const [goalError, setGoalError] = useState<string | null>(null);
   const [requestError, setRequestError] = useState<RequestErrorState | null>(null);
   const [realAnalysisConsent, setRealAnalysisConsent] = useState(false);
+  const [isResearching, setIsResearching] = useState(false);
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
   const requestId = useRef(0);
   const activeRequestController = useRef<AbortController | null>(null);
@@ -102,6 +109,7 @@ export function CaseWorkspace({
     requestId.current += 1;
     activeRequestController.current?.abort();
     activeRequestController.current = null;
+    setIsResearching(false);
     setRequestError(null);
   }
 
@@ -240,6 +248,11 @@ export function CaseWorkspace({
       }
       if (requestId.current !== activeRequest) return;
       const needsClarification = result.profile.sufficiency.state === "needs-clarification";
+      if (!needsClarification) {
+        setIsResearching(true);
+        result = await addOfficialResearch(result, controller.signal);
+      }
+      if (requestId.current !== activeRequest) return;
       setBuilderResult(result);
       setShowQuestion(needsClarification);
       setCaseState((current) => ({ ...current, goalInput: input.goal ?? current.goalInput, category: input.category ?? null, analysis: result.analysis, status: needsClarification ? "needs-clarification" : "analysis-complete" }));
@@ -249,6 +262,7 @@ export function CaseWorkspace({
       setRequestError({ code: apiError.code, message: apiError.message, requestId: apiError.requestId });
       setCaseState((current) => ({ ...current, status: "error", validationError: null }));
     } finally {
+      setIsResearching(false);
       if (activeRequestController.current === controller) activeRequestController.current = null;
     }
   }
@@ -281,13 +295,34 @@ export function CaseWorkspace({
       }, builderResult, corrections);
       return;
     }
-    setBuilderResult((current) => {
-      if (!current) return current;
-      const updated = answerCaseBuilderQuestion(current, answer);
-      setCaseState((state) => ({ ...state, analysis: updated.analysis, status: "analysis-complete" }));
-      return updated;
-    });
+    if (!builderResult || activeRequestController.current) return;
+    const updated = answerCaseBuilderQuestion(builderResult, answer);
     setShowQuestion(false);
+    const controller = new AbortController();
+    activeRequestController.current = controller;
+    const activeRequest = requestId.current + 1;
+    requestId.current = activeRequest;
+    setBuilderResult(updated);
+    setIsResearching(true);
+    setCaseState((state) => ({ ...state, analysis: updated.analysis, status: "mock-analyzing" }));
+    void addOfficialResearch(updated, controller.signal).then((researched) => {
+      if (requestId.current !== activeRequest) return;
+      setBuilderResult(researched);
+      setCaseState((state) => ({ ...state, analysis: researched.analysis, status: "analysis-complete" }));
+    }).finally(() => {
+      if (activeRequestController.current === controller) activeRequestController.current = null;
+      setIsResearching(false);
+    });
+  }
+
+  async function addOfficialResearch(result: CaseBuilderResult, signal: AbortSignal): Promise<CaseBuilderResult> {
+    try {
+      const research = await sourceResearchService.research(result.profile, result.analysis, signal);
+      return { ...result, analysis: applyResearchToAnalysis(result.analysis, research) };
+    } catch {
+      if (signal.aborted) throw new DOMException("Research cancelled", "AbortError");
+      return { ...result, analysis: markResearchUnavailable(result.analysis) };
+    }
   }
 
   function handleSaveContext(goal: string, category: BureaucracyCategory | null) {
@@ -300,9 +335,9 @@ export function CaseWorkspace({
     if (input) void runCaseBuilder(input, builderResult, corrections);
   }
 
-  const isBusy = caseState.status === "validating" || caseState.status === "mock-analyzing";
+  const isBusy = caseState.status === "validating" || caseState.status === "mock-analyzing" || isResearching;
   const canAnalyze = canBuildCase(caseState) && !isBusy && (analysisMode === "mock" || realAnalysisConsent);
-  const liveMessage = requestError?.message ?? getLiveMessage(caseState, analysisMode);
+  const liveMessage = requestError?.message ?? (isResearching ? "Checking official sources for the ready case profile." : getLiveMessage(caseState, analysisMode));
 
   return (
     <div className="space-y-6">
@@ -315,7 +350,7 @@ export function CaseWorkspace({
             <button type="button" onClick={handleStartOver} disabled={isBusy} className="rounded-xl border border-[#bfc7c2] bg-white px-4 py-2.5 text-sm font-semibold text-[#35443c] outline-none focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:opacity-60">Start over</button>
           </div>
           <CaseProfileSummary key={builderResult.profile.id} profile={builderResult.profile} isMock={builderResult.analysis.isMock} disabled={isBusy} onSaveContext={handleSaveContext} onChangeAnswer={() => { setShowQuestion(true); setCaseState((current) => ({ ...current, status: "needs-clarification" })); }} />
-          {isBusy ? <AnalysisLoadingState mode={analysisMode} /> : null}
+          {isBusy ? <AnalysisLoadingState mode={analysisMode} message={isResearching ? "Checking official sources and connecting them to route claims…" : undefined} /> : null}
           {showQuestion && !isBusy ? (
             <div dir={builderResult.analysis.outputLanguage === "ar" ? "rtl" : "ltr"} lang={builderResult.analysis.outputLanguage}>
               <ClarificationCard analysis={builderResult.analysis} onAnswer={handleClarification} />

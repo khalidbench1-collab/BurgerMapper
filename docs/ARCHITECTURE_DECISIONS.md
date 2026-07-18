@@ -185,3 +185,35 @@ These dated records capture durable technical choices. Product-level choices and
 - **Reason:** Explicit ceilings make failure and spend behavior predictable enough for later evaluation without adding persistence or a rate-limit database.
 - **Tradeoff:** Difficult documents may time out or need more context; current per-case ceiling is enforced inside the provider request contract rather than across distributed anonymous sessions.
 - **Revisit when:** Phase 6 measures quality, latency, cost, abuse, and provider-limit behavior with synthetic evaluations.
+
+## 2026-07-18 — Post-sufficiency official-source research boundary
+
+- **Context:** A completed `CaseProfile` needs current official evidence, but the analysis endpoint may contain private goals and document data that official-source retrieval does not need.
+- **Decision:** Add `POST /api/cases/research` as a separate JSON boundary invoked only for a `sufficient` profile. Its strict request accepts only an abstract route topic, optional category, output language, and sufficiency state; extra fields are rejected.
+- **Reason:** The boundary enforces research timing and data minimization independently of the browser and analysis provider.
+- **Tradeoff:** The client performs one additional application-server request after clarification, and topic coverage is deliberately narrower than arbitrary goal interpretation.
+- **Revisit when:** Phase 6 evaluation shows that a richer abstract profile is necessary; any added field requires a privacy and query-leakage review.
+
+## 2026-07-18 — Retrieval, validation, synthesis, and rendering separation
+
+- **Context:** Search results, validated official sources, supported claims, and user-visible steps have different trust levels and failure modes.
+- **Decision:** Separate an `OfficialSourceRetriever`, exact-host allowlist and canonical/status/recency validation, atomic claim synthesis, and UI route/source rendering. The Phase 5 provider uses a dated curated official-source snapshot and exposes a replaceable retriever interface; automated tests inject synthetic records and never depend on live web availability.
+- **Reason:** Each trust transition is testable, retrieved content cannot directly control actions, and unsupported evidence can be filtered before route rendering.
+- **Tradeoff:** The current snapshot does not automatically detect source changes after its access date. A live refresh provider still needs bounded retrieval, parsing, monitoring, and evaluation.
+- **Revisit when:** Phase 6 establishes freshness thresholds, outage behavior, conflict precision, and a privacy-safe live-refresh strategy.
+
+## 2026-07-18 — Explicit source-evidence graph
+
+- **Context:** A generic list of links can look authoritative without proving any route statement.
+- **Decision:** Extend `CaseAnalysis` compatibly with optional `RouteClaim`, `CaseResearchSummary`, and deadline-provenance records; extend sources with supported claim IDs, authority type, jurisdiction, conflict, HTTP status, and access time; extend steps with claim IDs. Existing source and analysis fields remain valid for mock placeholders.
+- **Reason:** The route can place citations beside the exact claim and distinguish federal law, official service guidance, Berlin practice, document facts, inference, and unresolved uncertainty.
+- **Tradeoff:** Claim/source/step IDs must remain internally coherent and multilingual text must be authored or generated consistently.
+- **Revisit when:** Evaluation requires versioned evidence, quoted passages, machine-readable statutory references, or claim-level confidence beyond the current support states.
+
+## 2026-07-18 — Official pages remain untrusted content
+
+- **Context:** Even an official page can contain irrelevant instructions, compromised content, or links that should not trigger application actions.
+- **Decision:** Page text is evidence only. It cannot override application instructions, request secrets, trigger tools, follow links, or create a claim without validated metadata and an explicit support relationship. Full pages, queries, and browsing traces are not persisted.
+- **Reason:** Official-domain status narrows provenance but does not eliminate prompt injection or content-integrity risk.
+- **Tradeoff:** Useful page changes may be ignored until the curated claim record is refreshed and reviewed.
+- **Revisit when:** A live retrieval/parser implementation is evaluated against adversarial official-page fixtures and content-change monitoring.

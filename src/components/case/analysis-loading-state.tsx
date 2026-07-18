@@ -1,4 +1,4 @@
-export function AnalysisLoadingState({ mode = "mock" }: { mode?: "mock" | "openai" }) {
+export function AnalysisLoadingState({ mode = "mock", message }: { mode?: "mock" | "openai"; message?: string }) {
   return (
     <section aria-labelledby="analysis-loading-heading" className="rounded-2xl border border-[#d4d9d5] bg-white p-6 sm:p-8">
       <div className="flex items-start gap-4">
@@ -8,9 +8,9 @@ export function AnalysisLoadingState({ mode = "mock" }: { mode?: "mock" | "opena
             {mode === "mock" ? "Building your mock route" : "Analyzing your case"}
           </h2>
           <p className="mt-2 text-sm leading-6 text-[#68736d]">
-            {mode === "mock"
+            {message ?? (mode === "mock"
               ? "The BurgerMapper server is validating the input in memory and applying the fictional scenario. Nothing is sent to an AI provider."
-              : "The BurgerMapper server is validating the input and waiting for a structured OpenAI response. You can start over to cancel."}
+              : "The BurgerMapper server is validating the input and waiting for a structured OpenAI response. You can start over to cancel.")}
           </p>
         </div>
       </div>

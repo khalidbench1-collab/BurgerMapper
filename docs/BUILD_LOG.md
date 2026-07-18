@@ -429,3 +429,46 @@ Phase 5 should research official Berlin and German federal sources only after a 
 ## 2026-07-18 — Phase 5 synthetic smoke-test standing authorization
 
 This documentation-only update did not start Phase 5 or make an API request. The user granted standing authorization for exactly one live `gpt-5.6-luna` Responses API smoke request when Phase 5 begins. `AGENTS.md`, the Phase 5 master prompt, phase status, README, and decisions now bound that exception to short synthetic `input_text`, `low` reasoning, `store: false`, at most 2,000 output tokens, no files or private data, no tools, no retry, no verification/tone/second call, and an estimated billable cost no greater than USD 0.10. Only content-free result metadata may be recorded. All broader development, research, evaluation, and production API traffic remains permission-gated.
+
+## 2026-07-18 — Phase 5 official-source research and cited personalized routes
+
+### Objective, start, and bounded Luna smoke
+
+Add official-source evidence only after a sufficiently complete `CaseProfile`, connect atomic claims to route steps, and preserve privacy, multilingual output, mock fallback, and honest uncertainty. The worktree was clean on `main` at `b3cdd216990a08d74c4c27e2968c0fc62fe33c1a` before Phase 5 began.
+
+The one standing-authorized synthetic Responses request was made before implementation under the exact cap. It used `gpt-5.6-luna`, low reasoning, `store: false`, no tool, retry, verification, tone, file, private data, or second call. It passed on 2026-07-18 with 2,252 ms latency, 47 input tokens, 30 output tokens, 77 total tokens, a schema-valid result, and estimated cost USD 0.000227. Project data-sharing status was unknown. No prompt or output content was recorded. The user later allowed another call if necessary, but no second call was needed or made.
+
+### Source architecture and allowlist
+
+- Added `POST /api/cases/research`, strict typed request/response/errors, no-store and discard metadata, and a server-enforced `sufficient` profile gate.
+- The browser sends only an abstract route topic, optional category, language, and sufficiency flag. The endpoint rejects extra private fields and never needs the goal, answer text, name, raw profile, pasted content, document, model output, or personal identifier.
+- Added a replaceable `OfficialSourceRetriever`, deterministic curated provider, URL/metadata/status/recency validation, claim synthesis, conflict detection, step mapping, and unavailable/no-source fallback.
+- Allowed exact HTTPS hosts: `service.berlin.de` for Berlin service guidance; `www.berlin.de` for Berlin authorities; `www.gesetze-im-internet.de` for federal law; and `www.elster.de` for official tax administration. Cross-host redirects, non-official URLs, stale records, unavailable responses, and incomplete metadata do not support claims.
+- The dated source snapshot was inspected on 2026-07-18 and covers the fictional residence-renewal, address-registration, and freelance tax-registration routes. Representative official pages: [Berlin residence registration](https://service.berlin.de/dienstleistung/120686/), [Federal Registration Act section 17](https://www.gesetze-im-internet.de/bmg/__17.html), [LEA contact/application guidance](https://www.berlin.de/einwanderung/ueber-uns/kontakt/artikel.1394180.php), [Residence Act section 81](https://www.gesetze-im-internet.de/aufenthg_2004/__81.html), [Berlin tax opening guidance](https://www.berlin.de/sen/finanzen/steuern/downloads/artikel.9770.php), and the [ELSTER tax-registration questionnaire](https://www.elster.de/eportal/formulare-leistungen/alleformulare/fseeun).
+- Runtime live refresh, unrestricted browsing, and private case-derived search queries were not added. This is an explicit freshness limitation, not a claim that the source catalog updates itself.
+
+### Contracts, route behavior, and safety
+
+- Evolved `SourceReference` backward-compatibly with supported claim IDs, authority type, jurisdiction, conflict state, response status, and access time.
+- Added optional `RouteClaim`, research summary, deadline provenance, and step claim IDs to `CaseAnalysis`; existing mock placeholders remain valid.
+- Rendered law, official service guidance, Berlin administrative practice, document fact, inference, and uncertainty as distinct evidence kinds. Verified citations appear beside exact steps and source cards show their support scope.
+- Labelled detected letter deadlines as document facts that require confirmation against the original. Official research cannot silently overwrite extracted facts.
+- Conflicts, no-source results, stale/unavailable evidence, and unsupported topics keep limitations and a responsible-authority escalation rather than presenting legal certainty.
+- Retrieved page content remains untrusted evidence and cannot override instructions, trigger links/tools, request secrets, or create claims without validated metadata and explicit support.
+- English, German, and Arabic claims are deterministic; Arabic result containers remain RTL while dates, identifiers, and source links remain LTR.
+
+### Tests, quality gates, and fixes
+
+- Expanded the suite from 107 to 128 tests across 16 files. Coverage includes sufficiency gating, abstract privacy payloads, allowlist acceptance/rejection, same-host and cross-host redirects, metadata/recency/status validation, atomic claim mapping, law/guidance/practice labels, unsupported downgrade, conflict, no-source, injection boundary, multilingual claims, Arabic LTR URLs, typed endpoint errors, cited UI rendering, and all previous goal/document/provider/correction/reset/print/accessibility regressions.
+- `npm run lint` — passed with no findings.
+- `npm test` — passed: 16 files and 128 tests.
+- `npm run build` — passed with strict TypeScript; `/api/cases/research` appears as a dynamic route alongside the existing routes.
+- `npm audit` — passed with 0 vulnerabilities; no dependency or lockfile change was required.
+- Local HTTP checks covered `/`, `/case`, the category query, the manifest, existing mock analysis, sufficient research success, insufficient-profile rejection, non-official/private-field rejection, no-source behavior, cited route data, and retention headers.
+- Initial tests could not resolve a `server-only` marker because the project does not carry that package; keeping the modules exclusively under the server import path preserved the boundary without adding a dependency. Claim de-duplication initially hid the law/guidance distinction for the same deadline; separate atomic claim IDs fixed the evidence model.
+
+### Codex collaboration and next phase
+
+Codex verified official OpenAI model/pricing documentation, ran the single authorized content-free smoke request, inspected current official government pages, designed the privacy-minimal research boundary, implemented evidence contracts and cited-route UI, wrote synthetic adversarial and regression tests, and reconciled all Build Week records. No real letter, private document, live research query, stored page, unrestricted web search, deployment, or Phase 6 evaluation work was added.
+
+Phase 6 should build the representative synthetic evaluation set and release-blocking reliability, safety, citation, latency, cost, outage, abuse, multilingual, RTL, accessibility, dependency, and privacy controls defined in the master plan. Do not begin it automatically.

@@ -22,6 +22,15 @@ export function DeadlineCard({ analysis }: { analysis: CaseAnalysis }) {
           {copy.urgency}: {copy.urgencyLevel[analysis.urgency]}
         </p>
       </div>
+      {analysis.deadlineProvenance?.confirmationRequired ? (
+        <p className="mt-3 text-xs leading-5 text-[#6b554a]">
+          {analysis.outputLanguage === "de"
+            ? "Dokumentangabe: Prüfen Sie dieses Datum am Originalschreiben; es wurde nicht durch eine offizielle Quelle bestätigt."
+            : analysis.outputLanguage === "ar"
+              ? "حقيقة من المستند: أكّد هذا التاريخ من الخطاب الأصلي؛ لم يتم التحقق منه بواسطة مصدر رسمي."
+              : "Document fact: confirm this date against the original letter; it has not been verified by an official source."}
+        </p>
+      ) : null}
 
       <div className="mt-5 border-t border-[#ead5ca] pt-5">
         <p className="text-sm font-semibold text-[#5e4539]">{copy.clarification}</p>

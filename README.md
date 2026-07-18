@@ -6,9 +6,9 @@ BurgerMapper is a Berlin-first bureaucracy navigator. A user can begin by descri
 
 The Build Week target is to let a user state a goal, optionally add an official German letter as text, PDF, or image, receive a plain-language explanation, answer only clarification questions that could change the route, and get personalized next steps backed by official German government sources. The interface is in English, with generated routes in English, German, and Arabic.
 
-Phase 4 adds a server-only OpenAI Responses API provider behind the secure Phase 2 boundary while preserving the Phase 3 goal-first mock workflow. Real mode is consent-gated and schema-validated; mock mode remains the development and demo default.
+Phase 5 adds official-source research after the structured case profile is sufficient. The route—not search results—remains the product: supported changing claims are connected to official Berlin or German federal evidence beside the relevant step, while document facts, inference, conflict, and uncertainty remain distinct.
 
-## Phase 4 real and mock workflow
+## Phase 5 cited-route workflow
 
 - Goal-first landing page at `/` and case workspace at `/case`, led by “What do you need to get done?”.
 - Goal-only cases are supported. Pasted text, PDF/image upload, and the fictional sample remain optional evidence through the same route flow.
@@ -26,6 +26,11 @@ Phase 4 adds a server-only OpenAI Responses API provider behind the secure Phase
 - An editable case summary for correcting the goal, category, or previous answer without starting over; the mock route is regenerated from the corrected profile.
 - A typed analysis contract covering document facts, plain-language interpretation, deadline and urgency, requested action, required documents, uncertainty, adaptive next steps, unverified source placeholders, and a legal-information disclaimer.
 - Print-friendly result styling and clear separation between extracted facts, interpretation, uncertainty, action, and sources.
+- A separate `POST /api/cases/research` boundary that accepts only an abstract route topic, optional category, language, and profile-sufficiency state—never a goal, name, raw letter, pasted text, file, or model response.
+- Official research starts only after the profile is sufficient. Before the consequential question is answered, the endpoint returns a safe typed error.
+- Atomic route claims distinguish federal law, official service guidance, Berlin administrative practice, document facts, inference, and unresolved uncertainty.
+- Citations appear beside the exact supported route step. Source cards show publisher, title, canonical URL, domain, access date, jurisdiction, support relationship, verification status, and conflict state.
+- Deadlines detected in a letter are labelled as document facts and must be confirmed against the original unless an official source separately supports them.
 
 Six visible orientation categories are available on the landing page and in the case workflow:
 
@@ -41,6 +46,8 @@ Category selection is optional. It helps users begin without knowing an official
 Mock mode does not analyze arbitrary goals, text, or documents. It demonstrates the expected profile, clarification, and route structure with fictional content and explicitly says that the goal or evidence was not interpreted.
 
 Real mode maps goal and pasted content to `input_text`, verified PDFs to `input_file`, and verified PNG/JPEG/WebP images to `input_image`. The server uses the official OpenAI SDK and Responses API with `gpt-5.6-luna` by default, configurable through `OPENAI_MODEL`. Structured Outputs are runtime-validated with Zod for document interpretation, profile facts and uncertainty, the next-question decision, and the route. One narrowly triggered verification pass is allowed only for high risk, source conflict, suspected unsupported claims, or failed validation; it is never used to polish tone.
+
+The current official-source provider is a deterministic server-side snapshot inspected on 2026-07-18. It covers the fictional residence-permit renewal, Berlin address registration, and freelance tax-registration routes. Allowed domains are limited to `service.berlin.de`, `www.berlin.de`, `www.gesetze-im-internet.de`, and `www.elster.de`. Other topics retain an honest no-source or unverified state. Automated tests do not depend on live web availability, and the application does not yet refresh sources at request time.
 
 ## Mock configuration
 
@@ -94,7 +101,7 @@ Prerequisites: Node.js 20.9 or newer and npm.
 
 4. Open `http://localhost:3000`.
 
-Run the Phase 4 checks with:
+Run the Phase 5 checks with:
 
 ```bash
 npm test
@@ -114,9 +121,9 @@ No API key is required for mock mode. To test real mode, configure the key priva
 
 ## Current implementation status
 
-Phase 4 is complete at the implementation and mocked-transport level. A user can start with a goal alone or add pasted text, PDF/image evidence, the trusted sample, an optional category, and an output language. One validated application-server endpoint returns the existing `CaseAnalysis` plus an optional structured `CaseProfile`. Real mode uses explicit consent, strict schemas, one-question decisions, answer-driven profile/route rebuilding, task-specific reasoning, cancellation, safe typed errors, bounded retry, request/output ceilings, and selective verification. Mock mode remains fully operational without a key.
+Phase 5 is complete. A user can start with a goal alone or add pasted text, PDF/image evidence, the trusted sample, an optional category, and an output language. The analysis boundary returns `CaseAnalysis` plus an optional structured `CaseProfile`; after sufficiency, the source-research boundary returns atomic claims, official evidence, and step mappings. Real analysis remains consent-gated and mock analysis remains fully operational without a key.
 
-The automated suite contains 107 passing tests across 13 files. All OpenAI provider tests use an injected synthetic transport and cannot spend API credit.
+The automated suite contains 128 passing tests across 16 files. Automated OpenAI provider tests use an injected synthetic transport and cannot spend API credit. One separately authorized, bounded synthetic Luna smoke request succeeded on 2026-07-18 with 77 total tokens and an estimated cost of USD 0.000227; no prompt or output content was recorded.
 
 The remaining Build Week work is governed by a permanent phase-gated execution system. [AGENTS.md](AGENTS.md) contains canonical repository rules, [INSTRUCTIONS.md](INSTRUCTIONS.md) explains safe operation, and [docs/MASTER_BUILD_PLAN.md](docs/MASTER_BUILD_PLAN.md) contains standalone prompts for Phases 3–8. [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md) is the authoritative state record.
 
@@ -126,13 +133,13 @@ To begin the next eligible phase in a fresh Codex session, use exactly:
 Read AGENTS.md, docs/MASTER_BUILD_PLAN.md, and docs/PHASE_STATUS.md. Execute the first phase marked NOT STARTED whose prerequisites are complete. Follow its full prompt. Stop after its commit and final report. Never automatically begin the next phase.
 ```
 
-Phase 5 is next: official-source research and cited personalized routes. It must not begin automatically.
+Phase 6 is next: reliability, safety, evaluation, and cost controls. It must not begin automatically.
 
 Current limitations:
 
 - No local PDF text extraction or OCR; real mode sends supported files directly to the Responses API.
-- No official-source retrieval or verification. Real results contain no verified citations, and mock results retain clearly labelled placeholders.
-- No live real API smoke request was run during Phase 4, so model availability for the configured API project and real-output quality are not yet empirically confirmed. A standing authorization now permits exactly one tightly bounded synthetic `gpt-5.6-luna` smoke request at the start of Phase 5; it does not authorize real documents, research calls, retries, or broader API traffic.
+- Official sources are a narrow dated snapshot, not a live crawler. Only three fictional route topics have curated cited evidence; other categories retain an honest no-source or placeholder state.
+- The successful live Luna smoke established project/model/schema access only. It did not evaluate real document quality, legal accuracy, multilingual quality, source research, or production behavior.
 - No login, database, local storage, analytics, tracking, or deployment.
 - A model can be wrong, miss text, or misread a deadline; outputs remain legal information rather than legal advice.
 
@@ -140,11 +147,11 @@ The request planner now feeds the real server provider: pasted text and the trus
 
 ## Privacy behavior
 
-Before analysis, the goal, answers, optional text, and selected `File` remain in React state for the open tab. On analysis they are sent to the BurgerMapper server as multipart form data. The server normalizes text, verifies document type/signature, and processes the request in memory. Mock mode makes no third-party transfer. Real mode requires explicit consent and sends the minimum needed goal, evidence, category/language context, and security instructions to OpenAI; the request sets `store: false`. BurgerMapper does not intentionally persist or log content and reports application-memory discard, but this does not promise provider deletion: OpenAI's published default abuse-monitoring retention may be up to 30 days, and any project data-sharing choice also applies. Reset, refresh, or tab close clears browser state.
+Before analysis, the goal, answers, optional text, and selected `File` remain in React state for the open tab. On analysis they are sent to the BurgerMapper server as multipart form data. The server normalizes text, verifies document type/signature, and processes the request in memory. Mock mode makes no third-party transfer. Real mode requires explicit consent and sends the minimum needed goal, evidence, category/language context, and security instructions to OpenAI; the request sets `store: false`. After sufficiency, research sends only an abstract topic, category, language, and sufficiency flag to the BurgerMapper server; the curated provider sends no private query or case content externally. BurgerMapper does not intentionally persist or log content and reports application-memory discard, but this does not promise provider deletion for real OpenAI analysis: published default abuse-monitoring retention may be up to 30 days, and project data-sharing choices also apply. Reset, refresh, or tab close clears browser state.
 
 ## Security
 
-AI calls are server-side only. Local `.env*` files are ignored except for the safe `.env.example`; never commit credentials or expose an OpenAI API key to browser code. The public endpoint revalidates all browser input, accepts only known sample IDs and supported MIME/signature pairs, requires real-transfer consent, returns safe typed errors without stack traces or raw provider messages, and marks responses `no-store`. Goals and documents are untrusted evidence that cannot override application instructions or trigger link following. No chain of thought is requested or retained. The app has no analytics, tracking, remote font, remote application asset, or `dangerouslySetInnerHTML`.
+AI calls are server-side only. Local `.env*` files are ignored except for the safe `.env.example`; never commit credentials or expose an OpenAI API key to browser code. The public endpoints revalidate browser input, reject private fields at the research boundary, require real-transfer consent, return safe typed errors without stack traces or raw provider messages, and mark responses `no-store`. Goals, documents, and retrieved pages are untrusted evidence that cannot override application instructions or trigger link following. Canonical URLs must remain HTTPS and on the allowlist; cross-domain redirects and stale, unavailable, or incomplete evidence are downgraded. No chain of thought is requested or retained. The app has no analytics, tracking, remote font, remote application asset, or `dangerouslySetInnerHTML`.
 
 ## Build Week provenance
 
@@ -152,7 +159,7 @@ The BurgerMapper concept and an earlier, unrelated prototype predated OpenAI Bui
 
 ## How Codex contributed
 
-Codex established the Phase 0 repository and helped implement Phases 1, 1.5, 2, 3, and 4: typed domain and transport contracts, client/server validation, the in-memory API boundary, magic-byte checks, the multilingual mock service, structured `CaseProfile`, guided builder, official OpenAI SDK boundary, Responses request mapping, Zod Structured Outputs, consent, prompt-injection controls, provider error/cost limits, tests, audits, verification, and documentation. No real `gpt-5.6-luna` response was generated during Phase 4, so the submission must not yet claim model-output evidence.
+Codex established the Phase 0 repository and helped implement Phases 1 through 5: typed contracts, validation, in-memory boundaries, multimodal intake, structured `CaseProfile`, guided builder, server-only Responses integration, consent, prompt-injection controls, official-domain allowlisting, atomic claim-to-source mappings, cited-route rendering, synthetic tests, audits, verification, and documentation. The only live Luna evidence is the content-free Phase 5 synthetic smoke metadata; no real personal document was used.
 
 ## Codex `/feedback` Session ID
 

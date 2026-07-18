@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CaseWorkspace } from "@/components/case/case-workspace";
 import { CASE_FORM_FIELDS } from "@/domain/analysis-api";
+import { RESEARCH_CASE_ENDPOINT } from "@/domain/research-api";
 import { isBureaucracyCategory } from "@/domain/categories";
 import type { CaseInput, SupportedLanguage } from "@/domain/case";
 import { MockDocumentAnalysisService } from "@/services/document-analysis";
@@ -213,7 +214,7 @@ describe("CaseWorkspace", () => {
     await user.click(screen.getByRole("button", { name: "Save and rebuild question" }));
 
     expect(await screen.findByRole("heading", { name: /Is this address your primary residence/ })).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls.filter(([url]) => url === "/api/cases/analyze")).toHaveLength(2);
     expect(screen.getByText(UPDATED_GOAL)).toBeInTheDocument();
     expect(screen.getByText(/2 corrections remembered/)).toBeInTheDocument();
     expect(screen.queryByTestId("analysis-result")).not.toBeInTheDocument();
@@ -287,9 +288,55 @@ describe("CaseWorkspace", () => {
     expect(formData.get(CASE_FORM_FIELDS.consentToOpenAI)).toBe("true");
     expect(Array.from(formData.keys())).not.toContain("OPENAI_API_KEY");
   });
+
+  it("researches only after sufficiency and sends no goal or evidence content", async () => {
+    const user = userEvent.setup();
+    render(<CaseWorkspace initialCategory="visa-immigration" />);
+    await user.type(screen.getByLabelText("What do you need to get done?"), VALID_GOAL);
+    await buildUntilQuestion(user);
+
+    expect(fetchMock.mock.calls.some(([url]) => url === RESEARCH_CASE_ENDPOINT)).toBe(false);
+    await answerAndGetRoute(user);
+
+    const researchCall = fetchMock.mock.calls.find(([url]) => url === RESEARCH_CASE_ENDPOINT);
+    expect(researchCall).toBeDefined();
+    const body = JSON.parse(String(researchCall?.[1]?.body));
+    expect(body).toEqual({
+      topic: "residence-permit-renewal",
+      category: "visa-immigration",
+      outputLanguage: "en",
+      profileSufficiency: "sufficient",
+    });
+    expect(JSON.stringify(body)).not.toContain(VALID_GOAL);
+  });
 });
 
 async function mockSuccessfulAnalyzeFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  if (input === RESEARCH_CASE_ENDPOINT) {
+    return {
+      ok: true,
+      json: async () => ({
+        research: {
+          sources: [],
+          claims: [],
+          stepEvidence: [],
+          summary: {
+            status: "no-sources",
+            researchedAt: "2026-07-18T12:05:00.000Z",
+            provider: "curated-official-sources",
+            limitations: ["Synthetic UI fallback."],
+            escalation: "Confirm with the authority.",
+          },
+        },
+        metadata: {
+          requestId: "research-ui-mock",
+          receivedAt: "2026-07-18T12:05:00.000Z",
+          retentionStatus: "discarded-after-processing",
+          inputScope: "abstract-route-topic-only",
+        },
+      }),
+    } as Response;
+  }
   expect(input).toBe("/api/cases/analyze");
   const formData = init?.body as FormData;
   const caseInput = caseInputFromFormData(formData);

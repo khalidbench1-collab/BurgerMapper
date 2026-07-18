@@ -1,6 +1,6 @@
 # Build Week submission checklist
 
-Completion of the final submission is not claimed. Phase 4 provides a locally tested goal-first mock workflow plus a consent-gated server-only OpenAI provider verified with synthetic mocked transport and 107 automated tests. No live model request, official-source research, deployment, or final submission is claimed. Verify every item again against the final competition rules.
+Completion of the final submission is not claimed. Phase 5 provides a locally tested goal-first workflow, consent-gated server-only OpenAI provider, post-sufficiency cited routes for three fictional topics, 128 automated tests, and one content-free synthetic Luna access smoke. The source snapshot is not live research, and no deployment or final submission is claimed. Verify every item again against the final competition rules.
 
 - [ ] Working project
 - [ ] Chosen category

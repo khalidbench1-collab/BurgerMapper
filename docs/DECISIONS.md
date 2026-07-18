@@ -112,3 +112,16 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Decision | Reason |
 | --- | --- |
 | Use the user's 2026-07-18 standing authorization for exactly one bounded synthetic Luna smoke request at the start of Phase 5 | One real request can verify project-level model access and the implemented Responses/Structured Outputs boundary before source-research complexity is added. The exception is limited to synthetic `input_text`, `low` reasoning, `store: false`, 2,000 output tokens, no tools/retry/verification/second call, and an estimated billable cost no greater than USD 0.10. It supersedes the Phase 4 call-permission decision only for this exact request; every other API call still requires specific permission. |
+
+## Phase 5 official-source decisions
+
+| Decision | Reason |
+| --- | --- |
+| Enforce profile sufficiency before research | A route-changing answer can change the relevant procedure, documents, and evidence. Researching earlier wastes work and can attach generic or misleading sources. |
+| Send only an abstract route topic to the research endpoint | Category, language, topic, and sufficiency are enough for the current curated provider. Names, goals, letters, files, reference numbers, and profile text add privacy risk without improving retrieval. |
+| Start with four exact official hostnames | `service.berlin.de`, `www.berlin.de`, `www.gesetze-im-internet.de`, and `www.elster.de` cover the three fictional demo routes while preventing aggregators or lookalike domains from becoming primary evidence. HTTPS, exact hostname, same-host canonical redirects, metadata, status, and recency are validated. |
+| Model atomic claims separately from source cards | Explicit claim IDs and step mappings make citations evidentiary rather than decorative. A source supports only the claims listed in its contract. |
+| Preserve law, service guidance, local practice, document fact, inference, and uncertainty as different kinds | Users should not mistake a Berlin service page for federal law, or a model interpretation for official policy. |
+| Display conflicts and downgrade missing evidence | BurgerMapper does not silently select among official conflicts. Stale, unavailable, incomplete, redirected, or non-allowlisted evidence cannot support a certain route instruction and triggers limitation/escalation copy. |
+| Treat a letter deadline as a document fact by default | A date detected in the user's letter comes from that document, not from web research. The UI requires confirmation against the original unless separate official evidence supports the deadline. |
+| Use a dated curated provider for the Phase 5 demo | The server boundary, validation, claim synthesis, and rendering are fully replaceable and deterministic offline. Runtime live refresh and unrestricted web search are deferred until evaluation proves their reliability and privacy behavior. |

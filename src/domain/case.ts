@@ -37,7 +37,61 @@ export interface UploadedDocument {
 export type SourceVerificationStatus =
   | "placeholder-unverified"
   | "needs-review"
-  | "verified";
+  | "verified"
+  | "unavailable"
+  | "conflicting";
+
+export type SourceAuthorityType =
+  | "federal-law"
+  | "official-service-guidance"
+  | "local-administrative-practice";
+
+export type SourceConflictStatus = "none" | "conflict";
+
+export type RouteClaimKind =
+  | "law"
+  | "official-service-guidance"
+  | "local-administrative-practice"
+  | "document-fact"
+  | "model-inference"
+  | "unresolved-uncertainty";
+
+export type ClaimSupportStatus =
+  | "supported"
+  | "partially-supported"
+  | "unsupported"
+  | "conflicting";
+
+export interface RouteClaim {
+  id: string;
+  text: string;
+  kind: RouteClaimKind;
+  supportStatus: ClaimSupportStatus;
+  sourceIds: string[];
+  jurisdiction: string;
+}
+
+export type ResearchStatus =
+  | "not-started"
+  | "verified"
+  | "partial"
+  | "no-sources"
+  | "conflict"
+  | "unavailable";
+
+export interface CaseResearchSummary {
+  status: ResearchStatus;
+  researchedAt: string | null;
+  provider: "curated-official-sources" | "mock-fallback";
+  limitations: string[];
+  escalation: string | null;
+}
+
+export interface DeadlineProvenance {
+  kind: "document-fact" | "official-source" | "user-provided" | "unknown";
+  sourceIds: string[];
+  confirmationRequired: boolean;
+}
 
 export interface SourceReference {
   id: string;
@@ -48,6 +102,11 @@ export interface SourceReference {
   accessedAt: string | null;
   supports: string[];
   verificationStatus: SourceVerificationStatus;
+  supportedClaimIds?: string[];
+  authorityType?: SourceAuthorityType;
+  jurisdiction?: string;
+  conflictStatus?: SourceConflictStatus;
+  httpStatus?: number;
 }
 
 export interface RequiredDocument {
@@ -67,6 +126,7 @@ export interface NextStep {
   timing: string;
   status: NextStepStatus;
   officialSourceIds: string[];
+  claimIds?: string[];
 }
 
 export type ClarificationAnswerId = string;
@@ -101,6 +161,9 @@ export interface CaseAnalysis {
   clarificationQuestion: ClarificationQuestion;
   nextSteps: NextStep[];
   officialSources: SourceReference[];
+  routeClaims?: RouteClaim[];
+  research?: CaseResearchSummary;
+  deadlineProvenance?: DeadlineProvenance;
   disclaimer: string;
   generatedAt: string;
   outputLanguage: SupportedLanguage;

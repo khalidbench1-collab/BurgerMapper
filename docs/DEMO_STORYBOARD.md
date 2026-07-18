@@ -1,6 +1,6 @@
-# Three-minute demo storyboard — Phase 4 draft
+# Three-minute demo storyboard — Phase 5 draft
 
-> Draft based on the Phase 4 implementation. Mock mode is fully working. Real OpenAI analysis is implemented and covered with mocked transport, but no paid live request has been authorized or run; do not present real output in the demo until one synthetic live check is separately approved and passes. No source search or verification exists yet.
+> Draft based on the Phase 5 implementation. Mock mode and the post-sufficiency cited route are fully working. The one authorized synthetic Luna smoke check passed, but it did not analyze a document or verify route quality. The source catalog is a dated, narrow official snapshot rather than live web research; keep that limitation visible.
 
 The storyboard stays limited to behavior that actually exists after Phase 3 and will be updated by every later product phase.
 
@@ -32,10 +32,10 @@ Edit the goal or category, rebuild the question, then change the previous answer
 
 Show the deadline and first actions in the final fictional route. Start over, choose Arabic, rebuild the sample, and show right-to-left output while dates and source URLs remain readable.
 
-## 2:27–2:43 — Honest source limitation
+## 2:27–2:47 — Cited claims and honest limits
 
-Show **Placeholder — not verified** labels and the legal-information disclaimer. Official-source research begins only after a future real case profile is ready.
+After the profile becomes sufficient, show verified official sources connected beside the exact route claims they support. Point out the law/service-guidance/administrative-practice labels, publisher and access date, and the document-fact warning on the detected deadline. Switch to Arabic and show that the result remains RTL while official URLs stay LTR. Briefly choose an unsupported category to show an honest no-source limitation and authority escalation rather than invented certainty.
 
-## 2:43–3:00 — Engineering evidence
+## 2:47–3:00 — Engineering evidence
 
-Show `POST /api/cases/analyze`, strict `CaseProfile`, provider-independent mock/OpenAI adapters, stable `CaseAnalysis`, explicit consent, prompt-injection boundary, 107 passing tests, dated commits, and prior-work disclosure. Credit Codex for evidenced implementation. Do not claim `gpt-5.6-luna` produced a tested route until a separately approved live call occurs.
+Show `POST /api/cases/analyze`, privacy-minimal `POST /api/cases/research`, strict `CaseProfile`, atomic claim/source mappings, the exact official-domain allowlist, 128 passing tests, dated commits, and prior-work disclosure. Credit Codex for evidenced implementation. Describe the Luna smoke only as project/model/schema access evidence; do not claim it produced or verified the demonstrated route.
