@@ -487,8 +487,23 @@ CURRENT STATUS ASSUMPTIONS
 - Real analysis separates extracted facts, interpretation, and uncertainty but does not yet research or verify official sources.
 - Current source entries are absent or explicitly unverified placeholders.
 - `docs/PHASE_STATUS.md` marks Phase 5 NOT STARTED and Phase 4 COMPLETE.
+- The user granted a narrowly bounded standing authorization on 2026-07-18 for the single synthetic live-provider smoke test specified below. It does not authorize broader API usage.
 
 Read `AGENTS.md`, `INSTRUCTIONS.md`, this entire prompt, status, source-related contracts, provider architecture, tests, and current official-source limitations. Confirm a clean worktree and record the starting commit.
+
+STANDING LIVE-PROVIDER SMOKE TEST — RUN ONCE BEFORE IMPLEMENTATION
+
+Do not ask the user again if, and only if, every bound below can be satisfied:
+
+- make exactly one Responses API request using `gpt-5.6-luna`;
+- use only a short trusted fictional sample or synthetic goal as `input_text`;
+- send no PDF, image, private data, personal information, source-research query, or retrieved page;
+- use `low` reasoning, `store: false`, and at most 2,000 output tokens;
+- disable retries and do not trigger a verification, tone-polishing, tool, or second model call;
+- verify current official pricing first and proceed only when estimated billable cost is no more than USD 0.10;
+- record only pass/fail, exact model ID, date, latency, token usage, cost metadata, and whether project data-sharing status was known—never input or output content.
+
+This is the user's explicit standing authorization for that exact request. It is valid even if project data-sharing eligibility is unknown, because the input is wholly synthetic and the possible billed cost is capped above. Do not change dashboard data-sharing settings. If any bound cannot be confirmed, configuration is unavailable, or the call fails, make no retry and report the blocker or limitation. This authorization does not cover source research, evaluation batches, real documents, production traffic, or any later API call.
 
 OBJECTIVE
 
@@ -528,20 +543,21 @@ ARCHITECTURE REQUIREMENTS
 
 IMPLEMENTATION TASKS
 
-1. Define profile-sufficiency preconditions for research and enforce them server-side.
-2. Create and document the official-domain allowlist and redirect policy.
-3. Implement official-source retrieval using the approved server-side OpenAI/tool or direct retrieval architecture established from current official documentation; do not add a second AI provider.
-4. Scope research queries from the resolved profile without including unnecessary personal details.
-5. Validate final URLs, domains, publishers, titles, access dates, and response status.
-6. Extract atomic supported claims and connect each to one or more verified sources.
-7. Identify conflicts among official sources, jurisdiction mismatches, date/version issues, and claims with no adequate support.
-8. Prevent unsupported changing factual claims from appearing as certain route instructions.
-9. Build the final personalized route with: detected and user-provided deadlines; ordered actions; documents; responsible party; timing; dependencies; alternatives; uncertainty; citations; escalation; and safe verification steps.
-10. Render citations beside relevant route steps and claims in English, German, and Arabic.
-11. Keep URLs and identifiers LTR in Arabic output.
-12. Replace Phase 2/4 source placeholders only when evidence is actually retrieved and verified; otherwise retain an honest unverified state.
-13. Add failure behavior for unavailable pages, redirects, blocked retrieval, no sources, source conflicts, and provider/tool outage.
-14. Preserve a deterministic mocked research provider and fixtures for tests and offline demos.
+1. Perform the single standing-authorized synthetic live-provider smoke test above and record only its content-free result. Do not repeat it.
+2. Define profile-sufficiency preconditions for research and enforce them server-side.
+3. Create and document the official-domain allowlist and redirect policy.
+4. Implement official-source retrieval using the approved server-side OpenAI/tool or direct retrieval architecture established from current official documentation; do not add a second AI provider.
+5. Scope research queries from the resolved profile without including unnecessary personal details.
+6. Validate final URLs, domains, publishers, titles, access dates, and response status.
+7. Extract atomic supported claims and connect each to one or more verified sources.
+8. Identify conflicts among official sources, jurisdiction mismatches, date/version issues, and claims with no adequate support.
+9. Prevent unsupported changing factual claims from appearing as certain route instructions.
+10. Build the final personalized route with: detected and user-provided deadlines; ordered actions; documents; responsible party; timing; dependencies; alternatives; uncertainty; citations; escalation; and safe verification steps.
+11. Render citations beside relevant route steps and claims in English, German, and Arabic.
+12. Keep URLs and identifiers LTR in Arabic output.
+13. Replace Phase 2/4 source placeholders only when evidence is actually retrieved and verified; otherwise retain an honest unverified state.
+14. Add failure behavior for unavailable pages, redirects, blocked retrieval, no sources, source conflicts, and provider/tool outage.
+15. Preserve a deterministic mocked research provider and fixtures for tests and offline demos.
 
 PRIVACY REQUIREMENTS
 
@@ -616,10 +632,11 @@ Run and pass:
 - `npm test`
 - `npm run build`
 - `npm audit`
+- the one standing-authorized synthetic Luna smoke request, within its exact one-call, token, data, and cost bounds;
 - local HTTP/API checks for insufficient profile, successful mocked/authorized official research, non-official rejection, no-source/conflict errors, cited route, and existing mock/real analysis;
 - source allowlist, redirect, claim support, injection, privacy-query, multilingual, RTL/LTR URL, accessibility, print, and provider-fallback checks.
 
-Do not depend on live web availability for automated tests. If a bounded live official-source check is needed, use only synthetic/non-private case context and record date/domain/status without copying full content.
+Do not depend on live web availability for automated tests. The standing Luna authorization does not cover a live official-source check; obtain separate permission if one is genuinely needed. Any approved check must use only synthetic/non-private case context and record date/domain/status without copying full content.
 
 GIT CHECKS
 
@@ -637,23 +654,24 @@ FINAL REPORT FORMAT
 
 Return:
 
-1. Research trigger and sufficiency gate
-2. Official-domain allowlist
-3. Retrieval and validation architecture
-4. Source and claim contracts
-5. Personalized cited-route behavior
-6. Conflict, uncertainty, deadline, and escalation behavior
-7. Privacy and injection controls
-8. Multilingual and Arabic URL behavior
-9. Tests and total passing
-10. Lint result
-11. Build result
-12. Audit/dependency result
-13. HTTP/source verification
-14. Documentation updated
-15. Commit hash
-16. Warnings and limitations
-17. Exact recommended Phase 6 objective
+1. Standing-authorized synthetic Luna smoke-test result
+2. Research trigger and sufficiency gate
+3. Official-domain allowlist
+4. Retrieval and validation architecture
+5. Source and claim contracts
+6. Personalized cited-route behavior
+7. Conflict, uncertainty, deadline, and escalation behavior
+8. Privacy and injection controls
+9. Multilingual and Arabic URL behavior
+10. Tests and total passing
+11. Lint result
+12. Build result
+13. Audit/dependency result
+14. HTTP/source verification
+15. Documentation updated
+16. Commit hash
+17. Warnings and limitations
+18. Exact recommended Phase 6 objective
 
 STOP CONDITION
 

@@ -106,3 +106,9 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Never silently replace requested real analysis with mock fiction | Real-mode failures return typed errors; the user may deliberately retry or switch configuration, preserving honesty. |
 | Permit one structured verification pass only for approved triggers | Extra cost is restricted to high-risk, conflicting, unsupported, or invalid output rather than routine tone work. |
 | Do not run a manual live test without separate call permission | API access enables implementation but does not authorize spending balance or transmitting content; mocked transport proves the boundary without a paid call. |
+
+## Phase 5 live-provider smoke-test authorization
+
+| Decision | Reason |
+| --- | --- |
+| Use the user's 2026-07-18 standing authorization for exactly one bounded synthetic Luna smoke request at the start of Phase 5 | One real request can verify project-level model access and the implemented Responses/Structured Outputs boundary before source-research complexity is added. The exception is limited to synthetic `input_text`, `low` reasoning, `store: false`, 2,000 output tokens, no tools/retry/verification/second call, and an estimated billable cost no greater than USD 0.10. It supersedes the Phase 4 call-permission decision only for this exact request; every other API call still requires specific permission. |

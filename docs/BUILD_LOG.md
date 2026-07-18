@@ -425,3 +425,7 @@ The OpenAI docs MCP server was registered but requires a fresh session, so the o
 Codex verified current official API documentation, designed and implemented the replaceable provider, schemas, consent, privacy/security controls, retry/error/cost boundaries, synthetic tests, documentation, and mock preservation while keeping paid API usage at zero for this run.
 
 Phase 5 should research official Berlin and German federal sources only after a sufficient profile, cite supported claims beside route steps, identify conflicts and uncertainty, and keep URLs LTR in Arabic. Do not begin it automatically.
+
+## 2026-07-18 — Phase 5 synthetic smoke-test standing authorization
+
+This documentation-only update did not start Phase 5 or make an API request. The user granted standing authorization for exactly one live `gpt-5.6-luna` Responses API smoke request when Phase 5 begins. `AGENTS.md`, the Phase 5 master prompt, phase status, README, and decisions now bound that exception to short synthetic `input_text`, `low` reasoning, `store: false`, at most 2,000 output tokens, no files or private data, no tools, no retry, no verification/tone/second call, and an estimated billable cost no greater than USD 0.10. Only content-free result metadata may be recorded. All broader development, research, evaluation, and production API traffic remains permission-gated.

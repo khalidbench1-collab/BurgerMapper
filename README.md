@@ -132,7 +132,7 @@ Current limitations:
 
 - No local PDF text extraction or OCR; real mode sends supported files directly to the Responses API.
 - No official-source retrieval or verification. Real results contain no verified citations, and mock results retain clearly labelled placeholders.
-- No live real API smoke request was run during Phase 4 because the user did not authorize spending credit or transmitting a synthetic case. Model availability for the configured API project and real-output quality are therefore not yet empirically confirmed.
+- No live real API smoke request was run during Phase 4, so model availability for the configured API project and real-output quality are not yet empirically confirmed. A standing authorization now permits exactly one tightly bounded synthetic `gpt-5.6-luna` smoke request at the start of Phase 5; it does not authorize real documents, research calls, retries, or broader API traffic.
 - No login, database, local storage, analytics, tracking, or deployment.
 - A model can be wrong, miss text, or misread a deadline; outputs remain legal information rather than legal advice.
 

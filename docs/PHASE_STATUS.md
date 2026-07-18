@@ -11,7 +11,7 @@ Last verified: 2026-07-18
 | 1.5 | Multimodal case intake | COMPLETE | `aeb7f42033e01d5295ceae5ae6b3367eb87b5cd0` | Phase 1 |
 | 2 | Secure multimodal analysis boundary | COMPLETE | `c6369e91a505e8d97ce2a7a6bbd460492b5dda9b` | Phase 1.5 |
 | 3 | Goal-based Case Builder Agent in mock mode | COMPLETE | `f72589e7102403ca9fa8b78c16f46c401b6c934b` | Phase 2 COMPLETE |
-| 4 | Real OpenAI multimodal and structured-output integration | COMPLETE | `feat: integrate OpenAI case analysis` — hash pending final report | Phase 3 COMPLETE and API gate resolved |
+| 4 | Real OpenAI multimodal and structured-output integration | COMPLETE | `4d0b20d73defbb72ed8af9efeecd07b58ff041be` | Phase 3 COMPLETE and API gate resolved |
 | 5 | Official-source research and cited personalized routes | NOT STARTED | Exact future commit: `feat: add official-source route research` | Phase 4 COMPLETE |
 | 6 | Reliability, safety, evaluation, and cost controls | NOT STARTED | Exact future commit: `test: harden BurgerMapper reliability` | Phase 5 COMPLETE |
 | 7 | Final user-experience and accessibility polish | NOT STARTED | Exact future commit: `feat: polish the BurgerMapper experience` | Phase 6 COMPLETE |
@@ -23,6 +23,13 @@ Last verified: 2026-07-18
 - Official documentation was verified on 2026-07-18 for the exact ID, Responses API, text/image/PDF inputs, Structured Outputs, and `low`, `medium`, `high`, and `xhigh` reasoning.
 - The official server SDK, strict schemas, consent, provider adapter, bounded errors/retries/limits, selective verification, and mock fallback are implemented.
 - No real API request was authorized or made, so project-level Luna access and real-output quality remain unverified. The key value was never inspected, printed, logged, or committed.
+
+## Phase 5 standing smoke-test authorization
+
+- On 2026-07-18, the user authorized exactly one live `gpt-5.6-luna` Responses API smoke request during Phase 5 without another permission prompt.
+- The request must use only short synthetic `input_text`, `low` reasoning, `store: false`, at most 2,000 output tokens, no tools, no retry, no verification pass, and no second request.
+- Current official pricing must place the estimated billable cost at or below USD 0.10. Only content-free result metadata may be recorded.
+- Failure or an unconfirmed bound ends the test immediately. This standing authorization covers no research call, real document, evaluation batch, or production traffic.
 
 ## Status meanings
 
@@ -41,4 +48,4 @@ Run exactly:
 Read AGENTS.md, docs/MASTER_BUILD_PLAN.md, and docs/PHASE_STATUS.md. Execute the first phase marked NOT STARTED whose prerequisites are complete. Follow its full prompt. Stop after its commit and final report. Never automatically begin the next phase.
 ```
 
-Autonomous execution stops after the Phase 4 commit and report. A future authorized run may begin Phase 5 official-source research. The live OpenAI smoke test remains separately permission-gated and is not a prerequisite for preserving mock operation.
+Autonomous execution stopped after the Phase 4 commit and report. A future run may begin Phase 5 official-source research. Its one bounded synthetic live-provider smoke test is already authorized under the rules above; all other real API calls remain separately permission-gated.
