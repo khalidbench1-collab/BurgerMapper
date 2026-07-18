@@ -105,3 +105,35 @@ These dated records capture durable technical choices. Product-level choices and
 - **Reason:** Repository-local instructions make execution reproducible while preserving review points, privacy boundaries, user-controlled external actions, and dated Build Week provenance.
 - **Tradeoff:** The plan deliberately sacrifices continuous multi-phase execution and may pause for user confirmation even when later technical work is defined.
 - **Revisit when:** The Build Week release candidate and handoff are complete; do not extend the phase sequence automatically.
+
+## 2026-07-18 — Configurable Luna provider and task-specific reasoning
+
+- **Context:** Phase 4 will add one OpenAI provider for intake, profile decisions, multimodal interpretation, research support, and route construction, but the API is not implemented and access is still gated.
+- **Decision:** Plan `gpt-5.6-luna` as the primary model behind configurable `OPENAI_MODEL`. Plan reasoning by task: intake `low`, profile decisions `medium`, document analysis/research/routes `high`, and high-risk cases `xhigh`. Phase 4 must verify the exact model identifier, project availability, capabilities, and supported reasoning values in current official OpenAI documentation before using them.
+- **Reason:** A named primary model and task-specific effort plan support repeatable implementation and evaluation without hard-coding deployment configuration or pretending unverified API details are settled.
+- **Tradeoff:** Availability or accepted reasoning values may differ when Phase 4 begins, which can block implementation pending an explicit decision.
+- **Revisit when:** Official documentation, project access, evaluations, latency, or cost show that the planned model or a reasoning level is unsupported or unsuitable.
+
+## 2026-07-18 — Structured CaseProfile memory and outputs
+
+- **Context:** BurgerMapper must remember corrections and build a route across several bounded decisions without persistent private-content storage.
+- **Decision:** Use the structured `CaseProfile` as MVP memory and use Structured Outputs for clarification decisions, profile updates, document interpretation, and routes. Validate outputs at runtime; do not add a vector database or request visible chain of thought or hidden reasoning.
+- **Reason:** Explicit schemas provide the route-relevant memory and validation boundary the product needs while minimizing retention, retrieval complexity, and unverifiable reasoning artifacts.
+- **Tradeoff:** The profile must be deliberately evolved when new route-relevant facts appear, and it will not support semantic recall over a large external corpus.
+- **Revisit when:** A validated use case requires retrieval over a bounded knowledge corpus that cannot be represented or linked safely through `CaseProfile`, or the provider's verified Structured Outputs interface changes.
+
+## 2026-07-18 — Procedural warmth without a tone-polishing pass
+
+- **Context:** Stressed users need respectful guidance, but chatbot-like reassurance, routine acknowledgements, and extra model calls can obscure the route and increase cost and latency.
+- **Decision:** Express warmth through one consequential question at a time, acceptance of “I don't know”, remembered corrections, a brief reason for questions, and non-judgmental language. Use acknowledgements only for corrections, urgency, confusion, or major route changes. Keep final routes factual and more serious than intake. Do not add a second tone-polishing call.
+- **Reason:** Useful behavior is calmer and more trustworthy than conversational filler, and it keeps the primary structured response responsible for both content and presentation.
+- **Tradeoff:** Tone quality must be evaluated within task outputs rather than isolated in a dedicated rewriting stage.
+- **Revisit when:** Phase 6 evidence shows a specific tone failure that cannot be corrected through instructions, schema fields, deterministic UI copy, or primary-call evaluation.
+
+## 2026-07-18 — Selective structured verification pass
+
+- **Context:** A routine second model pass would add cost and latency, while a small set of safety-critical conditions deserves additional scrutiny.
+- **Decision:** Permit an optional schema-validated verification pass only for high-risk routes, official-source conflicts, suspected unsupported claims, or failed validation. It must not serve as a general tone-polishing step.
+- **Reason:** Risk-triggered verification concentrates additional work where it can materially improve safety and evidence quality.
+- **Tradeoff:** Trigger definitions and pass/fail handling add branching and must be evaluated for missed triggers and unnecessary calls.
+- **Revisit when:** Phase 6 evaluation shows the trigger policy has unacceptable false negatives, false positives, latency, or cost.

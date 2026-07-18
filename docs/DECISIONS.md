@@ -62,3 +62,19 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Use `PHASE_STATUS.md` as the authoritative execution state | Explicit prerequisites and blocked reasons prevent Codex from skipping unresolved external gates or inferring that credentials and authorizations exist. |
 | Block Phase 4 until private API access is ready | OpenAI billing and `OPENAI_API_KEY` setup require user action. Codex must never request the secret in chat or implement around unavailable access. |
 | End autonomous work at the deployed release-candidate handoff | Current-rule verification, category choice, application writing, video publishing, `/feedback`, and Devpost submission require current external facts or user-controlled actions and remain outside autonomous repository work. |
+
+## Planned Luna interaction and API decisions
+
+| Decision | Reason |
+| --- | --- |
+| Plan `gpt-5.6-luna` as the primary model while keeping `OPENAI_MODEL` configurable | The explicit model target makes Phase 4 and Phase 6 planning concrete, while configuration preserves operational flexibility. Its exact identifier, access, capabilities, and reasoning values must be verified from current official OpenAI documentation before implementation. |
+| Use procedural warmth | Calm, respectful, patient, direct behavior helps stressed users without creating an emotional, chatty, or falsely reassuring assistant persona. |
+| Make warmth behavioral | One consequential question, acceptance of “I don't know”, remembered corrections, a brief reason for each question, and avoidance of repetition or judgment are more useful than conversational filler. |
+| Use acknowledgements selectively | Routine acknowledgement before every response adds friction and can feel artificial. Reserve it for corrections, urgency, confusion, or major route changes. |
+| Use `CaseProfile` as MVP memory and do not add a vector database | The route depends on a small structured set of goal, facts, answers, uncertainty, and corrections. A vector store would add privacy and retrieval complexity without a demonstrated MVP need. |
+| Use Structured Outputs for clarification decisions, profile updates, document interpretation, and routes | Runtime-validated schemas make the model boundary testable and keep facts, decisions, uncertainty, and route data explicit. |
+| Do not request chain of thought or hidden reasoning | BurgerMapper needs validated decisions and short user-facing explanations, not private reasoning traces or sensitive internal material. |
+| Plan task-specific reasoning levels, subject to implementation verification | Intake is planned at `low`, profile decisions at `medium`, document analysis/research/routes at `high`, and high-risk cases at `xhigh`. Phase 4 must verify these exact values against the selected model and API before use. |
+| Do not use a second tone-polishing call | Procedural warmth belongs in the primary task instructions and product behavior; a routine extra call adds latency, cost, and another failure surface without improving route evidence. |
+| Allow only a narrowly triggered structured verification pass | A bounded additional pass is justified for high-risk routes, source conflicts, suspected unsupported claims, or failed validation—not for routine cases or general tone. |
+| Keep final routes more serious than intake | Intake can be calmly conversational, while the route must prioritize factual actions, deadlines, uncertainty, and evidence. |

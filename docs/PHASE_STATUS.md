@@ -17,6 +17,13 @@ Last verified: 2026-07-18
 | 7 | Final user-experience and accessibility polish | NOT STARTED | Exact future commit: `feat: polish the BurgerMapper experience` | Phase 6 COMPLETE |
 | 8 | GitHub, deployment, release candidate, and submission handoff | NOT STARTED | Exact future commit: `chore: prepare Build Week release candidate` | Phase 7 COMPLETE plus GitHub, visibility, Vercel, and production-variable gates |
 
+## Planned Phase 4 model boundary
+
+- Primary planned model: `gpt-5.6-luna`; runtime selection remains configurable through server-only `OPENAI_MODEL`.
+- Phase 4 remains blocked pending API access and private `OPENAI_API_KEY` configuration.
+- Before implementation, Phase 4 must verify the exact model identifier, project availability, multimodal and Structured Outputs support, and the planned reasoning values (`low`, `medium`, `high`, `xhigh`) against current official OpenAI documentation.
+- No model SDK, API request, secret, or product feature was added by this planning update.
+
 ## Status meanings
 
 - `NOT STARTED`: prerequisites are recorded but no implementation for this phase has begun.

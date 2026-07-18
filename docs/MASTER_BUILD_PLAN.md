@@ -10,6 +10,16 @@ Read AGENTS.md, docs/MASTER_BUILD_PLAN.md, and docs/PHASE_STATUS.md. Execute the
 
 Run one phase at a time. Do not batch prompts, pre-implement later phases, or bypass a `BLOCKED` status. Completed history must remain intact.
 
+## Planned Luna interaction and API architecture
+
+- `gpt-5.6-luna` is the planned primary model; `OPENAI_MODEL` remains configurable. Phase 4 must verify the exact identifier, project availability, multimodal support, Structured Outputs support, and reasoning-setting values in current official OpenAI documentation before implementation. Do not silently substitute another model.
+- Use procedural warmth: calm, respectful, patient, and direct, not emotional, chatty, or overly reassuring. Warmth comes from one consequential question at a time, accepting “I don't know”, remembering corrections, briefly explaining why a question matters, and avoiding repeated questions or judgmental language.
+- Do not force an acknowledgement before every response. Use one only for a correction, urgency, confusion, or a major route change. Final routes should be factual and more serious than intake conversation.
+- The structured `CaseProfile` is MVP memory. Do not add a vector database.
+- Use Structured Outputs for clarification decisions, profile updates, document interpretation, and routes. Do not request visible chain of thought or hidden reasoning.
+- Planned reasoning levels are intake `low`, profile decisions `medium`, document analysis/research/routes `high`, and high-risk cases `xhigh`; Phase 4 must verify that these exact values are supported before use.
+- Do not use a second tone-polishing model call. Permit an optional structured verification pass only for high-risk routes, source conflicts, suspected unsupported claims, or failed validation.
+
 ## Completed baseline
 
 | Phase | Commit |
@@ -70,6 +80,8 @@ UX REQUIREMENTS
 - Show one deterministic clarification question at a time.
 - Every question must explain briefly why the answer changes the route.
 - Include an “I don't know” or equivalent answer wherever uncertainty is valid.
+- Establish procedural warmth through calm, respectful, patient, direct wording and useful behavior, not chatty reassurance or an emotional assistant persona.
+- Do not add routine acknowledgement copy before every question or result. Reserve acknowledgements for corrections, urgency, confusion, or major route changes.
 - Let the user view an editable case summary and correct any previous answer without starting over.
 - Recompute downstream profile sufficiency and route implications after corrections.
 - Use a progress indicator based on meaningful states such as “Understanding your goal”, “Need one detail”, and “Route ready”. Do not display fake step totals or pretend the number of questions is known.
@@ -88,6 +100,7 @@ ARCHITECTURE REQUIREMENTS
 - Keep the final route compatible with or deliberately evolve `CaseAnalysis`; document any migration.
 - Keep deterministic mock scenarios and question selection outside components.
 - Do not add a database or localStorage. Short-lived case state remains in memory.
+- Treat the structured `CaseProfile` as the case's memory. Do not add embeddings or a vector database for the MVP.
 
 IMPLEMENTATION TASKS
 
@@ -141,6 +154,7 @@ Keep all existing tests and add synthetic-only coverage for at least:
 - “I don't know” behavior;
 - profile sufficiency stops questions;
 - prevention of an endless question loop;
+- procedural-warmth behavior, including no routine acknowledgements, no judgmental phrasing, and no repeated questions;
 - editable summary and correction of previous answers;
 - downstream recomputation after correction;
 - final route derives from `CaseProfile`;
@@ -264,11 +278,13 @@ Implement a server-only OpenAI Responses API provider for goal, pasted text, PDF
 
 OFFICIAL MODEL/API VERIFICATION
 
-- Before choosing `OPENAI_MODEL` or writing SDK payloads, use current official OpenAI developer documentation through the configured OpenAI docs skill/MCP.
-- Verify the current supported Responses API, multimodal `input_text`/`input_file`/`input_image` shapes, structured-output method, file/image limits, detail controls, timeout/error guidance, and the exact current model identifier suitable for this workflow.
+- Start with `gpt-5.6-luna` as the explicitly planned primary model and keep `OPENAI_MODEL` configurable.
+- Before writing SDK payloads, use current official OpenAI developer documentation through the configured OpenAI docs skill/MCP. Verify that the exact `gpt-5.6-luna` identifier is available to the project and supports the required Responses API multimodal inputs, Structured Outputs, and reasoning controls. Do not silently choose a substitute if it is unavailable; stop and request an explicit model decision.
+- Verify the current supported Responses API, multimodal `input_text`/`input_file`/`input_image` shapes, Structured Outputs method, file/image limits, detail controls, timeout/error guidance, and the exact supported reasoning-setting values.
 - Use only official OpenAI documentation for these API facts. Do not rely on memory, old examples, or third-party tutorials.
 - Record the verification date and direct official documentation links in the build log or architecture decision without copying excessive text.
 - Keep `OPENAI_MODEL` configurable. Do not hard-code an unverified “latest” alias.
+- Treat intake `low`, profile decisions `medium`, document analysis/research/routes `high`, and high-risk cases `xhigh` as planned values only until this verification succeeds. Record any supported-value difference and obtain a deliberate decision rather than inventing a mapping.
 
 REGRESSION POLICY
 
@@ -285,7 +301,10 @@ UX REQUIREMENTS
 - Show clear consent immediately before a real analysis sends input from BurgerMapper to OpenAI.
 - State what is sent, why, that OpenAI is the processor used for analysis, and the current retention limitation supported by verified configuration/documentation. Do not overpromise deletion.
 - Keep one meaningful clarification question at a time and stop when the profile is sufficient.
+- Apply procedural warmth: calm, respectful, patient, direct, and useful—not emotional, chatty, or overly reassuring. Accept “I don't know”, remember corrections, explain briefly why a question matters, and avoid repeated questions and judgmental language.
+- Do not prepend acknowledgements routinely. Use them only for corrections, urgency, confusion, or major route changes.
 - Separate extracted facts, model interpretation, uncertainty, requested action, and recommended route.
+- Keep final routes factual and more serious than the conversational intake.
 - Label real and mock modes unambiguously.
 - Provide calm typed errors and retry choices; never display provider exceptions or raw responses.
 - Preserve keyboard, focus, live-region, mobile, print, multilingual, and RTL behavior.
@@ -299,8 +318,11 @@ ARCHITECTURE REQUIREMENTS
 - Map normalized goal/text/sample to `input_text`, verified PDF to `input_file`, and verified image to `input_image` using the tested Phase 2 planner or a documented compatible evolution.
 - Send optional category and output language as separate trusted application context.
 - Preserve and strengthen the untrusted-document security instruction.
-- Define strict structured schemas for profile updates, extracted document facts, uncertainty, next-question decision, clarification options including “I don't know” where valid, sufficiency, and final `CaseAnalysis`/route.
+- Use Structured Outputs with strict schemas for clarification decisions, profile updates, extracted document facts, uncertainty, document interpretation, clarification options including “I don't know” where valid, sufficiency, and final `CaseAnalysis`/route.
 - Validate every model response at runtime. Reject or safely repair only within bounded, tested rules; never trust TypeScript types alone.
+- Use the structured `CaseProfile` as the only MVP case memory; do not add a vector database.
+- Apply the verified task-specific reasoning level to each request. Do not request visible chain of thought or hidden reasoning; return only schema-defined decisions and concise user-facing rationale.
+- Do not make a second call solely for tone polishing. Allow a separate structured verification pass only for a high-risk route, source conflict, suspected unsupported claim, or failed validation, and keep it bounded and testable.
 - Keep original private input and full request plans out of responses and logs.
 - Keep mock and real providers returning the same public contracts with honest `isMock`/processing metadata.
 
@@ -315,12 +337,15 @@ IMPLEMENTATION TASKS
 7. Implement real PDF `input_file` and PNG/JPEG/WebP `input_image` analysis with verified detail/size constraints.
 8. Implement structured profile extraction/update and a structured next-question-or-sufficient decision.
 9. Implement structured final route generation after sufficient profile data.
-10. Keep document facts, interpretation, missing information, and uncertainty distinct in contracts and UI.
-11. Add explicit real-mode consent and ensure cancellation before/during the request is honored where technically possible.
-12. Add bounded timeout, retry, backoff, and provider-error mapping. Do not blindly retry invalid input, permission, billing, or safety errors.
-13. Enforce input size, output size, token/output limits, maximum clarification count, and per-case request ceilings for cost control.
-14. Preserve mock fallback for development, demos, provider outage, or missing configuration as explicitly selected behavior; do not silently replace a requested real analysis with fictional output.
-15. Keep raw provider responses, prompt content, goals, letters, documents, and profile content out of logs.
+10. Apply the verified task-specific reasoning configuration and record the mapping without requesting or retaining chain of thought.
+11. Keep document facts, interpretation, missing information, and uncertainty distinct in contracts and UI.
+12. Encode procedural warmth in the primary structured call and UI behavior; do not add a tone-polishing call.
+13. Add the narrowly triggered, optional structured verification pass with explicit tests and request/cost ceilings.
+14. Add explicit real-mode consent and ensure cancellation before/during the request is honored where technically possible.
+15. Add bounded timeout, retry, backoff, and provider-error mapping. Do not blindly retry invalid input, permission, billing, or safety errors.
+16. Enforce input size, output size, token/output limits, maximum clarification count, and per-case request ceilings for cost control.
+17. Preserve mock fallback for development, demos, provider outage, or missing configuration as explicitly selected behavior; do not silently replace a requested real analysis with fictional output.
+18. Keep raw provider responses, prompt content, goals, letters, documents, profile content, and hidden reasoning out of logs.
 
 PRIVACY REQUIREMENTS
 
@@ -340,6 +365,7 @@ LEGAL AND SAFETY RULES
 - Official-source fields remain clearly unverified placeholders or absent until Phase 5.
 - Surface uncertainty, unreadable content, conflicting dates, low confidence, and missing facts.
 - Provide an escalation/safe-verification step for high-risk ambiguity.
+- Never ask the model to reveal or provide hidden reasoning. Brief user-facing explanations must be generated as explicit structured fields, not chain of thought.
 
 TESTING
 
@@ -351,6 +377,11 @@ All automated provider tests must use mocked transport—never spend API credit 
 - structured schema acceptance and rejection;
 - malformed, partial, overlong, and adversarial model outputs;
 - next-question versus sufficient decisions;
+- correct Structured Outputs usage for clarification, profile update, document interpretation, and route schemas;
+- verified reasoning selection by task class and safe handling when a requested value is unsupported;
+- no requested/returned chain of thought and no second tone-polishing call;
+- verification pass triggers only for high risk, source conflict, suspected unsupported claim, or failed validation;
+- procedural warmth, correction handling, selective acknowledgements, and a more factual final-route tone;
 - maximum-question and request ceilings;
 - facts/interpretation/uncertainty separation;
 - prompt-injection instruction presence and hostile document fixtures;
@@ -367,6 +398,7 @@ OUT OF SCOPE
 - Local OCR or separate PDF extraction.
 - Database, login, localStorage, cloud document storage, analytics, tracking, payments, alerts, GitHub remote, deployment, YouTube, or Devpost.
 - A generic chatbot, multiple simultaneous questions, or autonomous tool use.
+- Vector-database memory, chain-of-thought collection, routine tone-polishing calls, or unconditional verification calls.
 - Phases 5 through 8.
 
 MANDATORY DOCUMENTATION UPDATES
@@ -686,7 +718,7 @@ IMPLEMENTATION TASKS
 1. Inventory current risk areas, failure modes, dependencies, endpoint limits, accessibility gaps, and provider/source costs.
 2. Create a representative synthetic evaluation set containing routine, ambiguous, multilingual, missing-data, high-risk, and adversarial cases.
 3. Add prompt-injection fixtures in goals, pasted text, PDF/image-derived content, and retrieved-source content.
-4. Add question-quality evaluation: one at a time, route-changing, understandable, includes uncertainty answer when valid, no repeated or unnecessary question.
+4. Add Luna-specific question and tone evaluation: useful and route-changing questions, one at a time, understandable rationale, “I don't know” when valid, correction handling, no repeated or unnecessary questions, no false reassurance, and no robotic filler.
 5. Add profile-completeness evaluation: required route facts, honest unknowns, correction propagation, and stop conditions.
 6. Add route-completeness evaluation: first action, deadline provenance, documents, timing, sequence, alternatives, uncertainty, citations, and escalation.
 7. Add citation validation: official allowlist, claim mapping, access date, verification state, URL validity, conflict handling, and no unsupported claims.
@@ -702,6 +734,7 @@ IMPLEMENTATION TASKS
 17. Run dependency audit and license review for direct production dependencies.
 18. Run accessibility review covering keyboard, focus, names, status/errors, heading order, contrast, zoom/reflow, RTL, reduced motion, and print.
 19. Define explicit release-blocking thresholds and make the phase fail when they are not met.
+20. Evaluate `gpt-5.6-luna` structured-output validity, multilingual quality, latency, and cost by task class, using the verified reasoning settings and content-free measurements.
 
 PRIVACY REQUIREMENTS
 
@@ -731,6 +764,7 @@ Keep all existing tests. Add a documented command or commands for the evaluation
 - high-risk immigration, housing, health, family, and deadline scenarios using fictional facts;
 - malicious document/source instructions;
 - irrelevant or repeated clarification questions;
+- useful-question rate, unnecessary-question rate, correction handling, false reassurance, and robotic filler;
 - insufficient and sufficient profiles;
 - corrections and invalidated downstream answers;
 - complete/incomplete routes;
@@ -740,6 +774,8 @@ Keep all existing tests. Add a documented command or commands for the evaluation
 - provider/source outage and fallback;
 - timeouts, aborts, rate limits, duplicate/concurrent requests, abuse limits, and cost ceilings;
 - client secret scan and no private-content logging;
+- Structured Outputs validity for clarification, profile-update, document-interpretation, route, and optional verification schemas;
+- Luna multilingual quality plus latency and cost across intake, profile, document/research/route, and high-risk task classes;
 - dependency/license and accessibility checks suitable for automation.
 
 Do not make routine tests call live providers or the web. If an optional bounded live smoke test is retained, gate it explicitly, use only synthetic input, limit cost, and exclude output from Git/logs.
@@ -753,6 +789,8 @@ Define exact measurable criteria before marking Phase 6 complete. At minimum blo
 - unsupported high-impact claim presented as certain;
 - missing or non-official primary citation for a changing route claim;
 - failure to stop asking questions;
+- repeated/unnecessary questions, ignored corrections, false reassurance, or robotic filler above the documented Luna evaluation thresholds;
+- structured-output validity, multilingual quality, latency, or cost outside documented release thresholds;
 - route missing a known deadline or first action;
 - broken Arabic RTL/URL behavior;
 - provider outage without safe recovery;
@@ -1119,7 +1157,7 @@ IMPLEMENTATION TASKS
 2. Verify no real prototype code, secret, private document, personal information, provider response, research cache, debug log, local environment file, or generated export is tracked.
 3. Complete README: product, goal-first workflow, inputs, languages, route, architecture, OpenAI/Codex usage, setup, environment names without values, mock mode, tests/evaluations, privacy/security, official-source behavior, accessibility, known limitations, provenance, repository/deployment/video/feedback placeholders.
 4. Review and update prior-work disclosure without weakening the existing truth: concept and earlier prototype predated Build Week; no prior code is included; this repository implementation is traceable through commits and Codex evidence.
-5. Complete Codex collaboration explanation with phase-specific evidence; mention GPT-5.6 only if actually used and evidenced.
+5. Complete Codex collaboration explanation with phase-specific evidence; mention `gpt-5.6-luna` only if it was actually used and evidenced.
 6. Complete architecture/setup/privacy/security/limitations/dependency/license documentation.
 7. Resolve the GitHub gates, then create or connect the authorized repository without rewriting history. Push the full branch/history using normal non-force Git operations.
 8. Resolve repository visibility/judge access and record only verified settings.

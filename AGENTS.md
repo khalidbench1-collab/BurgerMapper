@@ -41,6 +41,16 @@ Do not trade a higher priority for decorative polish or feature breadth.
 
 Maintain a structured `CaseProfile` as the working representation of the user's goal, known facts, evidence, answers, uncertainty, and route-relevant context.
 
+Use **procedural warmth**: calm, respectful, patient, and direct. Do not make BurgerMapper emotional, chatty, overly reassuring, or performatively friendly. Warmth should come primarily from useful behavior:
+
+- ask one consequential question at a time;
+- accept “I don't know” without judgment;
+- preserve and apply corrections;
+- explain briefly why a question matters;
+- avoid repeated questions and judgmental language.
+
+Do not require an acknowledgement before every response. Acknowledge only when it helps the user understand a correction, urgency, confusion, or a major route change. Keep final routes factual and more serious than the conversational intake.
+
 Ask one meaningful clarification question at a time. Ask only when the answer can change at least one of:
 
 - eligibility;
@@ -96,6 +106,12 @@ The final result must be a personalized route with clear actions, timing, docume
 - Keep client, server, provider, transport, domain, mock, and UI responsibilities clear.
 - Keep OpenAI calls server-side. Do not add another AI provider.
 - Preserve mock mode as an operational fallback.
+- Plan `gpt-5.6-luna` as the primary OpenAI model while keeping `OPENAI_MODEL` configurable. Before implementation, verify the exact model identifier, availability, and supported API settings against current official OpenAI documentation; do not silently substitute a different model.
+- Use the structured `CaseProfile` as case memory for the MVP. Do not add a vector database unless later evidence establishes a retrieval requirement that the profile cannot safely meet.
+- Use Structured Outputs for clarification decisions, profile updates, document interpretation, and final routes. Validate every structured result at runtime.
+- Never request, expose, store, or display visible chain of thought or hidden reasoning. Request only the structured decisions, facts, uncertainty, and user-facing explanations needed by the product.
+- Plan task-specific reasoning settings as follows: intake `low`; profile decisions `medium`; document analysis, official-source research, and routes `high`; high-risk cases `xhigh`. These values are provisional and must be verified against the selected model and Responses API during Phase 4 implementation before use.
+- Do not add a second model call merely to polish tone. An optional structured verification pass is permitted only for a high-risk route, conflicting sources, suspected unsupported claims, or failed schema/validation checks.
 - Avoid unnecessary dependencies and refactors. Explain each added dependency and review its license and audit impact.
 - Use synthetic fixtures only.
 - Do not regress existing intake methods, categories, multilingual output, RTL, clarification adaptation, reset, print, privacy, or typed errors.

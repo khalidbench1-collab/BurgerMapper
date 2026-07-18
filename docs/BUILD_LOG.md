@@ -283,3 +283,39 @@ Read AGENTS.md, docs/MASTER_BUILD_PLAN.md, and docs/PHASE_STATUS.md. Execute the
 ```
 
 This selects Phase 3 only. Phase 4 remains blocked until the user privately enables OpenAI API access and configures the key outside conversation.
+
+## 2026-07-18 — Luna tone and API architecture refinement
+
+### Objective and starting state
+
+Refine the permanent remaining-phase plan around `gpt-5.6-luna`, procedural warmth, structured case memory, Structured Outputs, task-specific reasoning, and selective verification without changing application code or implementing an API. The worktree was clean at `d03023f8063c224c283c3aa6c8800fd76cf92cc2` before this documentation-only task.
+
+### Decisions recorded
+
+- Planned `gpt-5.6-luna` as the primary OpenAI model while preserving server-only `OPENAI_MODEL` configuration.
+- Kept Phase 4 blocked pending API access and required current official verification of the exact model identifier, project availability, multimodal and Structured Outputs support, and reasoning settings before implementation.
+- Defined procedural warmth as calm, respectful, patient, and direct behavior: one consequential question at a time, “I don't know” support, correction memory, brief question rationale, and no repeated or judgmental questions.
+- Reserved acknowledgements for corrections, urgency, confusion, or major route changes; final routes remain more factual and serious than intake.
+- Chose the structured `CaseProfile` as MVP memory and explicitly rejected a vector database for the MVP.
+- Required Structured Outputs for clarification decisions, profile updates, document interpretation, and routes; prohibited requests for visible chain of thought or hidden reasoning.
+- Recorded provisional reasoning levels—intake `low`, profile decisions `medium`, document analysis/research/routes `high`, and high-risk cases `xhigh`—with mandatory Phase 4 verification before use.
+- Prohibited a second tone-polishing model call. Limited an optional structured verification pass to high-risk routes, source conflicts, suspected unsupported claims, or failed validation.
+- Added Phase 6 Luna evaluation criteria for useful questions, repeated or unnecessary questions, correction handling, false reassurance, robotic filler, structured-output validity, multilingual quality, latency, and cost.
+
+### Files and scope
+
+Updated `AGENTS.md`, `docs/MASTER_BUILD_PLAN.md`, `docs/DECISIONS.md`, `docs/ARCHITECTURE_DECISIONS.md`, `docs/BUILD_LOG.md`, and `docs/PHASE_STATUS.md`. No application, test, dependency, lockfile, environment, SDK, provider, or API implementation changed. No secret was created, inspected, or exposed.
+
+### Quality gates
+
+- `npm run lint`: passed with no ESLint errors.
+- `npm test`: passed — 10 test files and 59 tests.
+- `npm run build`: passed with Next.js 16.2.10; `/`, `/case`, `/manifest.webmanifest`, and `/api/cases/analyze` remained in the route manifest.
+- `npm audit`: passed — 0 vulnerabilities. The first sandboxed registry request failed without producing an audit result; the required audit was rerun with approved registry/cache access and completed successfully.
+- Documentation consistency: Luna, tone, memory, Structured Outputs, reasoning, verification-pass, Phase 4 gate, and Phase 6 evaluation rules were cross-checked across all six updated files.
+
+### Codex contribution and next phase
+
+Codex translated the agreed model and interaction choices into canonical repository rules, durable architecture records, and executable Phase 3, Phase 4, and Phase 6 requirements while preserving the external API-access gate and honest uncertainty about settings that must be verified during implementation.
+
+No product phase was implemented. Phase 3 remains the next executable phase; Phase 4 remains blocked pending private API access and must verify Luna's current official API support before any SDK or provider work.
