@@ -1,10 +1,14 @@
 import { MockModeBadge } from "@/components/case/mock-mode-badge";
+import { getCategoryDefinition } from "@/domain/categories";
 import type { CaseAnalysis } from "@/domain/case";
 import { RESULT_COPY } from "@/i18n/case-copy";
 import { formatCaseDate } from "@/lib/date-format";
 
 export function AnalysisSummary({ analysis }: { analysis: CaseAnalysis }) {
   const copy = RESULT_COPY[analysis.outputLanguage];
+  const category = analysis.category
+    ? getCategoryDefinition(analysis.category)
+    : null;
 
   return (
     <section aria-labelledby="analysis-summary-heading" className="space-y-5">
@@ -19,6 +23,18 @@ export function AnalysisSummary({ analysis }: { analysis: CaseAnalysis }) {
           {analysis.documentLanguage}
         </p>
       </div>
+
+      <aside className="rounded-2xl border border-[#d9ddd8] bg-white p-4 text-sm leading-6 text-[#5c6861]">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-semibold text-[#2a3931]">
+            Case category: {category?.label ?? "Not selected"}
+          </span>
+          <span className="rounded-full bg-[#f0f2ef] px-2 py-0.5 text-[0.68rem] font-semibold text-[#68736d]">
+            Orientation only
+          </span>
+        </div>
+        <p className="mt-1">{analysis.mockContext}</p>
+      </aside>
 
       <div className="rounded-2xl border border-[#cbd8d1] bg-[#f3f8f5] p-5 sm:p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#28664e]">

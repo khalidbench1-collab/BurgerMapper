@@ -1,39 +1,39 @@
-# Three-minute demo storyboard — Phase 1 draft
+# Three-minute demo storyboard — Phase 1.5 draft
 
-> Draft based on the working Phase 1 implementation. It will evolve as real extraction, source verification, and AI analysis are added. All current analysis content is a clearly labelled fictional mock.
+> Draft based on the working Phase 1.5 implementation. It will evolve as extraction, source verification, and real AI analysis are added. All current analysis content is a clearly labelled fictional mock.
 
 ## 0:00–0:18 — Problem hook
 
-Show the stress caused by a dense German official letter: the user needs the deadline, requested documents, uncertainty, and a route—not a chat transcript.
+Show the stress caused by a dense German official letter: the user needs its purpose, deadline, requested documents, and a route—not a chat transcript or knowledge of the official procedure name.
 
-## 0:18–0:35 — Start a case
+## 0:18–0:35 — Choose an orientation category
 
-Open the concise BurgerMapper landing page and select **Start a new case**. Point out the visible mock-mode status.
+Open the BurgerMapper landing page and choose **Visa & Immigration**. Show that `/case` opens with that optional category preselected and that it can be changed or cleared. Explain that categories orient the user; they do not decide eligibility.
 
-## 0:35–0:55 — Local document intake
+## 0:35–0:58 — Paste or upload a letter
 
-On `/case`, show the accepted PDF/image formats and 10 MB limit, then choose **Use the fictional sample letter**. Briefly show the privacy note: Phase 1 keeps a selected file only in browser memory and does not read or send it.
+Show **Paste text**, then briefly switch to **Upload document** to demonstrate PDF/image intake. Return to text and paste a fictional official message. Point out that the input stays in browser memory and mock mode does not read, send, persist, or truly interpret it. If time is tight, use **Try sample** instead.
 
-## 0:55–1:20 — Run the mock analysis
+## 0:58–1:22 — Demonstrate the route structure
 
-Keep English selected and run the short deterministic mock analysis. Show the clearly separated extracted-fact panel and plain-language interpretation for the fictional Landesamt für Einwanderung Berlin scenario.
+Run the deterministic mock analysis. State explicitly: the later real version is intended to identify the letter's purpose, but the current build uses the fictional Samira Haddad scenario to demonstrate the expected structured route. Show the separated facts, mock interpretation, uncertainty, and requested action.
 
-## 1:20–1:40 — Deadline, action, and uncertainty
+## 1:22–1:43 — Deadline and one useful clarification
 
-Highlight the detected 22 July 2026 deadline, high-urgency label, requested passport/insurance/income documents, and the explicit uncertainty about employment status and submission method.
+Highlight the fictional deadline and required documents. Answer **Employed** and show the income-evidence step adapt. Explain that BurgerMapper asks a question only when its answer changes the route.
 
-## 1:40–2:00 — One useful clarification
+## 1:43–2:08 — Personalized next steps
 
-Answer **Employed**. Show that the income document changes to employment evidence and step two becomes ready. Explain that BurgerMapper asks this question because the answer changes the route.
+Walk through the ordered route, responsible party, timing, and status. Emphasize that the route—not a chatbot transcript—is the product.
 
-## 2:00–2:20 — Route and source limitations
+## 2:08–2:29 — Arabic RTL result
 
-Walk through the four ordered next steps, then show both official-source entries labelled **Placeholder — not verified** and the legal-information disclaimer. Do not describe these as verified citations.
+Start over, choose Visa & Immigration again, select the sample and Arabic, then analyze. Show the right-to-left result layout while dates and source URLs remain readable.
 
-## 2:20–2:40 — Arabic RTL result
+## 2:29–2:43 — Official-source verification boundary
 
-Start over, select the fictional sample and Arabic, then run the analysis again. Show the right-to-left result layout while the source domains remain readable left-to-right.
+Show entries labelled **Placeholder — not verified** and the legal-information disclaimer. Explain that retrieval and verification of official sources will appear in a later workflow phase; do not present these placeholders as citations.
 
-## 2:40–3:00 — Engineering evidence
+## 2:43–3:00 — Engineering evidence
 
-Briefly show the typed provider-independent analysis contract, focused test result, dated commits, and prior-work disclosure. Explain accurately that Codex supported the Phase 1 architecture, implementation, tests, audit remediation, and documentation; add later GPT-5.6 contributions only when they have occurred and are evidenced.
+Briefly show the discriminated `CaseInput`, provider-independent `CaseAnalysis`, 33 passing tests, dated commits, and prior-work disclosure. Explain accurately that Codex supported the architecture, implementation, tests, verification, and documentation; add GPT-5.6 contributions only after they occur and are evidenced.

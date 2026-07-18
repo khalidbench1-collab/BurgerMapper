@@ -2,13 +2,26 @@ import type { Metadata } from "next";
 
 import { AppHeader } from "@/components/app-header";
 import { CaseWorkspace } from "@/components/case/case-workspace";
+import { isBureaucracyCategory } from "@/domain/categories";
 
 export const metadata: Metadata = {
   title: "New case | BurgerMapper",
   description: "Build a local mock route from a German official letter.",
 };
 
-export default function CasePage() {
+export default async function CasePage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    category?: string | string[];
+  }>;
+}) {
+  const categoryParam = (await searchParams).category;
+  const initialCategory =
+    typeof categoryParam === "string" && isBureaucracyCategory(categoryParam)
+      ? categoryParam
+      : null;
+
   return (
     <div className="min-h-screen bg-[#f5f2eb] text-[#17231d]">
       <AppHeader />
@@ -21,10 +34,10 @@ export default function CasePage() {
             Build a clear route from your letter
           </h1>
           <p className="mt-3 text-base leading-7 text-[#5f6c65]">
-            Start with the document and your preferred output language. The mock result keeps extracted facts, interpretation, uncertainty, actions, and sources visibly separate.
+            Choose an optional topic, add text or a document, and select the output language. Mock mode demonstrates the route without interpreting your content.
           </p>
         </header>
-        <CaseWorkspace />
+        <CaseWorkspace initialCategory={initialCategory} />
       </main>
     </div>
   );

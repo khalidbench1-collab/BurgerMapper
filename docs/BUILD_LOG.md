@@ -133,3 +133,51 @@ Codex reviewed the installed Next.js guidance, designed the typed contract and s
 ### Next phase
 
 Define a safe normalized-document input contract and implement tested PDF text extraction plus image OCR behind a privacy-controlled server boundary, while keeping mock mode and the existing `CaseAnalysis` service contract intact. Do not add real OpenAI calls until extracted input, retention behavior, and evaluation fixtures are agreed.
+
+## 2026-07-18 — Phase 1.5 multimodal case intake completion
+
+### Objective and starting state
+
+Complete the two agreed intake elements missing from the Phase 1 report: manual pasted-text input and six visible bureaucracy categories. The worktree was clean on `main` before this phase, at Phase 1 commit `6c1a9869a64da6aca834f5d02ffbd475256d0f17`. The existing file/sample workflow, multilingual mock results, clarification adaptation, and 13 tests were retained.
+
+### Implementation details
+
+- Added the six typed categories: Arrival & Registration, Visa & Immigration, Work & Business, Housing & Money, Health & Insurance, and Family & Children.
+- Added landing-page shortcuts that preselect `/case?category=...`, while preserving a general **Start a case** action.
+- Made category selection optional and clearable. Category context is passed to analysis and displayed as orientation only, never as an eligibility decision.
+- Added mutually exclusive **Paste text**, **Upload document**, and **Try sample** modes. Upload accepts PDF and image inputs, producing the four requested entry methods.
+- Added a labelled textarea with a 20 non-whitespace-character minimum, 20,000-character maximum, visible count, whitespace normalization, privacy guidance, and accessible validation announcements.
+- Added confirmation before switching away from non-empty text or a selected file. Start over clears text, file, sample, category, analysis, and errors.
+- Kept pasted text and `File` objects only in React state. Content is not logged, transmitted, persisted, rendered as HTML, or interpreted as Markdown.
+- Added hand-written English, German, and Arabic mock variations for Arrival & Registration and Work & Business. Visa & Immigration retains the fictional residence-renewal route; other categories retain the default mock route with selected context.
+- Results explicitly state that mock mode did not interpret the pasted text or document.
+
+### Architecture choices
+
+- Added a centralized `BureaucracyCategory` union and category metadata module.
+- Added one discriminated `CaseInput` union for text, file, and sample. Every branch includes output language and an optional category and returns the unchanged structured `CaseAnalysis` contract.
+- Kept validation and normalized input builders separate from the interface. `DocumentAnalysisService` accepts the unified input so a future server implementation will not require separate result UIs.
+- Kept category variations in mock-data modules rather than embedding procedure logic in components.
+
+### Tests and quality gates
+
+- Expanded the suite from 13 to 33 tests across 7 files.
+- Coverage includes six landing shortcuts, category select/clear/query preselection, text validation and normalization, the length maximum, discriminated inputs, mode switching, reset, safe handling of HTML-looking input, text reaching the service, category context and adaptation, file/sample regressions, and Arabic RTL.
+- `npm test` — passed: 7 files and 33 tests.
+- `npm run lint` — passed with exit code 0 and no ESLint findings.
+- `npm run build` — passed on Next.js 16.2.10 with strict TypeScript checks. `/` and `/manifest.webmanifest` are static; `/case` is dynamic because it reads the category query parameter.
+- `npm audit --json` — passed with 0 vulnerabilities across 543 dependencies reported by npm. No dependencies changed in Phase 1.5.
+- Local HTTP checks passed: `/`, `/case`, `/case?category=visa-immigration`, and `/manifest.webmanifest` returned 200. The responses showed all six categories, all three mode controls, Visa & Immigration preselection, and the manifest content type `application/manifest+json`.
+
+### Problems and fixes
+
+- One UI test initially matched both the visible validation alert and its screen-reader live copy. Querying the semantic alert region made the assertion match the accessible behavior.
+- In-app browser automation remained unavailable because bootstrap could not receive its sandbox policy. HTTP and component checks were completed instead; no alternate browser controller was used.
+
+### Codex collaboration notes
+
+Codex reviewed the existing contracts and Next.js routing guidance, implemented the unified intake model and optional category experience, wrote the category-aware multilingual mock variations, expanded the accessibility-focused tests, ran the quality and HTTP checks, and updated the provenance and demo documentation.
+
+### Next phase
+
+Define Phase 2 as a privacy-controlled server-side extraction layer: normalized PDF text extraction and image OCR with safe file handling, retention limits, typed extraction errors, deterministic fixtures, and evaluations. Keep mock mode and the `CaseInput`/`CaseAnalysis` boundary; do not add OpenAI interpretation until the extraction and privacy boundary is tested and documented.

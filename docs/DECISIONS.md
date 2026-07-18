@@ -27,3 +27,13 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Exclude OCR and PDF extraction from Phase 1 | The phase validates interaction, contract, accessibility, and privacy boundaries first; document parsing needs its own security, accuracy, and fixture work. |
 | Keep one client state boundary in `CaseWorkspace` | A single case route has a short-lived state machine and no cross-route persistence. Central local state with pure leaf components is easier to audit than adding context or a state library. |
 | Split result sections into focused components | Summary, deadline, requirements, clarification, route, sources, and disclaimer have different semantic and visual responsibilities. The suggested structure was followed where it improved clarity; orchestration remains in `AnalysisResult` rather than adding a component for every wrapper. |
+
+## Phase 1.5 intake decisions
+
+| Decision | Reason |
+| --- | --- |
+| Treat categories as optional orientation aids | Users may not know the official procedure name, and real letters can span topics. A category can preselect context or be cleared, but it never determines eligibility or blocks a general case. |
+| Normalize text, file, and sample inputs into one discriminated `CaseInput` contract | One typed service boundary prevents separate analysis UIs and makes it explicit which payload exists for each input kind. A later server implementation can accept the same union while preserving `CaseAnalysis`. |
+| Keep arbitrary pasted text mock-only | Until a real server-side interpretation pipeline and evaluations exist, returning fictional labelled output is safer than implying the pasted message was legally or factually understood. |
+| Keep pasted text only in browser memory | Official messages may contain sensitive information. React state supports the intake demonstration without storage, logs, analytics, or transmission, and reset removes it immediately. |
+| Confirm before discarding an active input during mode changes | Text and selected files are private user work. An explicit confirmation reduces accidental loss while still enforcing one active input method at a time. |

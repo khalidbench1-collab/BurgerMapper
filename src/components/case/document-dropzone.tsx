@@ -8,14 +8,12 @@ interface DocumentDropzoneProps {
   disabled?: boolean;
   error: string | null;
   onFileSelected: (file: File) => void;
-  onSampleSelected: () => void;
 }
 
 export function DocumentDropzone({
   disabled = false,
   error,
   onFileSelected,
-  onSampleSelected,
 }: DocumentDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -55,6 +53,7 @@ export function DocumentDropzone({
           ref={inputRef}
           id="document-file"
           type="file"
+          aria-label="Choose a PDF or image letter"
           accept={FILE_PICKER_ACCEPT}
           disabled={disabled}
           aria-describedby="document-formats document-privacy document-error"
@@ -85,23 +84,6 @@ export function DocumentDropzone({
           Choose a file
         </button>
       </div>
-
-      <div className="flex items-center gap-3" aria-hidden="true">
-        <span className="h-px flex-1 bg-[#dfe3df]" />
-        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[#7a847f]">
-          or
-        </span>
-        <span className="h-px flex-1 bg-[#dfe3df]" />
-      </div>
-
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={onSampleSelected}
-        className="w-full rounded-xl border border-[#bfd0c6] bg-[#f2f8f5] px-4 py-3 text-sm font-semibold text-[#185f45] outline-none hover:bg-[#e8f3ed] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        Use the fictional sample letter
-      </button>
 
       <p id="document-error" role="alert" className="min-h-6 text-sm font-medium text-[#a33f2d]">
         {error}

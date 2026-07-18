@@ -1,5 +1,6 @@
 import type {
   CaseAnalysis,
+  CaseInput,
   ClarificationAnswerId,
   NextStep,
   RequiredDocument,
@@ -26,7 +27,7 @@ interface MockContent {
   disclaimer: string;
 }
 
-interface RouteVariant {
+export interface RouteVariant {
   incomeDocument: RequiredDocument;
   incomeStep: Pick<NextStep, "title" | "description" | "status">;
   remainingUncertainty: string;
@@ -392,7 +393,7 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
 
 const ROUTE_VARIANTS: Record<
   SupportedLanguage,
-  Record<ClarificationAnswerId, RouteVariant>
+  Partial<Record<ClarificationAnswerId, RouteVariant>>
 > = {
   en: {
     employed: {
@@ -528,13 +529,33 @@ const ROUTE_VARIANTS: Record<
   },
 };
 
-export function buildMockCaseAnalysis(
-  outputLanguage: SupportedLanguage,
-): CaseAnalysis {
+const MOCK_CONTEXT: Record<
+  SupportedLanguage,
+  Record<CaseInput["kind"], string>
+> = {
+  en: {
+    text: "Mock mode is demonstrating the expected route format. The pasted text was not interpreted or understood.",
+    file: "Mock mode is demonstrating the expected route format. The selected file was not opened, read, or interpreted.",
+    sample: "Mock mode is using a fictional sample and does not represent a verified legal assessment.",
+  },
+  de: {
+    text: "Der Demo-Modus zeigt das erwartete Routenformat. Der eingefügte Text wurde weder interpretiert noch verstanden.",
+    file: "Der Demo-Modus zeigt das erwartete Routenformat. Die ausgewählte Datei wurde nicht geöffnet, gelesen oder interpretiert.",
+    sample: "Der Demo-Modus verwendet ein fiktives Beispiel und stellt keine verifizierte rechtliche Bewertung dar.",
+  },
+  ar: {
+    text: "يعرض الوضع التجريبي شكل المسار المتوقع. لم تتم قراءة النص الملصق أو تفسيره أو فهمه.",
+    file: "يعرض الوضع التجريبي شكل المسار المتوقع. لم يتم فتح الملف المحدد أو قراءته أو تفسيره.",
+    sample: "يستخدم الوضع التجريبي نموذجًا خياليًا ولا يمثل تقييمًا قانونيًا متحققًا منه.",
+  },
+};
+
+export function buildMockCaseAnalysis(input: CaseInput): CaseAnalysis {
+  const { outputLanguage } = input;
   const content = MOCK_CONTENT[outputLanguage];
 
   return {
-    id: `mock-analysis-${outputLanguage}`,
+    id: `mock-analysis-${input.kind}-${input.category ?? "general"}-${outputLanguage}`,
     documentTitle: content.documentTitle,
     issuingAuthority: "Landesamt für Einwanderung Berlin",
     documentType: content.documentType,
@@ -564,6 +585,9 @@ export function buildMockCaseAnalysis(
     disclaimer: content.disclaimer,
     generatedAt: new Date().toISOString(),
     outputLanguage,
+    inputKind: input.kind,
+    category: input.category ?? null,
+    mockContext: MOCK_CONTEXT[outputLanguage][input.kind],
     isMock: true,
   };
 }
@@ -571,6 +595,6 @@ export function buildMockCaseAnalysis(
 export function getMockRouteVariant(
   outputLanguage: SupportedLanguage,
   answer: ClarificationAnswerId,
-): RouteVariant {
-  return ROUTE_VARIANTS[outputLanguage][answer];
+): RouteVariant | null {
+  return ROUTE_VARIANTS[outputLanguage][answer] ?? null;
 }

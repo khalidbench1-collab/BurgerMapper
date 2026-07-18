@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AppHeader } from "@/components/app-header";
+import { CategoryShortcuts } from "@/components/category-shortcuts";
 
 export default function Home() {
   return (
@@ -23,11 +24,11 @@ export default function Home() {
                 href="/case"
                 className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#1d664b] px-6 py-3 text-base font-semibold text-white shadow-sm outline-none hover:bg-[#15523c] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35"
               >
-                Start a new case
+                Start a case
                 <span aria-hidden="true" className="ms-2">→</span>
               </Link>
               <p className="max-w-xs text-sm leading-6 text-[#68736d]">
-                Phase 1 uses a fictional mock analysis. No document is sent anywhere.
+                Mock mode only. Pasted text and documents stay in this browser tab.
               </p>
             </div>
           </section>
@@ -43,6 +44,7 @@ export default function Home() {
             </ol>
           </aside>
         </div>
+        <CategoryShortcuts />
       </main>
     </div>
   );

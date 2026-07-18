@@ -1,4 +1,8 @@
+import type { BureaucracyCategory } from "@/domain/categories";
+
 export type SupportedLanguage = "en" | "de" | "ar";
+
+export type InputKind = "text" | "file" | "sample";
 
 export type WorkflowStatus =
   | "idle"
@@ -62,7 +66,16 @@ export interface NextStep {
   officialSourceIds: string[];
 }
 
-export type ClarificationAnswerId = "employed" | "self-employed" | "both";
+export type ClarificationAnswerId =
+  | "employed"
+  | "self-employed"
+  | "both"
+  | "primary-residence"
+  | "secondary-residence"
+  | "unsure-residence"
+  | "freelance-only"
+  | "alongside-employment"
+  | "unsure-work";
 
 export interface ClarificationOption {
   id: ClarificationAnswerId;
@@ -97,21 +110,42 @@ export interface CaseAnalysis {
   disclaimer: string;
   generatedAt: string;
   outputLanguage: SupportedLanguage;
+  inputKind: InputKind;
+  category: BureaucracyCategory | null;
+  mockContext: string;
   isMock: true;
 }
 
-export interface AnalysisInput {
-  document: UploadedDocument;
+interface BaseCaseInput {
+  category?: BureaucracyCategory;
   outputLanguage: SupportedLanguage;
 }
 
+export type CaseInput =
+  | (BaseCaseInput & {
+      kind: "text";
+      text: string;
+    })
+  | (BaseCaseInput & {
+      kind: "file";
+      document: UploadedDocument;
+    })
+  | (BaseCaseInput & {
+      kind: "sample";
+      sampleId: string;
+    });
+
 export interface DocumentAnalysisService {
-  analyzeDocument(input: AnalysisInput): Promise<CaseAnalysis>;
+  analyzeDocument(input: CaseInput): Promise<CaseAnalysis>;
 }
 
 export interface CaseState {
   status: WorkflowStatus;
+  inputKind: InputKind;
+  category: BureaucracyCategory | null;
+  textInput: string;
   document: UploadedDocument | null;
+  sampleId: string | null;
   outputLanguage: SupportedLanguage;
   analysis: CaseAnalysis | null;
   validationError: string | null;
