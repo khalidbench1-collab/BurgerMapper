@@ -20,9 +20,14 @@ interface NormalizedCaseInputBase {
   category: BureaucracyCategory | null;
   outputLanguage: SupportedLanguage;
   receivedAt: string;
+  normalizedGoal: string | null;
 }
 
 export type NormalizedCaseInput =
+  | (NormalizedCaseInputBase & {
+      kind: "goal";
+      normalizedGoal: string;
+    })
   | (NormalizedCaseInputBase & {
       kind: "text";
       normalizedText: string;

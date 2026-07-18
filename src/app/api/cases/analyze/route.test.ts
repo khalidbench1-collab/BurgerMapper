@@ -21,6 +21,21 @@ const SUCCESS_OPTIONS = {
 } as const;
 
 describe("POST /api/cases/analyze", () => {
+  it("accepts a goal-only case without echoing the goal", async () => {
+    const privateGoal = "Renew a fictional residence permit without knowing the procedure name.";
+    const formData = baseForm("goal");
+    formData.set(CASE_FORM_FIELDS.goal, privateGoal);
+
+    const response = await handleAnalyzeCaseRequest(createRequest(formData), SUCCESS_OPTIONS);
+    const payload = (await response.json()) as AnalyzeCaseSuccessResponse;
+
+    expect(response.status).toBe(200);
+    expect(payload.analysis.inputKind).toBe("goal");
+    expect(payload.metadata.inputKind).toBe("goal");
+    expect(payload.analysis.mockContext).toContain("goal was validated in memory");
+    expect(JSON.stringify(payload)).not.toContain(privateGoal);
+  });
+
   it("accepts pasted text and returns the CaseAnalysis contract", async () => {
     const privateText =
       "  This   synthetic pasted message has enough useful characters.\r\nSecond line.  ";

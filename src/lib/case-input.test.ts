@@ -2,12 +2,30 @@ import { describe, expect, it } from "vitest";
 
 import {
   createFileCaseInput,
+  createGoalCaseInput,
   createSampleCaseInput,
   createTextCaseInput,
 } from "@/lib/case-input";
 import { createUploadedDocument } from "@/lib/file-validation";
 
 describe("normalized CaseInput builders", () => {
+  it("creates a normalized goal-only input", () => {
+    expect(
+      createGoalCaseInput(
+        "  Renew   a fictional residence permit. ",
+        "en",
+        null,
+      ),
+    ).toEqual({
+      valid: true,
+      input: {
+        kind: "goal",
+        goal: "Renew a fictional residence permit.",
+        outputLanguage: "en",
+      },
+    });
+  });
+
   it("creates a normalized discriminated text input", () => {
     const result = createTextCaseInput(
       "  A copied   official message with sufficient useful content. ",
@@ -43,6 +61,23 @@ describe("normalized CaseInput builders", () => {
       sampleId: "fictional-sample",
       category: "family-children",
       outputLanguage: "ar",
+    });
+  });
+
+  it("adds one normalized goal to existing evidence inputs", () => {
+    const result = createTextCaseInput(
+      "A copied official message with sufficient useful content.",
+      "en",
+      null,
+      "  Work out   which step comes first. ",
+    );
+
+    expect(result).toMatchObject({
+      valid: true,
+      input: {
+        kind: "text",
+        goal: "Work out which step comes first.",
+      },
     });
   });
 });

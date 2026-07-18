@@ -319,3 +319,61 @@ Updated `AGENTS.md`, `docs/MASTER_BUILD_PLAN.md`, `docs/DECISIONS.md`, `docs/ARC
 Codex translated the agreed model and interaction choices into canonical repository rules, durable architecture records, and executable Phase 3, Phase 4, and Phase 6 requirements while preserving the external API-access gate and honest uncertainty about settings that must be verified during implementation.
 
 No product phase was implemented. Phase 3 remains the next executable phase; Phase 4 remains blocked pending private API access and must verify Luna's current official API support before any SDK or provider work.
+
+## 2026-07-18 — Phase 3 goal-based Case Builder Agent in mock mode
+
+### Objective and starting state
+
+Build a calm goal-first guided case flow in deterministic mock mode while preserving every Phase 2 intake, validation, privacy, multilingual, and route behavior. The worktree was clean on `main` at `4e576505f80c078c8440903094299b76db5e6174` (`docs: refine Luna tone and API architecture`) before Phase 3 began.
+
+### Implementation details
+
+- Made “What do you need to get done?” the primary `/case` input, with whitespace normalization, plain-text handling, a 10-meaningful-character minimum, 1,000-character maximum, count, validation announcement, and privacy copy.
+- Added goal-only cases and optional goal context for pasted text, PDF/image upload, and the trusted sample without creating a second analysis endpoint or result UI.
+- Preserved the six optional categories and made evidence choices explicitly secondary: Goal only, Paste text, Upload document, and Try sample.
+- Added a strict `CaseProfile` covering goal, optional category, content-free evidence metadata, known mock facts, answers, uncertainty, output language, asked-question and correction history, sufficiency, and timestamps.
+- Added a provider-independent `CaseBuilderService` around the established server analysis service. Pure deterministic functions construct the profile, select one consequential question, apply “I don't know”, evaluate sufficiency, preserve corrections, and build the final fictional `CaseAnalysis` route from the profile.
+- Added an editable case summary. Goal or category changes rebuild the affected mock question; a previous answer can be reopened and changed without starting over.
+- Replaced step-count-like progress with meaningful states: Understanding your goal, Need one detail, and Route ready.
+- Extended the existing multipart server boundary with a backward-compatible `goal` field and goal-only input kind, centralized typed goal errors, server validation, no input echo, and future request-plan mapping to `input_text`.
+- Preserved cancellation, duplicate-request prevention, reset, print layout, typed safe errors, English/German/Arabic mock output, Arabic RTL, unverified source labels, mock warnings, and discarded-after-processing metadata.
+
+### Architecture and privacy choices
+
+- `CaseProfile` is the case's short-lived memory; no transcript, vector store, database, localStorage, analytics, or tracking was added.
+- The profile holds no pasted content, binary data, or filename. It stores only an evidence-kind label and the normalized goal needed for the current tab.
+- Goal content is validated in the server request but is not echoed in success metadata or typed errors, logged, persisted, written to disk, or sent to any third party.
+- Phase 3 uses deterministic fictional scenarios and explicitly states that neither the goal nor optional evidence was understood by AI.
+
+### Tests and quality gates
+
+- Expanded the suite from 59 to 80 tests across 12 files; all 80 passed.
+- Added synthetic coverage for goal validation and normalization, goal-only and goal-plus-evidence inputs, normalized server transport, future goal request planning, profile construction, deterministic question selection, question rationale, one-question sufficiency, “I don't know”, correction handling, route derivation, procedural warmth, duplicate prevention, typed errors, reset, categories, sample/file flows, and Arabic RTL regressions.
+- `npm run lint` — passed with exit code 0 and no ESLint findings.
+- `npm test` — passed: 12 files and 80 tests.
+- `npm run build` — passed on Next.js 16.2.10 with strict TypeScript; static `/` and `/manifest.webmanifest`, dynamic `/case` and `/api/cases/analyze`.
+- `npm audit --json` — passed with 0 vulnerabilities across 543 dependencies: 17 production, 491 development, and 105 optional.
+- No npm dependency or lockfile changes were made.
+
+### HTTP, accessibility, and security verification
+
+- Local GET checks returned 200 for `/`, `/case`, `/case?category=visa-immigration`, and `/manifest.webmanifest`; the manifest returned `application/manifest+json`.
+- A synthetic goal-only multipart request returned 200 with `inputKind: goal`, `isMock: true`, no original goal in the response, and `discarded-after-processing` metadata/header.
+- A short synthetic goal returned 422 with the safe typed `GOAL_TOO_SHORT` error. The known server-resolved sample and a temporary synthetic PDF signature each returned 200; the temporary fixture was removed immediately and is not tracked.
+- Component tests verify labels, one visible question, live error/status behavior, corrections, cancellation/duplicate guards, plain-text rendering, mobile-first responsive classes, print behavior, multilingual results, Arabic `dir="rtl"`, and left-to-right source URLs. Source inspection confirmed visible focus styles, semantic controls, live regions, responsive breakpoints, and print rules.
+- In-app browser automation was attempted through the required browser surface but could not initialize because its sandbox policy was unavailable. No alternate browser controller was substituted; rendered HTTP output, component integration tests, and source inspection provide the Phase 3 fallback evidence.
+
+### Problems and fixes
+
+- Existing UI assertions expected the previous evidence-first screen and were deliberately updated to retain those regressions inside the new goal-first flow rather than removed.
+- ESLint rejected synchronizing editable profile draft state inside an effect. Keying the editor by profile revision removed the cascading state effect and keeps correction drafts current.
+- The first restricted audit request could not reach the registry; the same required audit was rerun with approved audit access and passed.
+- A detached local production process exited before binding. HTTP verification was completed with a directly supervised development server, which was allowed to time out after all requests so no background process remained.
+
+### Codex collaboration notes
+
+Codex inspected the Phase 2 architecture, evolved the domain and server contracts compatibly, implemented the goal-first workspace and structured builder, wrote deterministic mock profile/sufficiency/correction logic, expanded the synthetic tests, fixed accessibility and lint findings, verified the build, audit, HTTP/API/privacy behavior, and updated all required Phase 3 evidence.
+
+### Next phase and external gate
+
+Phase 4 is the real OpenAI multimodal and Structured Outputs integration, but it remains blocked. The user must privately enable OpenAI API billing/access and configure `OPENAI_API_KEY` in `.env.local`, then explicitly authorize Phase 4. The secret must never be pasted into conversation. Phase 4 must verify the current official `gpt-5.6-luna` identifier, availability, capabilities, and reasoning settings before implementation.

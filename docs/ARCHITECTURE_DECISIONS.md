@@ -137,3 +137,19 @@ These dated records capture durable technical choices. Product-level choices and
 - **Reason:** Risk-triggered verification concentrates additional work where it can materially improve safety and evidence quality.
 - **Tradeoff:** Trigger definitions and pass/fail handling add branching and must be evaluated for missed triggers and unnecessary calls.
 - **Revisit when:** Phase 6 evaluation shows the trigger policy has unacceptable false negatives, false positives, latency, or cost.
+
+## 2026-07-18 — Structured CaseProfile and guided-builder boundary
+
+- **Context:** Goal-only and document-supported cases need one route memory that can show uncertainty, accept corrections, and stop asking questions without a chat transcript or persistence layer.
+- **Decision:** Introduce a strict in-memory `CaseProfile` and provider-independent `CaseBuilderService`. The profile records normalized goal, optional category, content-free evidence metadata, known mock facts, answers, uncertainties, output language, asked-question and correction history, sufficiency, and timestamps. Deterministic pure functions select one question, evaluate sufficiency, apply corrections, and build the final mock `CaseAnalysis` route.
+- **Reason:** A structured profile keeps the route auditable, makes corrections and stopping behavior testable, and provides the future Structured Outputs boundary without weakening the established analysis API.
+- **Tradeoff:** Phase 3 profile construction is partly client-side and deterministic; it cannot understand arbitrary goals or infer new facts, and its one-question policy represents only fictional scenarios.
+- **Revisit when:** Phase 4 has verified API access and schema-valid structured profile updates can replace deterministic mock construction while preserving privacy, correction history, mock fallback, and the `CaseAnalysis` route contract.
+
+## 2026-07-18 — Backward-compatible goal transport
+
+- **Context:** The secure endpoint already accepts four evidence kinds, while a user must now be able to start with a goal alone or attach that goal to any existing input.
+- **Decision:** Add a `goal` input discriminant and optional goal context on existing `CaseInput` variants, validate the goal independently on client and server, and map goal-only requests to the internal future `input_text` plan. Do not echo goal content in the API response.
+- **Reason:** One multipart boundary continues to protect every case path without creating a second goal endpoint or separate result UI.
+- **Tradeoff:** The stable API now has an additional optional field and error codes, and current mock analysis still cannot semantically interpret that field.
+- **Revisit when:** A future structured provider requires a versioned transport change that cannot be introduced compatibly.

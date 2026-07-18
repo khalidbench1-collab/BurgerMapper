@@ -15,10 +15,12 @@ export function AnalysisResult({
   analysis,
   onAnswer,
   onStartOver,
+  showClarification = true,
 }: {
   analysis: CaseAnalysis;
   onAnswer: (answer: ClarificationAnswerId) => void;
   onStartOver: () => void;
+  showClarification?: boolean;
 }) {
   const copy = RESULT_COPY[analysis.outputLanguage];
   const direction = analysis.outputLanguage === "ar" ? "rtl" : "ltr";
@@ -65,7 +67,9 @@ export function AnalysisResult({
         </section>
 
         <RequirementsList analysis={analysis} />
-        <ClarificationCard analysis={analysis} onAnswer={onAnswer} />
+        {showClarification ? (
+          <ClarificationCard analysis={analysis} onAnswer={onAnswer} />
+        ) : null}
         <RouteTimeline analysis={analysis} />
         <SourceList analysis={analysis} />
         <Disclaimer analysis={analysis} />

@@ -1,36 +1,36 @@
-# Three-minute demo storyboard — Phase 2 draft
+# Three-minute demo storyboard — Phase 3 draft
 
-> Draft based on the working Phase 2 implementation. All analysis remains fictional mock output. No OpenAI request, OCR, source search, or document interpretation occurs yet.
+> Draft based on the working Phase 3 implementation. All profile decisions and routes remain deterministic fictional mock output. No OpenAI request, OCR, source search, or genuine goal/document interpretation occurs yet.
 
-Planning checkpoint: the repository now contains a phase-gated execution system for the remaining work, but this did not add or change a product scene. The storyboard stays limited to behavior that actually exists after Phase 2 and will be updated by every later product phase.
+The storyboard stays limited to behavior that actually exists after Phase 3 and will be updated by every later product phase.
 
 ## 0:00–0:18 — Problem hook
 
-Show why a stressed newcomer needs the purpose, deadline, required documents, uncertainty, and next route from an official letter—not a chat transcript or knowledge of a procedure name.
+Show why a newcomer should be able to state an outcome in ordinary language and receive a route without knowing a German procedure name or navigating a chat transcript.
 
-## 0:18–0:35 — Choose optional context
+## 0:18–0:40 — Start with the goal
 
-Choose **Visa & Immigration** on the landing page. Show the category preselected on `/case`, then note that it can be changed or cleared and never determines eligibility.
+Open `/case` and enter a fictional goal such as “I need to renew my residence permit.” Show that this is the primary input and can be submitted without a document.
 
-## 0:35–0:57 — Choose one of four inputs
+## 0:40–0:58 — Add optional context
 
-Show Paste text, PDF/image upload, and Try sample as one calm intake. Use only the fictional sample for the recorded demo. Explain that the active input now goes to the BurgerMapper application server for in-memory validation.
+Choose **Visa & Immigration** and add the trusted fictional sample. Briefly show that paste and PDF/image upload remain alternatives, while category and evidence are optional.
 
-## 0:57–1:20 — Privacy-controlled mock request
+## 0:58–1:20 — Privacy-controlled mock profile
 
-Run the analysis. State that the server validates text length or document MIME/signature, sends nothing to an AI provider, intentionally stores nothing, and reports that temporary input was discarded. Mock mode demonstrates the future route structure without understanding the document.
+Build the case. State that the server validates the goal and evidence in memory, sends nothing to an AI provider, stores nothing intentionally, and discards request input. Mock mode demonstrates a structured `CaseProfile` without understanding the goal or sample.
 
-## 1:20–1:43 — Structured route and one useful question
+## 1:20–1:47 — One useful question
 
-Show the separated facts, interpretation, uncertainty, deadline, documents, and ordered next steps. Answer **Employed** and show the income-evidence step adapt because this answer changes the route.
+Show the editable profile summary and the single employment-status question with its “Why this changes the route” explanation. Choose **I don't know** and show uncertainty retained with a safe verification step.
 
-## 1:43–2:05 — Typed safety boundary
+## 1:47–2:08 — Correct the case
 
-Briefly show a safe validation error using a synthetic mismatched file or test evidence. Explain that raw server exceptions and original input never appear in the response.
+Edit the goal or category, rebuild the question, then change the previous answer. Show that the correction is remembered in the current tab and that the route is regenerated from the profile rather than an endless conversation.
 
-## 2:05–2:27 — Arabic RTL result
+## 2:08–2:31 — Route and Arabic RTL
 
-Start over, choose the fictional sample and Arabic, then analyze. Show the right-to-left result while dates and source URLs remain readable.
+Show the deadline and first actions in the final fictional route. Start over, choose Arabic, rebuild the fictional case, and show right-to-left output while dates and source URLs remain readable.
 
 ## 2:27–2:43 — Honest source limitation
 
@@ -38,4 +38,4 @@ Show **Placeholder — not verified** labels and the legal-information disclaime
 
 ## 2:43–3:00 — Engineering evidence
 
-Show `POST /api/cases/analyze`, the stable `CaseAnalysis`, discriminated client/server inputs, internal future Responses API plan, 59 passing tests, dated commits, and prior-work disclosure. Credit Codex only for evidenced architecture, implementation, testing, verification, and documentation work; add GPT-5.6 contributions after they occur.
+Show `POST /api/cases/analyze`, strict `CaseProfile`, provider-independent `CaseBuilderService`, stable `CaseAnalysis`, 80 passing tests, dated commits, and prior-work disclosure. Credit Codex only for evidenced architecture, implementation, testing, verification, and documentation work; add GPT-5.6 contributions after they occur.

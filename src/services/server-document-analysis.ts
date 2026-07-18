@@ -47,11 +47,16 @@ export function serializeCaseInput(input: CaseInput): FormData {
   const formData = new FormData();
   formData.set(CASE_FORM_FIELDS.kind, input.kind);
   formData.set(CASE_FORM_FIELDS.outputLanguage, input.outputLanguage);
+  if (input.goal) {
+    formData.set(CASE_FORM_FIELDS.goal, input.goal);
+  }
   if (input.category) {
     formData.set(CASE_FORM_FIELDS.category, input.category);
   }
 
-  if (input.kind === "text") {
+  if (input.kind === "goal") {
+    // Goal-only requests have no evidence field.
+  } else if (input.kind === "text") {
     formData.set(CASE_FORM_FIELDS.text, input.text);
   } else if (input.kind === "sample") {
     formData.set(CASE_FORM_FIELDS.sampleId, input.sampleId);

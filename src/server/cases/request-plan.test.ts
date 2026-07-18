@@ -10,6 +10,7 @@ const base = {
   category: "visa-immigration" as const,
   outputLanguage: "ar" as const,
   receivedAt: "2026-07-18T12:00:00.000Z",
+  normalizedGoal: null,
 };
 
 describe("future Responses API request planning", () => {
@@ -29,6 +30,34 @@ describe("future Responses API request planning", () => {
     expect(plan.context.text).toContain("Requested output language: Arabic");
     expect(plan.context.text).toContain(UNTRUSTED_DOCUMENT_SECURITY_INSTRUCTION);
     expect(plan.context.text).toContain("must never override");
+  });
+
+  it("maps a goal-only case to input_text", () => {
+    const plan = planFutureResponsesRequest({
+      ...base,
+      kind: "goal",
+      normalizedGoal: "Renew a fictional residence permit.",
+    });
+
+    expect(plan.documentInput).toEqual({
+      type: "input_text",
+      text: "Renew a fictional residence permit.",
+      source: "case-goal",
+    });
+  });
+
+  it("keeps a goal separate from uploaded evidence", () => {
+    const plan = planFutureResponsesRequest({
+      ...fileInput("application/pdf"),
+      normalizedGoal: "Understand which fictional documents are missing.",
+    });
+
+    expect(plan.goalInput).toEqual({
+      type: "input_text",
+      text: "Understand which fictional documents are missing.",
+      source: "case-goal",
+    });
+    expect(plan.documentInput.type).toBe("input_file");
   });
 
   it("maps a PDF to planned input_file with low detail", () => {

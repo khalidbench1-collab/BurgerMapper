@@ -85,6 +85,11 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
         label: "Both",
         routeImpact: "Prepare both employment and business evidence.",
       },
+      {
+        id: "dont-know",
+        label: "I don't know",
+        routeImpact: "Keep the income-evidence step open and verify what applies.",
+      },
     ],
     nextSteps: [
       {
@@ -204,6 +209,11 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
         label: "Beides",
         routeImpact: "Nachweise für Beschäftigung und Selbstständigkeit vorbereiten.",
       },
+      {
+        id: "dont-know",
+        label: "Ich weiß es nicht",
+        routeImpact: "Die Einkommensnachweise offenlassen und zuerst klären, was zutrifft.",
+      },
     ],
     nextSteps: [
       {
@@ -322,6 +332,11 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
         label: "كلاهما",
         routeImpact: "تجهيز إثباتات العمل الوظيفي والنشاط الخاص.",
       },
+      {
+        id: "dont-know",
+        label: "لا أعرف",
+        routeImpact: "إبقاء خطوة إثبات الدخل مفتوحة والتحقق مما ينطبق أولًا.",
+      },
     ],
     nextSteps: [
       {
@@ -438,6 +453,20 @@ const ROUTE_VARIANTS: Record<
       },
       remainingUncertainty: "The accepted submission channel still needs official verification.",
     },
+    "dont-know": {
+      incomeDocument: {
+        id: "income-evidence",
+        title: "Income evidence — needs verification",
+        description: "Confirm the work situation before deciding which income evidence applies.",
+        status: "depends-on-answer",
+      },
+      incomeStep: {
+        title: "Verify which income evidence applies",
+        description: "Check the work situation and the original request before choosing income documents.",
+        status: "needs-answer",
+      },
+      remainingUncertainty: "The work situation and accepted submission channel still need verification.",
+    },
   },
   de: {
     employed: {
@@ -481,6 +510,20 @@ const ROUTE_VARIANTS: Record<
         status: "ready",
       },
       remainingUncertainty: "Der zulässige Einreichungsweg muss noch offiziell geprüft werden.",
+    },
+    "dont-know": {
+      incomeDocument: {
+        id: "income-evidence",
+        title: "Einkommensnachweise — Klärung erforderlich",
+        description: "Vor der Auswahl der Nachweise muss die Arbeitssituation geklärt werden.",
+        status: "depends-on-answer",
+      },
+      incomeStep: {
+        title: "Passende Einkommensnachweise klären",
+        description: "Arbeitssituation und Originalanforderung prüfen, bevor Nachweise ausgewählt werden.",
+        status: "needs-answer",
+      },
+      remainingUncertainty: "Arbeitssituation und Einreichungsweg müssen noch geklärt werden.",
     },
   },
   ar: {
@@ -526,6 +569,20 @@ const ROUTE_VARIANTS: Record<
       },
       remainingUncertainty: "لا تزال طريقة التقديم المقبولة بحاجة إلى تحقق رسمي.",
     },
+    "dont-know": {
+      incomeDocument: {
+        id: "income-evidence",
+        title: "إثبات الدخل — يحتاج إلى تحقق",
+        description: "تحقق من وضع العمل قبل تحديد إثبات الدخل المناسب.",
+        status: "depends-on-answer",
+      },
+      incomeStep: {
+        title: "تحقق من إثبات الدخل المناسب",
+        description: "راجع وضع العمل والطلب الأصلي قبل اختيار مستندات الدخل.",
+        status: "needs-answer",
+      },
+      remainingUncertainty: "لا يزال وضع العمل وطريقة التقديم بحاجة إلى تحقق.",
+    },
   },
 };
 
@@ -534,16 +591,19 @@ const MOCK_CONTEXT: Record<
   Record<CaseInput["kind"], string>
 > = {
   en: {
+    goal: "Mock mode is demonstrating a goal-based route. The goal was validated in memory by the application server but was not interpreted or understood by AI.",
     text: "Mock mode is demonstrating the expected route format. The pasted text was validated in memory by the application server but was not interpreted or understood by AI.",
     file: "Mock mode is demonstrating the expected route format. The selected file was signature-checked in memory by the application server but was not interpreted by AI.",
     sample: "Mock mode is using a fictional sample and does not represent a verified legal assessment.",
   },
   de: {
+    goal: "Der Demo-Modus zeigt einen zielbasierten Weg. Das Ziel wurde im Arbeitsspeicher des Anwendungsservers validiert, aber nicht durch KI interpretiert oder verstanden.",
     text: "Der Demo-Modus zeigt das erwartete Routenformat. Der eingefügte Text wurde im Arbeitsspeicher des Anwendungsservers validiert, aber nicht durch KI interpretiert oder verstanden.",
     file: "Der Demo-Modus zeigt das erwartete Routenformat. Die Signatur der ausgewählten Datei wurde im Arbeitsspeicher des Anwendungsservers geprüft, aber die Datei wurde nicht durch KI interpretiert.",
     sample: "Der Demo-Modus verwendet ein fiktives Beispiel und stellt keine verifizierte rechtliche Bewertung dar.",
   },
   ar: {
+    goal: "يعرض الوضع التجريبي مسارًا مبنيًا على الهدف. تحقّق خادم التطبيق من الهدف في الذاكرة، لكن لم يفسره أو يفهمه أي نظام ذكاء اصطناعي.",
     text: "يعرض الوضع التجريبي شكل المسار المتوقع. تحقّق خادم التطبيق من النص الملصق في الذاكرة، لكن لم يفسره أو يفهمه أي نظام ذكاء اصطناعي.",
     file: "يعرض الوضع التجريبي شكل المسار المتوقع. تحقّق خادم التطبيق من توقيع الملف في الذاكرة، لكن لم يفسره أي نظام ذكاء اصطناعي.",
     sample: "يستخدم الوضع التجريبي نموذجًا خياليًا ولا يمثل تقييمًا قانونيًا متحققًا منه.",

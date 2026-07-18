@@ -37,7 +37,7 @@ describe("MockDocumentAnalysisService", () => {
       expect(result.whatTheAuthorityWants).toEqual(expect.any(String));
       expect(result.requiredDocuments).toHaveLength(3);
       expect(result.missingInformation.length).toBeGreaterThan(0);
-      expect(result.clarificationQuestion.options).toHaveLength(3);
+      expect(result.clarificationQuestion.options).toHaveLength(4);
       expect(result.nextSteps).toHaveLength(4);
       expect(result.officialSources).toHaveLength(2);
       expect(result.officialSources).toEqual(
@@ -72,6 +72,19 @@ describe("MockDocumentAnalysisService", () => {
     );
     expect(result.mockContext).toContain("not interpreted or understood by AI");
     expect(result.summary).toContain("No pasted text or uploaded file was interpreted");
+  });
+
+  it("accepts a goal-only input without pretending to understand it", async () => {
+    const service = new MockDocumentAnalysisService(0);
+    const result = await service.analyzeDocument({
+      kind: "goal",
+      goal: "Renew a fictional residence permit.",
+      outputLanguage: "en",
+    });
+
+    expect(result.inputKind).toBe("goal");
+    expect(result.mockContext).toContain("goal was validated in memory");
+    expect(result.mockContext).toContain("not interpreted or understood by AI");
   });
 
   it("creates a small category-aware Work & Business variation", async () => {

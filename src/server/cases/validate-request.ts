@@ -10,13 +10,22 @@ import {
   MAX_PASTED_TEXT_CHARACTERS,
   validatePastedText,
 } from "@/lib/text-validation";
+import {
+  MAX_GOAL_CHARACTERS,
+  validateCaseGoal,
+} from "@/lib/goal-validation";
 import { CaseRequestError } from "@/server/cases/errors";
 import type {
   NormalizedCaseInput,
   SupportedFileMimeType,
 } from "@/server/cases/types";
 
-const SUPPORTED_INPUT_KINDS: readonly InputKind[] = ["text", "file", "sample"];
+const SUPPORTED_INPUT_KINDS: readonly InputKind[] = [
+  "goal",
+  "text",
+  "file",
+  "sample",
+];
 const SUPPORTED_LANGUAGES: readonly SupportedLanguage[] = ["en", "de", "ar"];
 
 export async function normalizeAnalyzeCaseFormData(
@@ -51,6 +60,30 @@ export async function normalizeAnalyzeCaseFormData(
     ? categoryValue
     : null;
 
+  const goalValue = getSingleString(formData, CASE_FORM_FIELDS.goal, false);
+  if (goalValue && goalValue.length > MAX_GOAL_CHARACTERS) {
+    throw new CaseRequestError("GOAL_TOO_LONG", 413);
+  }
+  let normalizedGoal: string | null = null;
+  if (goalValue) {
+    const validation = validateCaseGoal(goalValue);
+    if (!validation.valid) {
+      throw new CaseRequestError(validation.code, 422);
+    }
+    normalizedGoal = validation.normalizedGoal;
+  }
+
+  if (kindValue === "goal") {
+    if (!normalizedGoal) throw new CaseRequestError("GOAL_REQUIRED", 422);
+    return {
+      kind: "goal",
+      category,
+      outputLanguage,
+      receivedAt,
+      normalizedGoal,
+    };
+  }
+
   if (kindValue === "text") {
     const text = getSingleString(formData, CASE_FORM_FIELDS.text, true);
     if (text === null) throw new CaseRequestError("INVALID_REQUEST", 400);
@@ -65,6 +98,7 @@ export async function normalizeAnalyzeCaseFormData(
       kind: "text",
       category,
       outputLanguage,
+      normalizedGoal,
       normalizedText: validation.normalizedText,
       receivedAt,
     };
@@ -83,6 +117,7 @@ export async function normalizeAnalyzeCaseFormData(
       kind: "sample",
       category,
       outputLanguage,
+      normalizedGoal,
       sampleId,
       receivedAt,
     };
@@ -111,6 +146,7 @@ export async function normalizeAnalyzeCaseFormData(
     kind: "file",
     category,
     outputLanguage,
+    normalizedGoal,
     receivedAt,
     file: {
       metadata: {

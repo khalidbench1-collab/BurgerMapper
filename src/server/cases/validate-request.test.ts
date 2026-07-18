@@ -21,6 +21,25 @@ const SIGNATURES = {
 } as const;
 
 describe("server file validation", () => {
+  it("normalizes a goal-only request", async () => {
+    const formData = baseForm("goal");
+    formData.set(CASE_FORM_FIELDS.goal, "  Renew   a fictional permit. ");
+
+    await expect(normalizeAnalyzeCaseFormData(formData, now())).resolves.toMatchObject({
+      kind: "goal",
+      normalizedGoal: "Renew a fictional permit.",
+    });
+  });
+
+  it("rejects a missing or too-short goal-only request", async () => {
+    const missing = baseForm("goal");
+    await expect(normalizeAnalyzeCaseFormData(missing, now())).rejects.toMatchObject({ code: "GOAL_REQUIRED" });
+
+    const short = baseForm("goal");
+    short.set(CASE_FORM_FIELDS.goal, "too short");
+    await expect(normalizeAnalyzeCaseFormData(short, now())).rejects.toMatchObject({ code: "GOAL_TOO_SHORT" });
+  });
+
   it.each(Object.entries(SIGNATURES))(
     "detects a valid %s signature",
     (mimeType, signature) => {
@@ -71,6 +90,7 @@ describe("server file validation", () => {
 
     await expect(normalizeAnalyzeCaseFormData(formData, now())).resolves.toMatchObject({
       kind: "text",
+      normalizedGoal: null,
       normalizedText: "Fictional official\nmessage with enough useful characters.",
     });
   });

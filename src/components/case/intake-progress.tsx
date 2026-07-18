@@ -1,15 +1,15 @@
 import type { WorkflowStatus } from "@/domain/case";
 
 const steps = [
-  { number: 1, label: "Document" },
-  { number: 2, label: "Language" },
-  { number: 3, label: "Your route" },
+  { id: "understanding", label: "Understanding your goal" },
+  { id: "clarification", label: "Need one detail" },
+  { id: "route", label: "Route ready" },
 ];
 
 function getCurrentStep(status: WorkflowStatus): number {
-  if (status === "analysis-complete") return 3;
-  if (status === "ready" || status === "mock-analyzing") return 2;
-  return 1;
+  if (status === "analysis-complete") return 2;
+  if (status === "needs-clarification") return 1;
+  return 0;
 }
 
 export function IntakeProgress({ status }: { status: WorkflowStatus }) {
@@ -18,17 +18,17 @@ export function IntakeProgress({ status }: { status: WorkflowStatus }) {
   return (
     <nav aria-label="Case progress" className="print:hidden">
       <ol className="grid grid-cols-3 gap-2">
-        {steps.map((step) => {
+        {steps.map((step, index) => {
           const state =
-            step.number < currentStep
+            index < currentStep
               ? "complete"
-              : step.number === currentStep
+              : index === currentStep
                 ? "current"
                 : "upcoming";
 
           return (
             <li
-              key={step.number}
+              key={step.id}
               aria-current={state === "current" ? "step" : undefined}
               className="min-w-0"
             >
@@ -42,7 +42,6 @@ export function IntakeProgress({ status }: { status: WorkflowStatus }) {
                 }`}
               />
               <p className="truncate text-xs font-semibold text-[#5d6862]">
-                <span className="sr-only">Step {step.number}: </span>
                 {step.label}
                 {state === "complete" ? <span className="sr-only"> complete</span> : null}
               </p>

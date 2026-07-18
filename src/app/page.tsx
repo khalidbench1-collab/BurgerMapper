@@ -14,17 +14,17 @@ export default function Home() {
               Berlin-first bureaucracy navigator
             </p>
             <h1 className="mt-6 max-w-3xl text-4xl font-semibold leading-[1.06] tracking-[-0.05em] text-[#142219] text-balance sm:text-6xl">
-              Official letters, turned into a clear route.
+              Start with what you need to get done.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-[#536159] sm:text-xl sm:leading-9">
-              BurgerMapper helps you understand what a Berlin authority is asking, what may be urgent, and what to do next.
+              Describe your goal in everyday language. Add a letter only if you have one, then build a clear fictional mock route.
             </p>
             <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
               <Link
                 href="/case"
                 className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#1d664b] px-6 py-3 text-base font-semibold text-white shadow-sm outline-none hover:bg-[#15523c] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35"
               >
-                Start a case
+                Describe your goal
                 <span aria-hidden="true" className="ms-2">→</span>
               </Link>
               <p className="max-w-xs text-sm leading-6 text-[#68736d]">
@@ -38,9 +38,9 @@ export default function Home() {
               A route, not a chat
             </p>
             <ol className="mt-5 space-y-5">
-              <RoutePreview number="1" title="Add the letter" description="Choose a PDF or image, or use the fictional sample." />
+              <RoutePreview number="1" title="Describe the outcome" description="Start without knowing the official procedure name." />
               <RoutePreview number="2" title="Clarify what matters" description="Answer one question only when it can change the route." />
-              <RoutePreview number="3" title="Follow clear next steps" description="See deadlines, documents, uncertainty, and source placeholders in one plan." />
+              <RoutePreview number="3" title="Follow a structured route" description="See deadlines, documents, uncertainty, and source placeholders in one plan." />
             </ol>
           </aside>
         </div>

@@ -43,6 +43,16 @@ export async function runConfiguredAnalysis(
 
 function toMockCaseInput(input: NormalizedCaseInput): CaseInput {
   const categoryPart = input.category ? { category: input.category } : {};
+  const goalPart = input.normalizedGoal ? { goal: input.normalizedGoal } : {};
+
+  if (input.kind === "goal") {
+    return {
+      kind: "goal",
+      goal: input.normalizedGoal,
+      outputLanguage: input.outputLanguage,
+      ...categoryPart,
+    };
+  }
 
   if (input.kind === "text") {
     return {
@@ -50,6 +60,7 @@ function toMockCaseInput(input: NormalizedCaseInput): CaseInput {
       text: input.normalizedText,
       outputLanguage: input.outputLanguage,
       ...categoryPart,
+      ...goalPart,
     };
   }
   if (input.kind === "sample") {
@@ -58,12 +69,14 @@ function toMockCaseInput(input: NormalizedCaseInput): CaseInput {
       sampleId: input.sampleId,
       outputLanguage: input.outputLanguage,
       ...categoryPart,
+      ...goalPart,
     };
   }
   return {
     kind: "file",
     outputLanguage: input.outputLanguage,
     ...categoryPart,
+    ...goalPart,
     document: {
       id: `server-upload-${input.receivedAt}`,
       metadata: {

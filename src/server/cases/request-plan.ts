@@ -7,7 +7,11 @@ import type { NormalizedCaseInput } from "@/server/cases/types";
 export type PlannedInputDetail = "low" | "auto";
 
 export type PlannedDocumentInput =
-  | { type: "input_text"; text: string; source: "pasted-text" | "trusted-sample" }
+  | {
+      type: "input_text";
+      text: string;
+      source: "case-goal" | "pasted-text" | "trusted-sample";
+    }
   | {
       type: "input_file";
       filename: string;
@@ -25,6 +29,7 @@ export interface FutureResponsesRequestPlan {
     type: "input_text";
     text: string;
   };
+  goalInput?: Extract<PlannedDocumentInput, { type: "input_text" }>;
   documentInput: PlannedDocumentInput;
 }
 
@@ -54,8 +59,18 @@ export function planFutureResponsesRequest(
     UNTRUSTED_DOCUMENT_SECURITY_INSTRUCTION,
   ].join("\n\n");
 
+  const goalInput =
+    input.kind !== "goal" && input.normalizedGoal
+      ? {
+          type: "input_text" as const,
+          text: input.normalizedGoal,
+          source: "case-goal" as const,
+        }
+      : undefined;
+
   return {
     context: { type: "input_text", text: contextText },
+    ...(goalInput ? { goalInput } : {}),
     documentInput: planDocumentInput(input, detail),
   };
 }
@@ -64,6 +79,13 @@ function planDocumentInput(
   input: NormalizedCaseInput,
   detail: PlannedInputDetail,
 ): PlannedDocumentInput {
+  if (input.kind === "goal") {
+    return {
+      type: "input_text",
+      text: input.normalizedGoal,
+      source: "case-goal",
+    };
+  }
   if (input.kind === "text") {
     return {
       type: "input_text",

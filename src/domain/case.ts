@@ -2,7 +2,9 @@ import type { BureaucracyCategory } from "@/domain/categories";
 
 export type SupportedLanguage = "en" | "de" | "ar";
 
-export type InputKind = "text" | "file" | "sample";
+export type InputKind = "goal" | "text" | "file" | "sample";
+
+export type EvidenceInputKind = "none" | Exclude<InputKind, "goal">;
 
 export type WorkflowStatus =
   | "idle"
@@ -10,6 +12,7 @@ export type WorkflowStatus =
   | "file-selected"
   | "ready"
   | "mock-analyzing"
+  | "needs-clarification"
   | "analysis-complete"
   | "error";
 
@@ -75,7 +78,8 @@ export type ClarificationAnswerId =
   | "unsure-residence"
   | "freelance-only"
   | "alongside-employment"
-  | "unsure-work";
+  | "unsure-work"
+  | "dont-know";
 
 export interface ClarificationOption {
   id: ClarificationAnswerId;
@@ -119,9 +123,14 @@ export interface CaseAnalysis {
 interface BaseCaseInput {
   category?: BureaucracyCategory;
   outputLanguage: SupportedLanguage;
+  goal?: string;
 }
 
 export type CaseInput =
+  | (BaseCaseInput & {
+      kind: "goal";
+      goal: string;
+    })
   | (BaseCaseInput & {
       kind: "text";
       text: string;
@@ -141,8 +150,9 @@ export interface DocumentAnalysisService {
 
 export interface CaseState {
   status: WorkflowStatus;
-  inputKind: InputKind;
+  inputKind: EvidenceInputKind;
   category: BureaucracyCategory | null;
+  goalInput: string;
   textInput: string;
   document: UploadedDocument | null;
   sampleId: string | null;

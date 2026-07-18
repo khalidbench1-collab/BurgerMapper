@@ -78,3 +78,16 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Do not use a second tone-polishing call | Procedural warmth belongs in the primary task instructions and product behavior; a routine extra call adds latency, cost, and another failure surface without improving route evidence. |
 | Allow only a narrowly triggered structured verification pass | A bounded additional pass is justified for high-risk routes, source conflicts, suspected unsupported claims, or failed validation—not for routine cases or general tone. |
 | Keep final routes more serious than intake | Intake can be calmly conversational, while the route must prioritize factual actions, deadlines, uncertainty, and evidence. |
+
+## Phase 3 guided-case decisions
+
+| Decision | Reason |
+| --- | --- |
+| Make the free-form goal the primary input | Users should be able to describe the outcome they need without knowing German bureaucracy terminology. Categories and evidence remain useful, optional context. |
+| Extend `CaseInput` backward-compatibly with goal context and a goal-only variant | Existing text, file, and sample clients keep their discriminants while every route can carry the same normalized goal through the secure endpoint. |
+| Use `CaseProfile` as short-lived route memory | A strict profile makes the goal, evidence reference, known facts, answers, uncertainty, sufficiency, and corrections inspectable without persistent storage or a conversation transcript. |
+| Ask exactly one consequential question before the fictional route | One deterministic answer changes the mock route while keeping the interface calm. A written reason makes the question's route impact explicit. |
+| Treat “I don't know” as a valid answer | Uncertainty should not block the user. The mock route preserves the unknown and adds a verification step instead of inventing certainty. |
+| Use explicit sufficiency rules outside UI components | A pure rule stops questioning after the route-changing answer and prevents an endless or UI-dependent conversation loop. |
+| Rebuild from corrected profile context | Editing the goal, category, or answer invalidates the affected mock decision and regenerates the question or route, while correction history remains in the current tab. |
+| Keep the Phase 3 builder deterministic and provider-independent | `CaseBuilderService` can later be backed by structured OpenAI outputs, while current behavior remains testable and does not claim to understand arbitrary user input. |

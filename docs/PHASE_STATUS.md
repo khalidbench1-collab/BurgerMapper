@@ -10,7 +10,7 @@ Last verified: 2026-07-18
 | 1 | Mock document analysis workflow | COMPLETE | `6c1a9869a64da6aca834f5d02ffbd475256d0f17` | Phase 0 |
 | 1.5 | Multimodal case intake | COMPLETE | `aeb7f42033e01d5295ceae5ae6b3367eb87b5cd0` | Phase 1 |
 | 2 | Secure multimodal analysis boundary | COMPLETE | `c6369e91a505e8d97ce2a7a6bbd460492b5dda9b` | Phase 1.5 |
-| 3 | Goal-based Case Builder Agent in mock mode | NOT STARTED | Exact future commit: `feat: add guided case builder` | Phase 2 COMPLETE |
+| 3 | Goal-based Case Builder Agent in mock mode | COMPLETE | `feat: add guided case builder` — hash pending final report | Phase 2 COMPLETE |
 | 4 | Real OpenAI multimodal and structured-output integration | BLOCKED — PENDING API ACCESS | User must privately enable API billing/access and configure `OPENAI_API_KEY` in `.env.local`; never paste the value into chat | Phase 3 COMPLETE and API gate resolved |
 | 5 | Official-source research and cited personalized routes | NOT STARTED | Exact future commit: `feat: add official-source route research` | Phase 4 COMPLETE |
 | 6 | Reliability, safety, evaluation, and cost controls | NOT STARTED | Exact future commit: `test: harden BurgerMapper reliability` | Phase 5 COMPLETE |
@@ -33,7 +33,7 @@ Last verified: 2026-07-18
 
 ## Next executable phase
 
-Phase 3 is the first phase marked `NOT STARTED` whose prerequisites are complete.
+No phase is currently executable. Phase 4 is next but remains blocked pending the user's private API-access and configuration actions.
 
 Run exactly:
 
@@ -41,4 +41,4 @@ Run exactly:
 Read AGENTS.md, docs/MASTER_BUILD_PLAN.md, and docs/PHASE_STATUS.md. Execute the first phase marked NOT STARTED whose prerequisites are complete. Follow its full prompt. Stop after its commit and final report. Never automatically begin the next phase.
 ```
 
-After Phase 3, autonomous execution must stop at the Phase 4 API-access gate unless the user has privately configured access and deliberately unblocked the status.
+Autonomous execution is stopped at the Phase 4 API-access gate. The user must enable OpenAI API billing/access and configure `OPENAI_API_KEY` privately in `.env.local`, then explicitly authorize Phase 4. The key must never be pasted into conversation.

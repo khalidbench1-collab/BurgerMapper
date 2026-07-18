@@ -1,10 +1,15 @@
-import type { InputKind } from "@/domain/case";
+import type { EvidenceInputKind } from "@/domain/case";
 
 const methods: Array<{
-  value: InputKind;
+  value: EvidenceInputKind;
   label: string;
   description: string;
 }> = [
+  {
+    value: "none",
+    label: "Goal only",
+    description: "Continue without a document",
+  },
   {
     value: "text",
     label: "Paste text",
@@ -27,14 +32,14 @@ export function InputMethodSelector({
   onChange,
   disabled = false,
 }: {
-  value: InputKind;
-  onChange: (kind: InputKind) => void;
+  value: EvidenceInputKind;
+  onChange: (kind: EvidenceInputKind) => void;
   disabled?: boolean;
 }) {
   return (
     <fieldset disabled={disabled}>
-      <legend className="text-sm font-semibold text-[#26362e]">How would you like to begin?</legend>
-      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+      <legend className="text-sm font-semibold text-[#26362e]">Would you like to add evidence?</legend>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {methods.map((method) => (
           <label
             key={method.value}
