@@ -2,6 +2,8 @@
 
 > Draft based on the working Phase 2 implementation. All analysis remains fictional mock output. No OpenAI request, OCR, source search, or document interpretation occurs yet.
 
+Planning checkpoint: the repository now contains a phase-gated execution system for the remaining work, but this did not add or change a product scene. The storyboard stays limited to behavior that actually exists after Phase 2 and will be updated by every later product phase.
+
 ## 0:00–0:18 — Problem hook
 
 Show why a stressed newcomer needs the purpose, deadline, required documents, uncertainty, and next route from an official letter—not a chat transcript or knowledge of a procedure name.

@@ -51,3 +51,14 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Prepare an internal request plan without installing the OpenAI SDK | Phase 2 can test input mappings and security context without implying an exact SDK payload, constructing a client, or risking an external request. |
 | Keep real-mode consent copy separate and inactive | The mock privacy message must describe current behavior. A separate prepared message avoids falsely implying OpenAI transfer before the real provider and consent step exist. |
 | Widen `CaseAnalysis.isMock` from literal `true` to `boolean` | This backward-compatible type widening preserves every current mock result while allowing the future provider to return the same contract honestly with `isMock: false`. No field name or current runtime value changed. |
+
+## Remaining-phase execution decisions
+
+| Decision | Reason |
+| --- | --- |
+| Make root `AGENTS.md` the canonical permanent agent rule set | Product, privacy, safety, quality, evidence, and Git constraints must survive across fresh Codex sessions rather than depend on one conversation. |
+| Keep complete standalone prompts for Phases 3–8 in one master plan | Each phase can be copied into a fresh session with full scope, gates, tests, exact commit message, and stop behavior while preserving a single roadmap. |
+| Execute and commit only one phase per run | A hard stop after each phase keeps review points small, prevents accidental scope creep, and creates clear dated Build Week evidence. |
+| Use `PHASE_STATUS.md` as the authoritative execution state | Explicit prerequisites and blocked reasons prevent Codex from skipping unresolved external gates or inferring that credentials and authorizations exist. |
+| Block Phase 4 until private API access is ready | OpenAI billing and `OPENAI_API_KEY` setup require user action. Codex must never request the secret in chat or implement around unavailable access. |
+| End autonomous work at the deployed release-candidate handoff | Current-rule verification, category choice, application writing, video publishing, `/feedback`, and Devpost submission require current external facts or user-controlled actions and remain outside autonomous repository work. |

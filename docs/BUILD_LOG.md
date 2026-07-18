@@ -234,3 +234,52 @@ Codex inspected the existing architecture and current Next.js Route Handler guid
 ### Next phase
 
 Implement a real server-side OpenAI Responses API provider behind explicit configuration and consent. Use the tested request planner, require strict structured-output validation against `CaseAnalysis`, add adversarial and multilingual evaluation fixtures, preserve the mock fallback and zero-retention disclosures, and keep official-source research out of scope until the real case profile is stable.
+
+## 2026-07-18 — Autonomous remaining-phase execution system
+
+### Objective and starting state
+
+Create a permanent repository-level execution plan for Phases 3–8 without implementing Phase 3 or changing runtime product behavior. The worktree was clean on `main` at Phase 2 commit `c6369e91a505e8d97ce2a7a6bbd460492b5dda9b` (`feat: add secure multimodal analysis boundary`).
+
+### Execution system created
+
+- Replaced the scaffold-only root `AGENTS.md` with canonical permanent product, UX, privacy, security, accessibility, official-source, engineering, documentation, quality, Git, external-gate, and one-phase stop rules while retaining the version-specific Next.js documentation requirement.
+- Added `INSTRUCTIONS.md` with the operator workflow, phase selection, start/completion/blocked protocols, secret-safe external actions, and final autonomous boundary.
+- Added `docs/MASTER_BUILD_PLAN.md` with complete standalone copy-paste prompts for Phases 3–8. Every prompt contains status assumptions, objective, regression policy, UX and architecture requirements, implementation tasks, privacy, legal/safety rules, testing, out-of-scope list, mandatory documentation, quality gates, Git checks, exact commit message, final report, and stop condition.
+- Added `docs/PHASE_STATUS.md` as the authoritative state record. Phases 0, 1, 1.5, and 2 are COMPLETE with verified hashes; Phase 3 is NOT STARTED; Phase 4 is BLOCKED PENDING API ACCESS; Phases 5–8 are NOT STARTED with explicit prerequisites.
+- Added `docs/PHASE_REPORT_TEMPLATE.md` for consistent evidence and `docs/FINAL_HANDOFF_CHECKLIST.md` for the deployed release-candidate boundary and user-owned submission actions.
+- Added the exact master execution command near the top of the master plan and linked the plan from the README.
+- Documented a non-circular commit-hash rule: the phase reports its new full hash after commit and the next authorized phase backfills it, avoiding a second commit or rewritten history solely for self-referential hash recording.
+
+### External-action gates
+
+The permanent rules require a clean stop for OpenAI billing/API access, private `OPENAI_API_KEY` setup, GitHub authentication, repository ownership/visibility, Vercel authentication, production environment variables, Codex `/feedback`, YouTube upload, and Devpost submission. No secret may be requested in chat. Phase 8 ends at a working, deployed, documented release candidate and hands current-rule/submission work back to ChatGPT and the user.
+
+### Consistency and quality verification
+
+- A mechanical prompt audit confirmed all required sections, all seven mandatory phase-document references, and the exact commit message in every Phase 3–8 prompt.
+- The master command, Phase 2 hash, Phase 3 next status, Phase 4 blocker, remaining prerequisites, final handoff boundary, and no-auto-advance rule were cross-checked across `AGENTS.md`, `INSTRUCTIONS.md`, the master plan, and phase status.
+- `npm run lint` — passed with exit code 0 and no findings.
+- `npm test` — passed: 10 files and 59 tests.
+- `npm run build` — passed on Next.js 16.2.10 with strict TypeScript; existing static and dynamic routes are unchanged.
+- `npm audit --json` — passed with 0 vulnerabilities across 543 dependencies: 17 production, 491 development, and 105 optional.
+- No dependency, lockfile, application source, API behavior, environment template, or product feature changed.
+
+### Problems and fixes
+
+- A phase commit cannot contain its own final hash. The first draft described hash recording inconsistently, so a canonical backfill rule was added to `AGENTS.md`, `INSTRUCTIONS.md`, and every phase prompt without allowing extra phase commits or history rewriting.
+- Phase 4's API access was deliberately recorded as blocked rather than inferred from the Phase 2 environment. The prompt instructs Codex to ask only for confirmation of private configuration, never the secret value.
+
+### Codex collaboration notes
+
+Codex verified Phase 2 history, designed the permanent phase governance and external-action gates, authored the six remaining standalone prompts, created status/report/handoff records, mechanically audited prompt completeness, ran all repository quality gates, and updated Build Week provenance. No Phase 3 implementation was started.
+
+### Next action
+
+In a fresh Codex session, run exactly:
+
+```text
+Read AGENTS.md, docs/MASTER_BUILD_PLAN.md, and docs/PHASE_STATUS.md. Execute the first phase marked NOT STARTED whose prerequisites are complete. Follow its full prompt. Stop after its commit and final report. Never automatically begin the next phase.
+```
+
+This selects Phase 3 only. Phase 4 remains blocked until the user privately enables OpenAI API access and configures the key outside conversation.

@@ -104,6 +104,16 @@ No API key is required for the current Phase 2 workflow. Keep `ENABLE_MOCK_AI=tr
 
 Phase 2 is complete. Text, PDF, image, and sample inputs now cross one validated application-server endpoint and return the existing typed `CaseAnalysis`. The implementation preserves six optional categories, multilingual mock routes, clarification adaptation, Arabic RTL, reset and print behavior, and the PWA foundation. The automated suite contains 59 passing tests.
 
+The remaining Build Week work is governed by a permanent phase-gated execution system. [AGENTS.md](AGENTS.md) contains canonical repository rules, [INSTRUCTIONS.md](INSTRUCTIONS.md) explains safe operation, and [docs/MASTER_BUILD_PLAN.md](docs/MASTER_BUILD_PLAN.md) contains standalone prompts for Phases 3–8. [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md) is the authoritative state record. This planning system adds no Phase 3 product behavior.
+
+To begin the next eligible phase in a fresh Codex session, use exactly:
+
+```text
+Read AGENTS.md, docs/MASTER_BUILD_PLAN.md, and docs/PHASE_STATUS.md. Execute the first phase marked NOT STARTED whose prerequisites are complete. Follow its full prompt. Stop after its commit and final report. Never automatically begin the next phase.
+```
+
+Phase 3 is next. Phase 4 remains blocked pending privately configured OpenAI API access; no secret should ever be pasted into chat.
+
 Current limitations:
 
 - No PDF text extraction, OCR, or image inspection.
@@ -128,7 +138,7 @@ The BurgerMapper concept and an earlier, unrelated prototype predated OpenAI Bui
 
 ## How Codex contributed
 
-Codex established the Phase 0 repository and helped implement Phases 1, 1.5, and 2: typed domain and transport contracts, client and server validation, the in-memory API boundary, magic-byte checks, future OpenAI request planning and prompt-injection controls, the multilingual mock service, accessibility behavior, tests, audits, verification, and documentation. The final submission account will add later-phase evidence and accurately distinguish how Codex and GPT-5.6 were used without claiming unfinished work.
+Codex established the Phase 0 repository and helped implement Phases 1, 1.5, and 2: typed domain and transport contracts, client and server validation, the in-memory API boundary, magic-byte checks, future OpenAI request planning and prompt-injection controls, the multilingual mock service, accessibility behavior, tests, audits, verification, and documentation. Codex also created the documentation-only autonomous execution system for Phases 3–8; it did not implement Phase 3 during that task. The final submission account will add later-phase evidence and accurately distinguish how Codex and GPT-5.6 were used without claiming unfinished work.
 
 ## Codex `/feedback` Session ID
 

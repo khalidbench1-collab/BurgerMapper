@@ -97,3 +97,11 @@ These dated records capture durable technical choices. Product-level choices and
 - **Reason:** Research should answer the resolved case question rather than gather generic or potentially misleading links too early.
 - **Tradeoff:** Current results contain clearly labelled, unverified placeholders and cannot support changing factual claims.
 - **Revisit when:** The real analysis contract and clarification sequence are evaluated and stable enough to define scoped source queries.
+
+## 2026-07-18 — Phase-gated autonomous execution
+
+- **Context:** Remaining implementation spans model access, external research, hardening, UX, repository publication, deployment, and submission handoff across multiple future sessions.
+- **Decision:** Govern work through canonical `AGENTS.md`, an authoritative phase-status file, standalone prompts, one exact commit per phase, explicit prerequisite gates, and a mandatory stop after each final report.
+- **Reason:** Repository-local instructions make execution reproducible while preserving review points, privacy boundaries, user-controlled external actions, and dated Build Week provenance.
+- **Tradeoff:** The plan deliberately sacrifices continuous multi-phase execution and may pause for user confirmation even when later technical work is defined.
+- **Revisit when:** The Build Week release candidate and handoff are complete; do not extend the phase sequence automatically.
