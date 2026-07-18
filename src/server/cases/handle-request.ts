@@ -9,6 +9,8 @@ import {
   runConfiguredAnalysis,
   type AnalysisRuntimeConfiguration,
 } from "@/server/cases/provider";
+import type { OpenAIResponsesTransport } from "@/server/cases/openai/provider";
+import { CASE_FORM_FIELDS } from "@/domain/analysis-api";
 import { normalizeAnalyzeCaseFormData } from "@/server/cases/validate-request";
 
 export const RETENTION_HEADER = "X-BurgerMapper-Retention";
@@ -19,6 +21,7 @@ export interface AnalyzeRequestOptions {
   mockDelayMs?: number;
   now?: () => Date;
   createRequestId?: () => string;
+  openAiTransport?: OpenAIResponsesTransport;
 }
 
 export async function handleAnalyzeCaseRequest(
@@ -47,17 +50,25 @@ export async function handleAnalyzeCaseRequest(
     );
     const configuration =
       options.runtimeConfiguration ?? readAnalysisRuntimeConfiguration();
-    const analysis = await runConfiguredAnalysis(
+    if (!configuration.mockEnabled && (!configuration.openAiApiKeyConfigured || !configuration.openAiApiKey?.trim())) {
+      throw new CaseRequestError("API_NOT_CONFIGURED", 503);
+    }
+    if (!configuration.mockEnabled && formData.get(CASE_FORM_FIELDS.consentToOpenAI) !== "true") {
+      throw new CaseRequestError("CONSENT_REQUIRED", 403);
+    }
+    const providerResult = await runConfiguredAnalysis(
       normalizedInput,
       configuration,
       options.mockDelayMs,
+      { transport: options.openAiTransport, signal: request.signal },
     );
 
     const response: AnalyzeCaseSuccessResponse = {
-      analysis,
+      analysis: providerResult.analysis,
+      ...(providerResult.profile ? { profile: providerResult.profile } : {}),
       metadata: {
         requestId,
-        processingMode: "mock",
+        processingMode: providerResult.processingMode,
         inputKind: normalizedInput.kind,
         receivedAt,
         retentionStatus: "discarded-after-processing",

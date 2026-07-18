@@ -30,8 +30,9 @@ export class ServerCaseBuilderService implements CaseBuilderService {
     input: CaseInput,
     signal?: AbortSignal,
   ): Promise<CaseBuilderResult> {
-    const analysis = await this.analysisService.analyzeDocument(input, signal);
-    const profile = createMockCaseProfile(input, analysis);
+    const response = await this.analysisService.analyzeCase(input, signal);
+    const analysis = response.analysis;
+    const profile = response.profile ?? createMockCaseProfile(input, analysis);
     return {
       profile,
       baseAnalysis: analysis,

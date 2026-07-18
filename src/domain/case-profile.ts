@@ -12,14 +12,14 @@ export type ProfileSufficiencyState = "needs-clarification" | "sufficient";
 
 export interface CaseGoal {
   text: string;
-  source: "user" | "workflow-default";
+  source: "user" | "workflow-default" | "model-interpretation";
 }
 
 export interface CaseProfileField {
   id: string;
   label: string;
   value: string;
-  source: "user" | "mock-scenario";
+  source: "user" | "mock-scenario" | "document" | "model-interpretation";
 }
 
 export interface CaseEvidenceReference {

@@ -24,13 +24,22 @@ export class AnalysisApiError extends Error {
 }
 
 export class ServerDocumentAnalysisService implements DocumentAnalysisService {
+  constructor(private readonly consentToOpenAI = false) {}
+
   async analyzeDocument(
     input: CaseInput,
     signal?: AbortSignal,
   ): Promise<CaseAnalysis> {
+    return (await this.analyzeCase(input, signal)).analysis;
+  }
+
+  async analyzeCase(
+    input: CaseInput,
+    signal?: AbortSignal,
+  ): Promise<AnalyzeCaseSuccessResponse> {
     const response = await fetch(ANALYZE_CASE_ENDPOINT, {
       method: "POST",
-      body: serializeCaseInput(input),
+      body: serializeCaseInput(input, this.consentToOpenAI),
       signal,
     });
 
@@ -39,11 +48,11 @@ export class ServerDocumentAnalysisService implements DocumentAnalysisService {
     if (!isSuccessResponse(payload)) {
       throw new AnalysisApiError("INTERNAL_ERROR", null);
     }
-    return payload.analysis;
+    return payload;
   }
 }
 
-export function serializeCaseInput(input: CaseInput): FormData {
+export function serializeCaseInput(input: CaseInput, consentToOpenAI = false): FormData {
   const formData = new FormData();
   formData.set(CASE_FORM_FIELDS.kind, input.kind);
   formData.set(CASE_FORM_FIELDS.outputLanguage, input.outputLanguage);
@@ -52,6 +61,12 @@ export function serializeCaseInput(input: CaseInput): FormData {
   }
   if (input.category) {
     formData.set(CASE_FORM_FIELDS.category, input.category);
+  }
+  if (consentToOpenAI) {
+    formData.set(CASE_FORM_FIELDS.consentToOpenAI, "true");
+  }
+  if (input.clarificationResolution) {
+    formData.set(CASE_FORM_FIELDS.clarificationResolution, JSON.stringify(input.clarificationResolution));
   }
 
   if (input.kind === "goal") {

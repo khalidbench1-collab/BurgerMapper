@@ -57,6 +57,9 @@ export function planFutureResponsesRequest(
     `Selected bureaucracy category: ${category}`,
     `Requested output language: ${LANGUAGE_NAMES[input.outputLanguage]}`,
     UNTRUSTED_DOCUMENT_SECURITY_INSTRUCTION,
+    input.clarificationResolution
+      ? `A previous route-changing question was answered. Question: ${input.clarificationResolution.questionPrompt}\nWhy it matters: ${input.clarificationResolution.questionReason}\nAnswer: ${input.clarificationResolution.answerLabel} (id: ${input.clarificationResolution.answerId}). Update the profile and route; ask another question only if it is still consequential.`
+      : "No clarification answer has been supplied yet.",
   ].join("\n\n");
 
   const goalInput =

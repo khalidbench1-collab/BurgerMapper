@@ -272,6 +272,21 @@ describe("CaseWorkspace", () => {
     resolveRequest(await successfulResponseForGoal());
     expect(await screen.findByRole("heading", { name: "What the route currently uses" })).toBeInTheDocument();
   });
+
+  it("requires real-mode consent and sends only the consent flag, never a browser secret", async () => {
+    const user = userEvent.setup();
+    render(<CaseWorkspace analysisMode="openai" />);
+    await user.type(screen.getByLabelText("What do you need to get done?"), VALID_GOAL);
+    const analyze = screen.getByRole("button", { name: "Analyze case" });
+    expect(analyze).toBeDisabled();
+    await user.click(screen.getByRole("checkbox", { name: /Send this case to OpenAI/ }));
+    expect(analyze).toBeEnabled();
+    await user.click(analyze);
+    await screen.findByRole("heading", { name: /Are you currently/ });
+    const formData = fetchMock.mock.calls[0][1]?.body as FormData;
+    expect(formData.get(CASE_FORM_FIELDS.consentToOpenAI)).toBe("true");
+    expect(Array.from(formData.keys())).not.toContain("OPENAI_API_KEY");
+  });
 });
 
 async function mockSuccessfulAnalyzeFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {

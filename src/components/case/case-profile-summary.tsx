@@ -12,11 +12,13 @@ import { MAX_GOAL_CHARACTERS, validateCaseGoal } from "@/lib/goal-validation";
 
 export function CaseProfileSummary({
   profile,
+  isMock,
   disabled,
   onSaveContext,
   onChangeAnswer,
 }: {
   profile: CaseProfile;
+  isMock: boolean;
   disabled: boolean;
   onSaveContext: (goal: string, category: BureaucracyCategory | null) => void;
   onChangeAnswer: () => void;
@@ -92,7 +94,7 @@ export function CaseProfileSummary({
       )}
 
       <p className="mt-5 rounded-xl bg-[#f3f6f3] px-4 py-3 text-sm leading-6 text-[#5c6861]">
-        {profile.sufficiency.state === "sufficient" ? "Profile sufficient for this fictional mock route." : "One route-changing detail is needed before the mock route is final."}
+        {profile.sufficiency.state === "sufficient" ? (isMock ? "Profile sufficient for this fictional mock route." : "Profile sufficient for this analyzed route.") : "One route-changing detail is needed before the route is final."}
         {profile.correctionHistory.length ? ` ${profile.correctionHistory.length} correction${profile.correctionHistory.length === 1 ? "" : "s"} remembered in this tab.` : ""}
       </p>
     </section>

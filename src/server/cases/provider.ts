@@ -1,24 +1,34 @@
-import type { CaseAnalysis, CaseInput } from "@/domain/case";
+import type { CaseInput } from "@/domain/case";
 import { CaseRequestError } from "@/server/cases/errors";
+import { DEFAULT_OPENAI_MODEL } from "@/server/cases/openai/config";
+import {
+  OpenAICaseBuilderProvider,
+  type OpenAIResponsesTransport,
+  type ProviderCaseResult,
+} from "@/server/cases/openai/provider";
 import type { NormalizedCaseInput } from "@/server/cases/types";
 import { MockDocumentAnalysisService } from "@/services/document-analysis";
 
 export interface AnalysisRuntimeConfiguration {
   mockEnabled: boolean;
   openAiApiKeyConfigured: boolean;
+  openAiApiKey?: string;
+  openAiModel?: string;
 }
 
 export function readAnalysisRuntimeConfiguration(
   environment: NodeJS.ProcessEnv = process.env,
 ): AnalysisRuntimeConfiguration {
   const configuredMockValue = environment.ENABLE_MOCK_AI?.trim().toLowerCase();
-  const mockEnabled = configuredMockValue
-    ? configuredMockValue === "true"
-    : environment.NODE_ENV !== "production";
+  const mockEnabled = configuredMockValue === undefined
+    ? environment.NODE_ENV !== "production"
+    : configuredMockValue !== "false";
 
   return {
     mockEnabled,
     openAiApiKeyConfigured: Boolean(environment.OPENAI_API_KEY?.trim()),
+    openAiApiKey: environment.OPENAI_API_KEY?.trim(),
+    openAiModel: environment.OPENAI_MODEL?.trim() || DEFAULT_OPENAI_MODEL,
   };
 }
 
@@ -26,15 +36,26 @@ export async function runConfiguredAnalysis(
   input: NormalizedCaseInput,
   configuration: AnalysisRuntimeConfiguration,
   mockDelayMs?: number,
-): Promise<CaseAnalysis> {
+  options: { transport?: OpenAIResponsesTransport; signal?: AbortSignal } = {},
+): Promise<ProviderCaseResult> {
   if (!configuration.mockEnabled) {
-    // Phase 2 deliberately has no real provider, even when a key exists.
-    throw new CaseRequestError("API_NOT_CONFIGURED", 503);
+    if (!configuration.openAiApiKeyConfigured || !configuration.openAiApiKey?.trim()) {
+      throw new CaseRequestError("API_NOT_CONFIGURED", 503);
+    }
+    const provider = new OpenAICaseBuilderProvider({
+      apiKey: configuration.openAiApiKey,
+      model: configuration.openAiModel?.trim() || DEFAULT_OPENAI_MODEL,
+      transport: options.transport,
+    });
+    return provider.analyze(input, options.signal);
   }
 
   try {
     const service = new MockDocumentAnalysisService(mockDelayMs);
-    return await service.analyzeDocument(toMockCaseInput(input));
+    return {
+      analysis: await service.analyzeDocument(toMockCaseInput(input)),
+      processingMode: "mock",
+    };
   } catch (error) {
     if (error instanceof CaseRequestError) throw error;
     throw new CaseRequestError("MOCK_PROVIDER_ERROR", 500);
@@ -44,6 +65,9 @@ export async function runConfiguredAnalysis(
 function toMockCaseInput(input: NormalizedCaseInput): CaseInput {
   const categoryPart = input.category ? { category: input.category } : {};
   const goalPart = input.normalizedGoal ? { goal: input.normalizedGoal } : {};
+  const resolutionPart = input.clarificationResolution
+    ? { clarificationResolution: input.clarificationResolution }
+    : {};
 
   if (input.kind === "goal") {
     return {
@@ -51,6 +75,7 @@ function toMockCaseInput(input: NormalizedCaseInput): CaseInput {
       goal: input.normalizedGoal,
       outputLanguage: input.outputLanguage,
       ...categoryPart,
+      ...resolutionPart,
     };
   }
 
@@ -61,6 +86,7 @@ function toMockCaseInput(input: NormalizedCaseInput): CaseInput {
       outputLanguage: input.outputLanguage,
       ...categoryPart,
       ...goalPart,
+      ...resolutionPart,
     };
   }
   if (input.kind === "sample") {
@@ -70,6 +96,7 @@ function toMockCaseInput(input: NormalizedCaseInput): CaseInput {
       outputLanguage: input.outputLanguage,
       ...categoryPart,
       ...goalPart,
+      ...resolutionPart,
     };
   }
   return {
@@ -77,6 +104,7 @@ function toMockCaseInput(input: NormalizedCaseInput): CaseInput {
     outputLanguage: input.outputLanguage,
     ...categoryPart,
     ...goalPart,
+    ...resolutionPart,
     document: {
       id: `server-upload-${input.receivedAt}`,
       metadata: {

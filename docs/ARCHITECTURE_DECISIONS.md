@@ -153,3 +153,35 @@ These dated records capture durable technical choices. Product-level choices and
 - **Reason:** One multipart boundary continues to protect every case path without creating a second goal endpoint or separate result UI.
 - **Tradeoff:** The stable API now has an additional optional field and error codes, and current mock analysis still cannot semantically interpret that field.
 - **Revisit when:** A future structured provider requires a versioned transport change that cannot be introduced compatibly.
+
+## 2026-07-18 — Server-only OpenAI Responses provider
+
+- **Context:** The secure multimodal boundary and structured mock builder were ready for a real provider, but secrets, user consent, cost, provider errors, and schema trust needed one controlled design.
+- **Decision:** Add an `OpenAICaseBuilderProvider` behind the existing server analysis boundary. Instantiate the official SDK only in explicitly selected real mode after configuration and consent; return the same `CaseAnalysis` plus an optional structured `CaseProfile`.
+- **Reason:** Provider-specific SDK types and credentials remain server-only while the client route UI and mock fallback stay replaceable and compatible.
+- **Tradeoff:** The public success envelope gains an optional profile and the provider adapter must normalize SDK output into existing domain types.
+- **Revisit when:** Evaluations show a single provider cannot meet accuracy, latency, or availability requirements, without adding an unauthorized AI vendor.
+
+## 2026-07-18 — Structured multimodal request and response boundary
+
+- **Context:** Goals, pasted text, PDFs, and images require different Responses content items, and model output is untrusted even when statically typed.
+- **Decision:** Map text/sample to `input_text`, PDF data URLs to `input_file`, and image data URLs to `input_image`; send separate category/language/security context; parse Zod Structured Outputs and revalidate coherence at runtime.
+- **Reason:** Direct multimodal input avoids a duplicate OCR/PDF pipeline and strict schemas keep profile, question, interpretation, uncertainty, and route decisions testable.
+- **Tradeoff:** Direct files can increase provider token cost, and strict schemas can reject otherwise usable prose; bounded failed-validation verification is the only repair path.
+- **Revisit when:** Phase 6 evaluations justify preprocessing, schema changes, different detail settings, or smaller task-specific calls.
+
+## 2026-07-18 — Consent, provider retention, and application discard
+
+- **Context:** Real cases may contain sensitive personal information, and application-memory discard does not control OpenAI platform retention or project data-sharing settings.
+- **Decision:** Require explicit per-case UI/server consent, send the minimum case content with `store: false`, log no content, write no files, and disclose the provider's documented default abuse-monitoring retention rather than promise deletion.
+- **Reason:** Users need an accurate boundary between browser memory, BurgerMapper processing, OpenAI processing, and provider controls.
+- **Tradeoff:** Consent adds a deliberate step, and `store: false` does not mean zero provider retention.
+- **Revisit when:** Deployment project retention/data-sharing settings are verified or stronger eligible retention controls are configured.
+
+## 2026-07-18 — Bounded provider reliability and cost policy
+
+- **Context:** Multimodal reasoning can be slow or costly, while blind retries and routine verification can consume a small project balance.
+- **Decision:** Use a 20-second timeout, one transient retry, 6,000 output-token ceiling, low document detail, four provider requests and three clarification questions per case, plus at most one trigger-restricted verification pass.
+- **Reason:** Explicit ceilings make failure and spend behavior predictable enough for later evaluation without adding persistence or a rate-limit database.
+- **Tradeoff:** Difficult documents may time out or need more context; current per-case ceiling is enforced inside the provider request contract rather than across distributed anonymous sessions.
+- **Revisit when:** Phase 6 measures quality, latency, cost, abuse, and provider-limit behavior with synthetic evaluations.

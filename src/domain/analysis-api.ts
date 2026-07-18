@@ -1,4 +1,5 @@
 import type { CaseAnalysis, InputKind } from "@/domain/case";
+import type { CaseProfile } from "@/domain/case-profile";
 
 export const ANALYZE_CASE_ENDPOINT = "/api/cases/analyze";
 
@@ -10,6 +11,8 @@ export const CASE_FORM_FIELDS = {
   text: "text",
   sampleId: "sampleId",
   file: "file",
+  consentToOpenAI: "consentToOpenAI",
+  clarificationResolution: "clarificationResolution",
 } as const;
 
 export const CASE_ANALYSIS_ERROR_CODES = [
@@ -30,13 +33,21 @@ export const CASE_ANALYSIS_ERROR_CODES = [
   "GOAL_TOO_LONG",
   "MOCK_PROVIDER_ERROR",
   "API_NOT_CONFIGURED",
+  "CONSENT_REQUIRED",
+  "PROVIDER_TIMEOUT",
+  "PROVIDER_RATE_LIMITED",
+  "PROVIDER_AUTH_ERROR",
+  "PROVIDER_BILLING_ERROR",
+  "PROVIDER_UNAVAILABLE",
+  "PROVIDER_RESPONSE_INVALID",
+  "REQUEST_LIMIT_REACHED",
   "INTERNAL_ERROR",
 ] as const;
 
 export type CaseAnalysisErrorCode =
   (typeof CASE_ANALYSIS_ERROR_CODES)[number];
 
-export type ProcessingMode = "mock";
+export type ProcessingMode = "mock" | "openai";
 export type RetentionStatus = "discarded-after-processing";
 
 export interface AnalysisRequestMetadata {
@@ -49,6 +60,7 @@ export interface AnalysisRequestMetadata {
 
 export interface AnalyzeCaseSuccessResponse {
   analysis: CaseAnalysis;
+  profile?: CaseProfile;
   metadata: AnalysisRequestMetadata;
 }
 
@@ -80,6 +92,22 @@ export const SAFE_ERROR_MESSAGES: Record<CaseAnalysisErrorCode, string> = {
   MOCK_PROVIDER_ERROR: "The mock route could not be created. Try again.",
   API_NOT_CONFIGURED:
     "Real analysis is not configured. Enable mock mode to continue.",
+  CONSENT_REQUIRED:
+    "Confirm consent before sending this case to OpenAI for analysis.",
+  PROVIDER_TIMEOUT:
+    "The analysis took too long. Try again with a smaller document.",
+  PROVIDER_RATE_LIMITED:
+    "The analysis service is temporarily busy. Wait a moment and try again.",
+  PROVIDER_AUTH_ERROR:
+    "Real analysis is not available because the server configuration was rejected.",
+  PROVIDER_BILLING_ERROR:
+    "Real analysis is unavailable because the API project cannot currently process paid requests.",
+  PROVIDER_UNAVAILABLE:
+    "The analysis service is temporarily unavailable. You can retry or use mock mode.",
+  PROVIDER_RESPONSE_INVALID:
+    "The analysis response could not be validated safely. Try again.",
+  REQUEST_LIMIT_REACHED:
+    "This case reached its analysis request limit. Start a new case to continue.",
   INTERNAL_ERROR: "The request could not be completed. Try again.",
 };
 

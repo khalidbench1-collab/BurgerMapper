@@ -69,17 +69,7 @@ export interface NextStep {
   officialSourceIds: string[];
 }
 
-export type ClarificationAnswerId =
-  | "employed"
-  | "self-employed"
-  | "both"
-  | "primary-residence"
-  | "secondary-residence"
-  | "unsure-residence"
-  | "freelance-only"
-  | "alongside-employment"
-  | "unsure-work"
-  | "dont-know";
+export type ClarificationAnswerId = string;
 
 export interface ClarificationOption {
   id: ClarificationAnswerId;
@@ -124,6 +114,16 @@ interface BaseCaseInput {
   category?: BureaucracyCategory;
   outputLanguage: SupportedLanguage;
   goal?: string;
+  clarificationResolution?: ClarificationResolution;
+}
+
+export interface ClarificationResolution {
+  questionId: string;
+  questionPrompt: string;
+  questionReason: string;
+  answerId: ClarificationAnswerId;
+  answerLabel: string;
+  options: ClarificationOption[];
 }
 
 export type CaseInput =

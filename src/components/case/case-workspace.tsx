@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { AnalysisLoadingState } from "@/components/case/analysis-loading-state";
 import { AnalysisResult } from "@/components/case/analysis-result";
@@ -34,6 +34,7 @@ import {
 import { createUploadedDocument, validateDocumentFile } from "@/lib/file-validation";
 import { validateCaseGoal } from "@/lib/goal-validation";
 import { validatePastedText } from "@/lib/text-validation";
+import { REAL_ANALYSIS_CONSENT_MESSAGE } from "@/lib/privacy-messages";
 import {
   answerCaseBuilderQuestion,
   categoryCorrection,
@@ -41,8 +42,7 @@ import {
   ServerCaseBuilderService,
 } from "@/services/case-builder";
 import { AnalysisApiError } from "@/services/server-document-analysis";
-
-const caseBuilderService = new ServerCaseBuilderService();
+import { ServerDocumentAnalysisService } from "@/services/server-document-analysis";
 
 interface RequestErrorState {
   code: CaseAnalysisErrorCode;
@@ -65,12 +65,23 @@ function createInitialState(category: BureaucracyCategory | null = null): CaseSt
   };
 }
 
-export function CaseWorkspace({ initialCategory = null }: { initialCategory?: BureaucracyCategory | null }) {
+export function CaseWorkspace({
+  initialCategory = null,
+  analysisMode = "mock",
+}: {
+  initialCategory?: BureaucracyCategory | null;
+  analysisMode?: "mock" | "openai";
+}) {
+  const caseBuilderService = useMemo(
+    () => new ServerCaseBuilderService(new ServerDocumentAnalysisService(analysisMode === "openai")),
+    [analysisMode],
+  );
   const [caseState, setCaseState] = useState<CaseState>(() => createInitialState(initialCategory));
   const [builderResult, setBuilderResult] = useState<CaseBuilderResult | null>(null);
   const [showQuestion, setShowQuestion] = useState(false);
   const [goalError, setGoalError] = useState<string | null>(null);
   const [requestError, setRequestError] = useState<RequestErrorState | null>(null);
+  const [realAnalysisConsent, setRealAnalysisConsent] = useState(false);
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
   const requestId = useRef(0);
   const activeRequestController = useRef<AbortController | null>(null);
@@ -172,6 +183,7 @@ export function CaseWorkspace({ initialCategory = null }: { initialCategory?: Bu
     setBuilderResult(null);
     setShowQuestion(false);
     setGoalError(null);
+    setRealAnalysisConsent(false);
     setCaseState(createInitialState());
   }
 
@@ -227,9 +239,10 @@ export function CaseWorkspace({ initialCategory = null }: { initialCategory?: Bu
         result = mergeCaseProfileCorrections(result, previousResult.profile, corrections);
       }
       if (requestId.current !== activeRequest) return;
+      const needsClarification = result.profile.sufficiency.state === "needs-clarification";
       setBuilderResult(result);
-      setShowQuestion(true);
-      setCaseState((current) => ({ ...current, goalInput: input.goal ?? current.goalInput, category: input.category ?? null, analysis: result.analysis, status: "needs-clarification" }));
+      setShowQuestion(needsClarification);
+      setCaseState((current) => ({ ...current, goalInput: input.goal ?? current.goalInput, category: input.category ?? null, analysis: result.analysis, status: needsClarification ? "needs-clarification" : "analysis-complete" }));
     } catch (error) {
       if (controller.signal.aborted || requestId.current !== activeRequest) return;
       const apiError = error instanceof AnalysisApiError ? error : new AnalysisApiError("INTERNAL_ERROR", null);
@@ -246,6 +259,28 @@ export function CaseWorkspace({ initialCategory = null }: { initialCategory?: Bu
   }
 
   function handleClarification(answer: ClarificationAnswerId) {
+    if (builderResult && !builderResult.analysis.isMock) {
+      const question = builderResult.analysis.clarificationQuestion;
+      const option = question.options.find((candidate) => candidate.id === answer);
+      const input = buildActiveInput();
+      if (!option || !input) return;
+      const previousAnswer = builderResult.profile.answers.find((item) => item.questionId === question.id);
+      const corrections: CaseProfileContextCorrection[] = previousAnswer && previousAnswer.answerId !== answer
+        ? [{ field: "clarification-answer", summary: "Clarification answer changed; the route was rebuilt." }]
+        : [];
+      void runCaseBuilder({
+        ...input,
+        clarificationResolution: {
+          questionId: question.id,
+          questionPrompt: question.prompt,
+          questionReason: question.reason,
+          answerId: option.id,
+          answerLabel: option.label,
+          options: question.options,
+        },
+      }, builderResult, corrections);
+      return;
+    }
     setBuilderResult((current) => {
       if (!current) return current;
       const updated = answerCaseBuilderQuestion(current, answer);
@@ -266,8 +301,8 @@ export function CaseWorkspace({ initialCategory = null }: { initialCategory?: Bu
   }
 
   const isBusy = caseState.status === "validating" || caseState.status === "mock-analyzing";
-  const canAnalyze = canBuildCase(caseState) && !isBusy;
-  const liveMessage = requestError?.message ?? getLiveMessage(caseState);
+  const canAnalyze = canBuildCase(caseState) && !isBusy && (analysisMode === "mock" || realAnalysisConsent);
+  const liveMessage = requestError?.message ?? getLiveMessage(caseState, analysisMode);
 
   return (
     <div className="space-y-6">
@@ -279,12 +314,12 @@ export function CaseWorkspace({ initialCategory = null }: { initialCategory?: Bu
           <div className="flex justify-end print:hidden">
             <button type="button" onClick={handleStartOver} disabled={isBusy} className="rounded-xl border border-[#bfc7c2] bg-white px-4 py-2.5 text-sm font-semibold text-[#35443c] outline-none focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:opacity-60">Start over</button>
           </div>
-          <CaseProfileSummary key={builderResult.profile.id} profile={builderResult.profile} disabled={isBusy} onSaveContext={handleSaveContext} onChangeAnswer={() => { setShowQuestion(true); setCaseState((current) => ({ ...current, status: "needs-clarification" })); }} />
-          {isBusy ? <AnalysisLoadingState /> : null}
+          <CaseProfileSummary key={builderResult.profile.id} profile={builderResult.profile} isMock={builderResult.analysis.isMock} disabled={isBusy} onSaveContext={handleSaveContext} onChangeAnswer={() => { setShowQuestion(true); setCaseState((current) => ({ ...current, status: "needs-clarification" })); }} />
+          {isBusy ? <AnalysisLoadingState mode={analysisMode} /> : null}
           {showQuestion && !isBusy ? (
             <div dir={builderResult.analysis.outputLanguage === "ar" ? "rtl" : "ltr"} lang={builderResult.analysis.outputLanguage}>
               <ClarificationCard analysis={builderResult.analysis} onAnswer={handleClarification} />
-              <p className="mt-3 text-sm leading-6 text-[#68736d]" dir="ltr">Mock mode uses one deterministic route-changing question. It has not interpreted your goal or evidence.</p>
+              <p className="mt-3 text-sm leading-6 text-[#68736d]" dir="ltr">{builderResult.analysis.isMock ? "Mock mode uses one deterministic route-changing question. It has not interpreted your goal or evidence." : "OpenAI identified one question whose answer can change the route."}</p>
             </div>
           ) : null}
           {builderResult.profile.sufficiency.state === "sufficient" && !isBusy ? (
@@ -312,9 +347,15 @@ export function CaseWorkspace({ initialCategory = null }: { initialCategory?: Bu
               <div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#237b59]">Output</p><h2 className="mt-2 text-xl font-semibold text-[#1d2b24]">Choose your route language</h2></div>
               <LanguageSelector value={caseState.outputLanguage} onChange={handleLanguageChange} disabled={isBusy} />
               <div className="border-t border-[#e0e4e0] pt-5">
+                {analysisMode === "openai" ? (
+                  <label className="mb-4 flex items-start gap-3 rounded-xl border border-[#c8d5dd] bg-[#f3f8fb] p-4 text-sm leading-6 text-[#385161]">
+                    <input type="checkbox" checked={realAnalysisConsent} onChange={(event) => setRealAnalysisConsent(event.target.checked)} disabled={isBusy} className="mt-1 h-4 w-4 accent-[#1d664b]" />
+                    <span><span className="font-semibold text-[#253b48]">Send this case to OpenAI for analysis</span><span className="mt-1 block">{REAL_ANALYSIS_CONSENT_MESSAGE}</span></span>
+                  </label>
+                ) : null}
                 {requestError ? <div role="alert" data-testid="analysis-api-error" className="mb-4 rounded-xl border border-[#e3b4a8] bg-[#fff7f4] p-4 text-sm text-[#7d3325]"><p className="font-semibold">{requestError.message}</p><p className="mt-1 text-xs">Error code: {requestError.code}{requestError.requestId ? ` · Request reference: ${requestError.requestId}` : ""}</p></div> : null}
-                {caseState.status === "mock-analyzing" ? <AnalysisLoadingState /> : <button type="button" disabled={!canAnalyze} onClick={handleAnalyze} className="w-full rounded-xl bg-[#1d664b] px-5 py-3.5 text-sm font-semibold text-white shadow-sm outline-none hover:bg-[#15523c] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:cursor-not-allowed disabled:bg-[#aeb8b2]">{caseState.status === "error" ? "Try building the mock case again" : "Build mock case"}</button>}
-                <p className="mt-3 text-center text-xs leading-5 text-[#737d77]">The application server validates and discards inputs in memory. Mock mode makes no AI-provider call.</p>
+                {caseState.status === "mock-analyzing" ? <AnalysisLoadingState mode={analysisMode} /> : <button type="button" disabled={!canAnalyze} onClick={handleAnalyze} className="w-full rounded-xl bg-[#1d664b] px-5 py-3.5 text-sm font-semibold text-white shadow-sm outline-none hover:bg-[#15523c] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:cursor-not-allowed disabled:bg-[#aeb8b2]">{caseState.status === "error" ? "Try analysis again" : analysisMode === "mock" ? "Build mock case" : "Analyze case"}</button>}
+                <p className="mt-3 text-center text-xs leading-5 text-[#737d77]">{analysisMode === "mock" ? "The application server validates and discards inputs in memory. Mock mode makes no AI-provider call." : "The server validates input in memory, sends the minimum required case content to OpenAI only after consent, and does not intentionally store it."}</p>
               </div>
             </aside>
           </div>
@@ -348,13 +389,13 @@ function canBuildCase(state: CaseState): boolean {
   return state.inputKind === "none" ? validateOptionalGoal(state.goalInput) : hasReadyEvidence(state);
 }
 
-function getLiveMessage(state: CaseState): string {
+function getLiveMessage(state: CaseState, mode: "mock" | "openai"): string {
   switch (state.status) {
     case "idle": return "Waiting for a goal or optional evidence.";
     case "validating": return "Validating the selected file.";
     case "file-selected": return "Evidence selected.";
     case "ready": return "Case context ready.";
-    case "mock-analyzing": return "Building the structured mock case profile.";
+    case "mock-analyzing": return mode === "mock" ? "Building the structured mock case profile." : "Analyzing the case with OpenAI.";
     case "needs-clarification": return "One route-changing detail is needed.";
     case "analysis-complete": return "Mock route ready.";
     case "error": return state.validationError ?? "An error occurred.";

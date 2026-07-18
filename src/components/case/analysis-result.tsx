@@ -28,7 +28,7 @@ export function AnalysisResult({
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden" dir="ltr">
-        <p className="text-sm font-medium text-[#5f6c65]">Your mock route is ready.</p>
+        <p className="text-sm font-medium text-[#5f6c65]">{analysis.isMock ? "Your mock route is ready." : "Your analyzed route is ready."}</p>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
@@ -51,7 +51,7 @@ export function AnalysisResult({
         data-testid="analysis-result"
         dir={direction}
         lang={analysis.outputLanguage}
-        aria-label={copy.mockBadge}
+        aria-label={analysis.isMock ? copy.mockBadge : "OpenAI analysis"}
         className="print-surface space-y-5 rounded-[1.5rem] border border-[#d6dbd7] bg-[#fbfbf8] p-4 shadow-[0_18px_60px_rgba(29,47,38,0.08)] sm:p-7"
       >
         <AnalysisSummary analysis={analysis} />

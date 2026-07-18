@@ -47,6 +47,9 @@ export async function normalizeAnalyzeCaseFormData(
     throw new CaseRequestError("INVALID_LANGUAGE", 400);
   }
   const outputLanguage = languageValue as SupportedLanguage;
+  const clarificationResolution = parseClarificationResolution(
+    getSingleString(formData, CASE_FORM_FIELDS.clarificationResolution, false),
+  );
 
   const categoryValue = getSingleString(
     formData,
@@ -81,6 +84,7 @@ export async function normalizeAnalyzeCaseFormData(
       outputLanguage,
       receivedAt,
       normalizedGoal,
+      clarificationResolution,
     };
   }
 
@@ -100,6 +104,7 @@ export async function normalizeAnalyzeCaseFormData(
       outputLanguage,
       normalizedGoal,
       normalizedText: validation.normalizedText,
+      clarificationResolution,
       receivedAt,
     };
   }
@@ -119,6 +124,7 @@ export async function normalizeAnalyzeCaseFormData(
       outputLanguage,
       normalizedGoal,
       sampleId,
+      clarificationResolution,
       receivedAt,
     };
   }
@@ -147,6 +153,7 @@ export async function normalizeAnalyzeCaseFormData(
     category,
     outputLanguage,
     normalizedGoal,
+    clarificationResolution,
     receivedAt,
     file: {
       metadata: {
@@ -158,6 +165,38 @@ export async function normalizeAnalyzeCaseFormData(
       bytes,
     },
   };
+}
+
+function parseClarificationResolution(value: string | null) {
+  if (!value) return null;
+  if (value.length > 2_000) throw new CaseRequestError("INVALID_REQUEST", 400);
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!parsed || typeof parsed !== "object") throw new Error("invalid");
+    const candidate = parsed as Record<string, unknown>;
+    const fields = ["questionId", "questionPrompt", "questionReason", "answerId", "answerLabel"] as const;
+    if (fields.some((field) => typeof candidate[field] !== "string" || !(candidate[field] as string).trim())) throw new Error("invalid");
+    if (fields.some((field) => (candidate[field] as string).length > 500)) throw new Error("invalid");
+    if (!Array.isArray(candidate.options) || candidate.options.length < 2 || candidate.options.length > 5) throw new Error("invalid");
+    const options = candidate.options.map((option) => {
+      if (!option || typeof option !== "object") throw new Error("invalid");
+      const item = option as Record<string, unknown>;
+      if (typeof item.id !== "string" || typeof item.label !== "string" || typeof item.routeImpact !== "string") throw new Error("invalid");
+      if (!item.id.trim() || !item.label.trim() || !item.routeImpact.trim() || item.id.length > 300 || item.label.length > 300 || item.routeImpact.length > 500) throw new Error("invalid");
+      return { id: item.id.trim(), label: item.label.trim(), routeImpact: item.routeImpact.trim() };
+    });
+    if (new Set(options.map((option) => option.id)).size !== options.length) throw new Error("invalid");
+    return {
+      questionId: (candidate.questionId as string).trim(),
+      questionPrompt: (candidate.questionPrompt as string).trim(),
+      questionReason: (candidate.questionReason as string).trim(),
+      answerId: (candidate.answerId as string).trim(),
+      answerLabel: (candidate.answerLabel as string).trim(),
+      options,
+    };
+  } catch {
+    throw new CaseRequestError("INVALID_REQUEST", 400);
+  }
 }
 
 function getSingleString(

@@ -14,7 +14,7 @@ export function AnalysisSummary({ analysis }: { analysis: CaseAnalysis }) {
     <section aria-labelledby="analysis-summary-heading" className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <MockModeBadge label={copy.mockBadge} />
+          <MockModeBadge mode={analysis.isMock ? "mock" : "openai"} label={analysis.isMock ? copy.mockBadge : "OpenAI analysis"} />
           <h2 id="analysis-summary-heading" className="mt-4 max-w-3xl text-2xl font-semibold tracking-[-0.035em] text-[#18271f] sm:text-3xl">
             {analysis.documentTitle}
           </h2>
@@ -58,7 +58,7 @@ export function AnalysisSummary({ analysis }: { analysis: CaseAnalysis }) {
 
       <article className="rounded-2xl border border-[#e1d8c9] bg-[#fffdf8] p-5 sm:p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#8a5a2f]">
-          {copy.mockBadge}
+          {analysis.isMock ? copy.mockBadge : "Model interpretation"}
         </p>
         <h3 className="mt-2 text-xl font-semibold text-[#202c26]">{copy.summary}</h3>
         <p className="mt-3 text-base leading-7 text-[#4d5b54]">{analysis.summary}</p>

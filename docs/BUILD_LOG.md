@@ -377,3 +377,51 @@ Codex inspected the Phase 2 architecture, evolved the domain and server contract
 ### Next phase and external gate
 
 Phase 4 is the real OpenAI multimodal and Structured Outputs integration, but it remains blocked. The user must privately enable OpenAI API billing/access and configure `OPENAI_API_KEY` in `.env.local`, then explicitly authorize Phase 4. The secret must never be pasted into conversation. Phase 4 must verify the current official `gpt-5.6-luna` identifier, availability, capabilities, and reasoning settings before implementation.
+
+## 2026-07-18 — Phase 4 real OpenAI multimodal and structured-output integration
+
+### Objective, start, and API gate
+
+Implement a server-only OpenAI Responses API provider for goal, text, trusted sample, PDF, and image cases while preserving the mock provider and stable route UI. The starting commit was `f72589e7102403ca9fa8b78c16f46c401b6c934b`. The user confirmed API billing and private `.env.local` configuration without revealing a key, then explicitly authorized Phase 4. The worktree also contained the user's intentional uncommitted `AGENTS.md` rule forbidding Codex-initiated API calls without a specific explanation and permission; it was preserved as part of this provider phase.
+
+No paid/manual OpenAI request was authorized or made. All provider verification uses injected synthetic transports, so the purchased balance was not intentionally used.
+
+### Official API verification on 2026-07-18
+
+- `gpt-5.6-luna` is the documented exact model ID and supports Responses, image input, Structured Outputs, and `low`, `medium`, `high`, and `xhigh` reasoning: https://developers.openai.com/api/docs/models/gpt-5.6-luna
+- PDF data uses `input_file`; provider file limits are 50 MB, while BurgerMapper retains its stricter 10 MB cap: https://developers.openai.com/api/docs/guides/file-inputs
+- Image data URLs use `input_image`; GPT-5.6 supports `low`, `high`, `original`, and `auto`; BurgerMapper defaults to `low`: https://developers.openai.com/api/docs/guides/images-vision
+- JavaScript Structured Outputs use `responses.parse` and `zodTextFormat`: https://developers.openai.com/api/docs/guides/structured-outputs
+- Reasoning effort is model-dependent and `xhigh` should be justified by evaluation: https://developers.openai.com/api/docs/guides/reasoning
+- API content is not used for training by default unless the project opts in, while default abuse-monitoring logs may retain content up to 30 days: https://developers.openai.com/api/docs/guides/your-data
+
+The OpenAI docs MCP server was registered but requires a fresh session, so the official-domain fallback was used. Project-level Luna availability was not probed because that would require an unauthorized API request; no substitute model was selected.
+
+### Implementation and architecture
+
+- Added official `openai` 6.48.0 (Apache-2.0) and `zod` 4.4.3 (MIT) production dependencies.
+- `ENABLE_MOCK_AI=true` remains network-free. `false` requires a server-only key and selects a configurable model, defaulting to `gpt-5.6-luna`.
+- Implemented `OpenAICaseBuilderProvider`; the SDK client is instantiated only after real configuration and consent checks.
+- Goal/text/sample map to `input_text`, PDF to `input_file`, and PNG/JPEG/WebP to `input_image`; payloads use `store: false`, `low` detail, separate trusted context, and the prompt-injection boundary.
+- Added Zod Structured Outputs for document facts, interpretation, uncertainty, `CaseProfile`, question-or-sufficient decisions, documents, route steps, disclaimer, and verification trigger. Runtime schema and coherence checks reject malformed, overlong, or contradictory output.
+- Kept `CaseAnalysis` compatible and added an optional server-produced `CaseProfile`. Provider question option IDs were safely widened from a closed mock-only union.
+- Real clarification answers are returned as bounded structured context so the profile and route can be rebuilt. Mock answers remain deterministic.
+- Added explicit UI and server consent, a 20-second timeout, one transient retry, typed auth/billing/rate/timeout/outage/validation errors, a 6,000-output-token ceiling, four-request ceiling, and three-question ceiling.
+- Added one optional structured verification pass only for high risk, source conflict, suspected unsupported claims, or failed validation. There is no tone-polishing call and no chain-of-thought request.
+- Preserved cancellation, duplicate prevention, no content logging/storage, multilingual/RTL, print, reset, typed errors, and mock fallback.
+
+### Testing, problems, and fixes
+
+- Added goal/text/PDF/PNG/JPEG/WebP request mapping, configuration, consent, schema accept/repair/reject, question/sufficiency, answer update, reasoning, verification, injection, timeout/retry/auth/billing/rate/outage, limits, no-secret, privacy-header, and mock fallback coverage.
+- `npm run lint`: passed with no findings.
+- `npm test`: 13 files and 107 tests passed.
+- `npm run build`: passed with strict TypeScript; static `/` and `/manifest.webmanifest`, dynamic `/case` and `/api/cases/analyze`.
+- `npm audit --json`: 0 vulnerabilities across 544 dependencies: 19 production, 490 development, and 105 optional.
+- HTTP checks covered all required GET routes, mock success, invalid input, missing configuration, consent rejection, and mocked real success. No live model test was run.
+- The first dependency install stalled under restricted network access; an approved `npm install` retry succeeded. Consent initially masked the missing-key error, so configuration now validates first. A test also found deliberate raw-goal copying into the response profile; real profiles now use the schema-validated profile goal instead.
+
+### Codex contribution and next phase
+
+Codex verified current official API documentation, designed and implemented the replaceable provider, schemas, consent, privacy/security controls, retry/error/cost boundaries, synthetic tests, documentation, and mock preservation while keeping paid API usage at zero for this run.
+
+Phase 5 should research official Berlin and German federal sources only after a sufficient profile, cite supported claims beside route steps, identify conflicts and uncertainty, and keep URLs LTR in Arabic. Do not begin it automatically.

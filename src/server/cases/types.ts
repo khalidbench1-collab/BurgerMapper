@@ -1,5 +1,6 @@
 import type { BureaucracyCategory } from "@/domain/categories";
 import type { InputKind, SupportedLanguage } from "@/domain/case";
+import type { ClarificationResolution } from "@/domain/case";
 import type { KnownSampleId } from "@/domain/samples";
 
 export interface NormalizedFileMetadata {
@@ -21,6 +22,7 @@ interface NormalizedCaseInputBase {
   outputLanguage: SupportedLanguage;
   receivedAt: string;
   normalizedGoal: string | null;
+  clarificationResolution?: ClarificationResolution | null;
 }
 
 export type NormalizedCaseInput =

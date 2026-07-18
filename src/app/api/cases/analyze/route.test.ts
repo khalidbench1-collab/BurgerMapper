@@ -9,6 +9,7 @@ import {
 } from "@/domain/analysis-api";
 import { MAX_PASTED_TEXT_CHARACTERS } from "@/lib/text-validation";
 import { handleAnalyzeCaseRequest } from "@/server/cases/handle-request";
+import { createSyntheticModelCaseOutput } from "@/server/cases/openai/fixtures.test-data";
 
 const SUCCESS_OPTIONS = {
   runtimeConfiguration: {
@@ -167,6 +168,52 @@ describe("POST /api/cases/analyze", () => {
     expect(response.status).toBe(503);
     expect(payload.error.code).toBe("API_NOT_CONFIGURED");
     expect(payload.error.message).not.toContain("OPENAI_API_KEY");
+  });
+
+  it("requires explicit consent before a configured real transfer", async () => {
+    const formData = baseForm("goal");
+    formData.set(CASE_FORM_FIELDS.goal, "Renew a fictional residence permit safely.");
+    const response = await handleAnalyzeCaseRequest(createRequest(formData), {
+      ...SUCCESS_OPTIONS,
+      runtimeConfiguration: {
+        mockEnabled: false,
+        openAiApiKeyConfigured: true,
+        openAiApiKey: "synthetic-test-key",
+        openAiModel: "gpt-5.6-luna",
+      },
+    });
+    const payload = (await response.json()) as AnalyzeCaseErrorResponse;
+    expect(response.status).toBe(403);
+    expect(payload.error.code).toBe("CONSENT_REQUIRED");
+  });
+
+  it("returns the existing contracts through a mocked real Responses transport without echoing input", async () => {
+    const privateGoal = "Renew a unique fictional permit goal that must not be echoed.";
+    const formData = baseForm("goal");
+    formData.set(CASE_FORM_FIELDS.goal, privateGoal);
+    formData.set(CASE_FORM_FIELDS.consentToOpenAI, "true");
+    const response = await handleAnalyzeCaseRequest(createRequest(formData), {
+      ...SUCCESS_OPTIONS,
+      runtimeConfiguration: {
+        mockEnabled: false,
+        openAiApiKeyConfigured: true,
+        openAiApiKey: "synthetic-test-key",
+        openAiModel: "gpt-5.6-luna",
+      },
+      openAiTransport: {
+        async parse() {
+          return { outputParsed: createSyntheticModelCaseOutput() };
+        },
+      },
+    });
+    const payload = (await response.json()) as AnalyzeCaseSuccessResponse;
+    expect(response.status).toBe(200);
+    expect(payload.metadata.processingMode).toBe("openai");
+    expect(payload.analysis.isMock).toBe(false);
+    expect(payload.profile?.sufficiency.state).toBe("needs-clarification");
+    expect(response.headers.get("x-burgermapper-retention")).toBe("discarded-after-processing");
+    expect(JSON.stringify(payload)).not.toContain(privateGoal);
+    expect(JSON.stringify(payload)).not.toContain("synthetic-test-key");
   });
 
   it("rejects a non-multipart request without returning its body", async () => {

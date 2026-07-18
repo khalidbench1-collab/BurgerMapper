@@ -1,6 +1,6 @@
 # Build Week submission checklist
 
-Completion of the final submission is not claimed. Phase 3 provides a locally tested goal-first guided mock case builder and 80 automated tests. It is not a real document-analysis or official-source product yet. Verify every item again against the final competition rules.
+Completion of the final submission is not claimed. Phase 4 provides a locally tested goal-first mock workflow plus a consent-gated server-only OpenAI provider verified with synthetic mocked transport and 107 automated tests. No live model request, official-source research, deployment, or final submission is claimed. Verify every item again against the final competition rules.
 
 - [ ] Working project
 - [ ] Chosen category

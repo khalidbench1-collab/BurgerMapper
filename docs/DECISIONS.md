@@ -91,3 +91,18 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Use explicit sufficiency rules outside UI components | A pure rule stops questioning after the route-changing answer and prevents an endless or UI-dependent conversation loop. |
 | Rebuild from corrected profile context | Editing the goal, category, or answer invalidates the affected mock decision and regenerates the question or route, while correction history remains in the current tab. |
 | Keep the Phase 3 builder deterministic and provider-independent | `CaseBuilderService` can later be backed by structured OpenAI outputs, while current behavior remains testable and does not claim to understand arbitrary user input. |
+
+## Phase 4 OpenAI integration decisions
+
+| Decision | Reason |
+| --- | --- |
+| Default to `gpt-5.6-luna` behind server-only `OPENAI_MODEL` | Official documentation verifies the required multimodal, Responses, Structured Outputs, and reasoning features while configuration avoids locking deployments to an immutable choice. |
+| Require explicit consent immediately before real transfer | A configured key does not authorize sending a user's goal or document to a third party; the user must see what is sent and why. |
+| Keep mock mode as the default development path | Automated work, demos, and regressions remain deterministic, private, free of API spend, and functional without a key. |
+| Use one primary structured result for interpretation, profile, question, and route | One schema keeps facts, interpretation, uncertainty, and actions explicit without a second tone-polishing call. |
+| Rebuild a real route from a bounded clarification answer | The answer can change the profile and route while the UI remains one-question-at-a-time and non-chatbot-like. |
+| Default PDF/image detail to `low` and cap output at 6,000 tokens | These limits reduce accidental latency and cost while Phase 6 evaluation is still pending. |
+| Retry only one transient provider failure | A bounded retry helps temporary outages without multiplying billing/auth/input failures or hiding an unavailable provider. |
+| Never silently replace requested real analysis with mock fiction | Real-mode failures return typed errors; the user may deliberately retry or switch configuration, preserving honesty. |
+| Permit one structured verification pass only for approved triggers | Extra cost is restricted to high-risk, conflicting, unsupported, or invalid output rather than routine tone work. |
+| Do not run a manual live test without separate call permission | API access enables implementation but does not authorize spending balance or transmitting content; mocked transport proves the boundary without a paid call. |
