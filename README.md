@@ -177,7 +177,7 @@ The BurgerMapper concept and an earlier, unrelated prototype predated OpenAI Bui
 
 ## How Codex contributed
 
-Codex established the Phase 0 repository and helped implement Phases 1 through 6: typed contracts, validation, in-memory boundaries, multimodal intake, structured `CaseProfile`, guided builder, server-only Responses integration, consent, prompt-injection controls, official-domain allowlisting, atomic claim-to-source mappings, cited-route rendering, synthetic release evaluations, abuse/cost controls, audits, verification, and documentation. The only live Luna evidence is the content-free Phase 5 synthetic smoke metadata; Phase 6 was fully offline and no real personal document was used. Phase 7 experience polish was implemented by Claude (Anthropic's coding agent) under the same phase protocol after Codex reached a usage limit; Codex remains the agent that creates and verifies the phase commits.
+Codex established the Phase 0 repository and helped implement Phases 1 through 6: typed contracts, validation, in-memory boundaries, multimodal intake, structured `CaseProfile`, guided builder, server-only Responses integration, consent, prompt-injection controls, official-domain allowlisting, atomic claim-to-source mappings, cited-route rendering, synthetic release evaluations, abuse/cost controls, audits, verification, and documentation. The only live Luna evidence is the content-free Phase 5 synthetic smoke metadata; Phase 6 was fully offline and no real personal document was used. Phase 7 experience polish was implemented by Claude (Anthropic's coding agent) under the same phase protocol after Codex reached a usage limit; Codex created and verified the Phase 6 and 7 commits. In Phase 8, Codex resolved the GitHub gates, pushed the preserved history, authenticated Vercel, and began release verification before reaching another usage limit; Claude completed the live production verification and release documentation.
 
 ## Codex `/feedback` Session ID
 
@@ -185,7 +185,7 @@ Placeholder: add the final Codex `/feedback` Session ID before submission.
 
 ## Live demo
 
-Placeholder: add the live deployment URL before submission.
+The production deployment runs at [https://burger-mapper.vercel.app](https://burger-mapper.vercel.app) (verified 2026-07-19). It runs the real consent-gated OpenAI mode: nothing is sent to OpenAI until the visitor explicitly agrees on the case screen, and the demo-mode fallback remains available through server configuration. The repository is public at [https://github.com/khalidbench1-collab/BurgerMapper](https://github.com/khalidbench1-collab/BurgerMapper).
 
 ## Demo video
 

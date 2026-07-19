@@ -14,8 +14,8 @@ Last verified: 2026-07-19
 | 4 | Real OpenAI multimodal and structured-output integration | COMPLETE | `4d0b20d73defbb72ed8af9efeecd07b58ff041be` | Phase 3 COMPLETE and API gate resolved |
 | 5 | Official-source research and cited personalized routes | COMPLETE | `8c24cb60476ff8bf88e199bdf45685e7fab777ce` | Phase 4 COMPLETE |
 | 6 | Reliability, safety, evaluation, and cost controls | COMPLETE | `94b72cb3602684ab9280fc8493dc4f2459d78edd` | Phase 5 COMPLETE |
-| 7 | Final user-experience and accessibility polish | COMPLETE | `feat: polish the BurgerMapper experience`; hash pending final report | Phase 6 COMPLETE |
-| 8 | GitHub, deployment, release candidate, and submission handoff | NOT STARTED | Exact future commit: `chore: prepare Build Week release candidate` | Phase 7 COMPLETE plus GitHub, visibility, Vercel, and production-variable gates |
+| 7 | Final user-experience and accessibility polish | COMPLETE | `86e3d85f3dee2f6afca3cd64995a799df1ae259e` | Phase 6 COMPLETE |
+| 8 | GitHub, deployment, release candidate, and submission handoff | COMPLETE | `hash pending final report` — `chore: prepare Build Week release candidate` | Phase 7 COMPLETE plus GitHub, visibility, Vercel, and production-variable gates |
 
 ## Implemented Phase 4 model boundary
 
@@ -57,20 +57,21 @@ Last verified: 2026-07-19
 - A same-day real-browser follow-up (Chrome DevTools, fictional sample only) verified 320 px/desktop layout, keyboard and skip-link behavior, live regions, and Arabic RTL with LTR URLs, then fixed three marginal muted-gray contrast values and one `dl` nesting nit it uncovered. Final Lighthouse mobile scores: accessibility 100, best practices 100, SEO 100 on both the homepage and a completed route. A human screen-reader walkthrough is still recommended before submission.
 - A user-directed customer-copy pass (2026-07-19) replaced all rendered "mock/fictional/Build Week" vocabulary with "demo/example" product language in English, German, and Arabic while preserving every honesty obligation (example-case basis, no AI interpretation in demo mode, not legal advice, unverified sources, non-government identity). Internal contracts and `ENABLE_MOCK_AI` keep the mock naming. All gates re-passed after the change.
 
-## Pending git actions — 2026-07-19 (two sequential commits, Codex only)
+## Implemented Phase 8 release state — 2026-07-19
 
-Both Phase 6 and Phase 7 are implemented, documented, and gate-verified, but neither mandated commit exists yet. The Phase 6 Codex session ended at a usage limit after staging its work; Phase 7 was then executed by Claude with every change left deliberately unstaged, so the Git index still contains exactly the Phase 6 content and the working tree adds Phase 7 on top. `HEAD` remains the Phase 5 commit `8c24cb60476ff8bf88e199bdf45685e7fab777ce`. No git mutation was performed in either Claude session.
+- Repository: public at `https://github.com/khalidbench1-collab/BurgerMapper`, default branch `main`, remote head equal to local `86e3d85f3dee2f6afca3cd64995a799df1ae259e` before this release commit, full phase history preserved without rewrites. Judge access requires no credentials. An MIT `LICENSE` file is included in this release candidate.
+- Deployment: production at `https://burger-mapper.vercel.app` via the user's GitHub-connected Vercel project. `/`, `/case`, `/case?category=visa-immigration`, and the manifest return `200` with the expected content.
+- Production mode: real consent-gated OpenAI analysis. A goal-only request without consent returns typed `403 CONSENT_REQUIRED` (proving `ENABLE_MOCK_AI=false` and a configured `OPENAI_API_KEY` without exposing values), a too-short goal returns typed `422 GOAL_TOO_SHORT` with a request reference, premature research returns `400`, and responses carry `no-store`, `nosniff`, and active rate-limit headers. The homepage shows the real-mode consent copy, "AI analysis" badge, independent non-government identity, and skip link, with no demo-only or competition vocabulary.
+- No full consented production OpenAI call has been made by an agent; per `AGENTS.md`, any live analysis remains user-authorized. Judges exercising the site provide their own consent per request.
+- Local gates re-verified on 2026-07-19 after the deployment: lint clean, 155/155 tests in 22 files, 5/5 release evaluations, strict production build, `npm audit` 0 vulnerabilities.
+- Codex resolved the GitHub/Vercel gates and began release verification, but probed a protected deployment-specific URL (Vercel authentication interstitial caused the HTML responses it saw) and then hit its usage limit; Claude re-ran the verification against the public production domain and completed the release documentation without git mutations.
 
-Verified evidence from 2026-07-19: the staged-only Phase 6 audit passed (28 files, +938/−36, `git diff --cached --check` clean, no sensitive or binary candidate, only `.env.example` tracked); with Phase 7 applied, lint, 155/155 tests in 22 files, the 5-test evaluation gate, the strict production build, a 0-vulnerability audit, and the local HTTP checks all passed.
+## Pending Phase 8 release actions
 
-Required Codex sequence, and nothing else:
-
-2. Record the new full Phase 6 hash, replace `hash pending final report` in the Phase 6 row above with it, and remove this completed step from this section.
-3. Stage all remaining working-tree changes (`git add -A`), inspect the staged list and `git diff --cached --check`, and verify no secret, private content, or unintended binary is included (expected: 29 modified files — 22 under `src/` plus README and 6 documentation files — and 6 new files: `src/components/app-footer.tsx`, `src/lib/route-export.ts`, and four test files).
-4. Create the Phase 7 commit with the exact message `feat: polish the BurgerMapper experience`.
-5. Report both full hashes and the final clean worktree status, then stop. The Phase 7 hash is backfilled at the start of Phase 8 per the `AGENTS.md` non-circular hash rule.
-
-Do not begin Phase 8 until both commits exist and the worktree is clean.
+1. Done 2026-07-19: an MIT `LICENSE` file was added to the working tree on the user's instruction; it ships with the release commit.
+2. Stage all working-tree changes, inspect the staged list and `git diff --check`, verify no secret or unintended file, then create exactly one commit with the exact message `chore: prepare Build Week release candidate`, set the Phase 8 row to `COMPLETE` with `hash pending final report` immediately before committing per the `AGENTS.md` rule, and push normally (no force) to `origin main`.
+3. The push will trigger the GitHub-connected Vercel production redeploy; re-check `https://burger-mapper.vercel.app` afterward.
+4. Remaining user-owned submission steps (never agent-performed): record and upload the demo video, run Codex `/feedback` and note the Session ID, choose the category, write the Devpost description, and submit before 2026-07-21 17:00 PT.
 
 ## Status meanings
 
@@ -81,12 +82,6 @@ Do not begin Phase 8 until both commits exist and the worktree is clean.
 
 ## Next executable phase
 
-Phase 8 is the first phase marked `NOT STARTED`, but its prerequisites are not complete until Codex creates the two pending commits above and the worktree is clean. Phase 8 additionally pauses at the GitHub, visibility, Vercel, and production-variable gates.
-
-After both pending commits exist, run exactly:
-
-```text
-Read AGENTS.md, docs/MASTER_BUILD_PLAN.md, and docs/PHASE_STATUS.md. Execute the first phase marked NOT STARTED whose prerequisites are complete. Follow its full prompt. Stop after its commit and final report. Never automatically begin the next phase.
-```
+Phase 8 is the final autonomous phase and is complete; its external gates and release candidate are recorded, while the user-owned submission steps remain (see "Pending Phase 8 release actions"). No further phase exists after Phase 8 — follow `docs/FINAL_HANDOFF_CHECKLIST.md` for the submission handoff.
 
 Any future real API request remains separately permission-gated unless the user grants a new exact authorization.

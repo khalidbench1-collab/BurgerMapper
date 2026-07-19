@@ -565,3 +565,41 @@ On direct user instruction, all user-visible copy was moved to customer vocabula
 Claude (Anthropic's coding agent) executed this phase under the repository phase protocol after Codex reached its usage limit, performed the audits and implementation above, and made no Git mutation. Codex must create the two pending sequential commits recorded in `docs/PHASE_STATUS.md` before Phase 8 begins.
 
 Phase 8 should produce the GitHub repository, deployment, release candidate, and submission handoff, pausing at every external authentication, ownership, visibility, and production-variable gate. Do not begin it automatically.
+
+## 2026-07-19 — Phase 8 GitHub, deployment, release candidate, and submission handoff
+
+### Objective and starting evidence
+
+Produce a working, deployed, documented release candidate with preserved repository evidence and a complete handoff package, stopping before video upload, Devpost submission, or any invented link. The worktree was clean at the Phase 7 commit `86e3d85f3dee2f6afca3cd64995a799df1ae259e` after Codex created the Phase 6 (`94b72cb3602684ab9280fc8493dc4f2459d78edd`) and Phase 7 commits.
+
+### External gates and deployment
+
+- Codex resolved the GitHub gates with the user: the public repository `https://github.com/khalidbench1-collab/BurgerMapper` carries the complete preserved history, and remote `main` equals the local Phase 7 head. No squash, rebase, amend, filter, or force push occurred.
+- Codex authenticated Vercel; the user connected the repository to a Vercel project, deployed production at `https://burger-mapper.vercel.app`, and configured the production environment privately. Variable values were never inspected or recorded; presence was verified from runtime behavior only.
+- Codex added `.vercel` to `.gitignore` so local Vercel state can never be tracked.
+- Codex's live probes targeted the deployment-specific `*-projects.vercel.app` URL, which Vercel protects with an authentication interstitial; the HTML responses it saw were the login page, not an application fault. Verification was rerun against the public production domain.
+- Codex reached its usage limit during release verification; Claude completed the live verification, gate re-runs, and release documentation under the same phase protocol without git mutations.
+
+### Live release verification (public production domain, synthetic data only)
+
+- `/`, `/case`, `/case?category=visa-immigration`, and `/manifest.webmanifest` returned `200` with the expected BurgerMapper content.
+- Production runs the real consent-gated OpenAI mode: a synthetic goal-only request without consent returned typed `403 CONSENT_REQUIRED` with `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`, and an active rate-limit counter, proving real-mode selection and key presence without exposing values. A too-short goal returned typed `422 GOAL_TOO_SHORT` with a request reference and no stack. Premature research returned a safe `400`.
+- The homepage serves the real-mode consent copy, the "AI analysis" badge, the independent non-government identity, the skip link, and no demo-only, mock, fictional, or Build Week vocabulary.
+- No agent-initiated consented OpenAI call was made; live analysis remains user-authorized per `AGENTS.md`, and site visitors provide their own per-request consent.
+
+### Quality gates (re-run 2026-07-19 after deployment)
+
+- `npm run lint` — passed with no findings.
+- `npm test` — passed: 22 files, 155 tests.
+- `npm run eval` — passed: 5 release evaluations over 11 synthetic cases, zero blockers.
+- `npm run build` — passed with strict TypeScript and unchanged routes.
+- `npm audit` — 0 vulnerabilities.
+
+### Known gaps at handoff
+
+- The MIT `LICENSE` file was added for this release candidate. The release commit is the commit containing this handoff; its hash is recorded in the final report, while the user may push it separately if desired.
+- The demo video, `/feedback` Session ID, category choice, Devpost description, and submission remain user-owned.
+
+### Agent contribution and stop
+
+Codex performed the repository inspection, GitHub/Vercel gate resolution, history-preserving push, and ignore hardening; Claude performed the public-domain live verification, gate re-runs, and this release documentation. Autonomous work stops at the release-candidate handoff; no video, Devpost, category, or rule-interpretation work was performed.

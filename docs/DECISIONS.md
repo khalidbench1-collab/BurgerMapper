@@ -150,3 +150,13 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Add a skip link and keep the Build Week label out of the header | Keyboard and screen-reader users get a direct path to content; a permanent product identity replaces a stale internal phase label. |
 | Keep category and evidence visible rather than collapsing them | Progressive disclosure is already achieved by ordering (goal first, optional panels after); hiding the six categories or evidence methods behind extra interactions would reduce discoverability for exactly the users the product serves. |
 | Present demo honesty in product language (user decision, 2026-07-19) | The user directed that the app read as a real customer product. All rendered "mock/fictional/Build Week prototype" vocabulary became "demo/example" wording, while every honesty obligation — example-case basis, no AI interpretation in demo mode, not legal advice, unverified sources, non-government identity — remains in the copy. Internal contracts and configuration keep the mock naming to avoid breaking stable boundaries. |
+
+## Phase 8 release decisions
+
+| Decision | Reason |
+| --- | --- |
+| Public GitHub repository with preserved history (user decision) | Judges need credential-free access to the dated phase commits that evidence Build Week work; the history contains no secrets, private documents, or provider responses, so public visibility is safe. |
+| Deploy through the user's GitHub-connected Vercel project | Pushes to `main` become auditable production deploys without agent-held credentials; local Vercel state is git-ignored. |
+| Run production in real consent-gated OpenAI mode (user decision, 2026-07-19) | Judges evaluate the genuine GPT-5.6 integration rather than a deterministic demo route; the Phase 6 consent, rate, concurrency, and cost boundaries were built for exactly this exposure, and the user controls spending through a private OpenAI budget cap. Demo mode remains one environment-variable flip away as the rollback. |
+| Verify production configuration from boundary behavior only | Typed `CONSENT_REQUIRED`/`GOAL_TOO_SHORT` responses and privacy headers prove mode and key presence without any agent reading, printing, or recording an environment value. |
+| Treat deployment-specific Vercel URLs as out of scope for release checks | `*-projects.vercel.app` URLs sit behind Vercel's authentication interstitial by design; only the public production domain represents what judges and users experience. |
