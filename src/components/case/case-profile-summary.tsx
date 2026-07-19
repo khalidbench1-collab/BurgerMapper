@@ -87,14 +87,16 @@ export function CaseProfileSummary({
           <SummaryField label="Evidence" value={profile.evidence[0]?.label ?? "Goal only — no document added"} />
           <div>
             <dt className="text-xs font-semibold uppercase tracking-[0.1em] text-[#66726b]">Clarification</dt>
-            <dd className="mt-1 text-sm leading-6 text-[#26362e]">{answer?.label ?? "One answer still needed"}</dd>
-            {answer ? <button type="button" onClick={onChangeAnswer} disabled={disabled} className="mt-2 text-sm font-semibold text-[#1d664b] underline underline-offset-4 outline-none focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:opacity-60">Change this answer</button> : null}
+            <dd className="mt-1 text-sm leading-6 text-[#26362e]">
+              {answer?.label ?? "One answer still needed"}
+              {answer ? <button type="button" onClick={onChangeAnswer} disabled={disabled} className="mt-2 block text-sm font-semibold text-[#1d664b] underline underline-offset-4 outline-none focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:opacity-60">Change this answer</button> : null}
+            </dd>
           </div>
         </dl>
       )}
 
       <p className="mt-5 rounded-xl bg-[#f3f6f3] px-4 py-3 text-sm leading-6 text-[#5c6861]">
-        {profile.sufficiency.state === "sufficient" ? (isMock ? "Profile sufficient for this fictional mock route." : "Profile sufficient for this analyzed route.") : "One route-changing detail is needed before the route is final."}
+        {profile.sufficiency.state === "sufficient" ? (isMock ? "Profile sufficient for this demo route." : "Profile sufficient for this analyzed route.") : "One route-changing detail is needed before the route is final."}
         {profile.correctionHistory.length ? ` ${profile.correctionHistory.length} correction${profile.correctionHistory.length === 1 ? "" : "s"} remembered in this tab.` : ""}
       </p>
     </section>

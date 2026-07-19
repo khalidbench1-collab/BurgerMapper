@@ -510,3 +510,58 @@ Detailed thresholds, reviews, and limitations are in [RELIABILITY_REPORT.md](REL
 Codex inspected the existing contracts, implemented the deterministic evaluation and operational boundaries, added adversarial/fallback/rate/cost coverage, performed the local audits, reconciled all evidence, and used no private data or live provider traffic.
 
 Phase 7 should perform final stress-friendly UX and visual accessibility polish across 320 px/mobile, desktop, English/German/Arabic, mixed RTL URLs, keyboard/focus/error/loading/empty/print/export/PWA behavior. Do not begin it automatically.
+
+## 2026-07-19 — Phase 7 final user-experience and accessibility polish
+
+### Objective and starting evidence
+
+Polish and simplify the complete experience so a stressed newcomer understands the product within seconds, reaches the goal input first, and can act on a calm deadline-first cited route across mobile, desktop, English, German, and Arabic. The Codex session for Phase 6 ended at a usage limit after staging its work but before committing, so this phase deliberately started from `HEAD` at the Phase 5 commit `8c24cb60476ff8bf88e199bdf45685e7fab777ce` with the audited Phase 6 changes held in the Git index, under an explicit user instruction that all Git actions remain reserved for Codex. Every Phase 7 change was left unstaged so the index still contains exactly the Phase 6 commit content. No OpenAI or live research request was made; all fixtures remain synthetic.
+
+### Screen audit and implementation
+
+- Audited every screen and state: landing, category preselection, goal-only, paste, PDF/image, sample, profile summary, clarification, sufficiency, loading, consent, route, sources, errors, fallback, reset, print, and manifest.
+- Made the homepage mode-aware: mock configurations keep the honest "never sent to an AI provider" line, real configurations state that input goes to OpenAI only after explicit consent on the case screen. The stale mock-only wording from Phase 3 was removed, and the header badge now reflects the active mode on the homepage as well.
+- Reordered the route result so the deadline/urgency card and a new localized "Your first action" card render before the extracted facts and long summary in reading, print, and export order.
+- Added a privacy-preserving local export: `src/lib/route-export.ts` converts the rendered `CaseAnalysis` into localized plain text with claim-to-source reference numbers, downloaded via an in-browser Blob URL under the fixed name `burgermapper-route.txt`. Print remains available.
+- Added a persistent non-government identity: a header note plus a new shared footer stating BurgerMapper is an independent guide, not an official government service, and provides legal information, not legal advice. The stale "Build Week · Phase 4" header label was removed.
+- Added a skip-to-content link before the header with a `#main-content` target on both pages.
+- Removed internal phase vocabulary from user-facing source status in English, German, and Arabic ("not accessed or verified yet").
+- Made the goal-help privacy line mode-aware in the case workspace.
+- Updated the root metadata and PWA manifest to the goal-first description with the independent identity, and declared the favicon as an installability icon. No offline claim exists.
+
+### Verification and review results
+
+- `npm run lint` — passed with no findings.
+- `npm test` — passed: 22 files and 155 tests, including 16 new Phase 7 tests for homepage hierarchy and mode honesty, six secondary categories plus general entry, skip link, non-government identity, deadline-before-summary ordering, first-action content, download file name/content/type, Arabic RTL first action, localized export labels, source URLs in the export, and manifest identity/icons/no-offline-claim.
+- `npm run eval` — passed: 1 file, 5 tests, 11 synthetic cases, zero release blockers.
+- `npm run build` — passed with strict TypeScript and unchanged static/dynamic routes.
+- `npm audit` — passed with 0 vulnerabilities; no dependency was added or changed.
+- Local production HTTP — `/`, `/case`, and `/case?category=visa-immigration` returned `200` with the new identity, skip link, and mode copy; the manifest returned the icon and honest description; goal-only mock analysis returned `200` with `isMock`, four steps, and a detected deadline; a too-short goal returned typed `GOAL_TOO_SHORT` `422` with a request reference and no stack; the Arabic sample returned `200` with `outputLanguage: ar`; premature research returned a safe `400`.
+- Reduced motion, focus rings, labels, landmarks, live regions, and print CSS were reviewed in source; the only animation remains the loading spinner with `motion-reduce:animate-none`.
+
+### Real-browser follow-up review — 2026-07-19
+
+A same-day follow-up session completed the previously deferred real-browser pass using Chrome via the DevTools protocol against the local production build, with only the fictional sample and synthetic goals:
+
+- Emulated 320 px mobile and 1280 px desktop viewports on `/` and the full `/case` flow: zero horizontal overflow and no element crossing the viewport edge at 320 px.
+- Verified the accessibility tree: banner/main/contentinfo landmarks, one `h1` with logical heading order, labeled goal textarea/category combobox/radio groups, polite and assertive live regions, and the disabled-until-valid analyze button.
+- Keyboard: the first Tab reveals the visible skip link (rendered at the top start corner), focus order runs logo → controls → citation links, and real Tab focus draws the 3 px brand focus ring.
+- Drove the complete fictional flow in English and Arabic: one question with a route-impact reason and "I don't know", deadline/urgency then first-action cards before the summary, Arabic `dir="rtl" lang="ar"` output with LTR source URLs and localized dates.
+- Chrome's native issue audit reported no accessibility issues on any inspected state.
+- Lighthouse (mobile) initially scored accessibility 95 on `/` and 92 on a completed route, failing only marginal muted-gray contrast (`#68736d` on cream, `#7a847e` on white, and the "Orientation only" badge) plus a `dl` content-model nit where the "Change this answer" button sat beside its `dd`. All were fixed (`#5d6862`/`#67716b` replacements; button moved inside the `dd`), lint and all 155 tests re-passed, the production build was repeated, and re-audits scored **accessibility 100, best practices 100, and SEO 100 on both the homepage and a completed route**.
+- Remaining honest gap: automated checks cannot replace human assistive-technology testing; a screen-reader walkthrough is still recommended before submission.
+
+### Customer-facing copy pass — 2026-07-19
+
+On direct user instruction, all user-visible copy was moved to customer vocabulary so the app reads as a real product rather than a competition prototype. "Mock mode"/"mock route" became "Demo mode"/"demo route", "fictional sample/letter" became "example letter"/"example case", and the route disclaimers in English, German, and Arabic were rewritten in product language without any reference to Build Week or prototype status. Content honesty was deliberately preserved everywhere: demo routes still state that they are based on an example case, were not interpreted by AI, are not legal advice, and rely on unverified source placeholders; the independent non-government identity and research limitation copy remain. Internal contracts, environment flags, provider names, sample IDs, and test fixtures keep the mock naming. Rendered HTML and the analysis API were re-verified to contain no occurrence of "mock", "fictional", or "Build Week", and lint, all 155 tests, the production build, and the 0-vulnerability audit passed again after the change.
+
+### Problems and fixes
+
+- PowerShell's `Invoke-WebRequest -Form` multipart encoding was rejected by the endpoint during HTTP verification; `curl.exe` requests succeeded, confirming an HTTP-client quirk rather than an application regression.
+- The first download test triggered a jsdom "navigation not implemented" warning through the real anchor click; the test now spies on the anchor click, which also asserts the exact download file name.
+
+### Agent contribution and next phase
+
+Claude (Anthropic's coding agent) executed this phase under the repository phase protocol after Codex reached its usage limit, performed the audits and implementation above, and made no Git mutation. Codex must create the two pending sequential commits recorded in `docs/PHASE_STATUS.md` before Phase 8 begins.
+
+Phase 8 should produce the GitHub repository, deployment, release candidate, and submission handoff, pausing at every external authentication, ownership, visibility, and production-variable gate. Do not begin it automatically.

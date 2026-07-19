@@ -33,7 +33,7 @@ export function CategoryShortcuts() {
             <p className="mt-2 text-sm leading-6 text-[#66716b]">
               {category.description}
             </p>
-            <p className="mt-3 text-xs leading-5 text-[#7a847e]">
+            <p className="mt-3 text-xs leading-5 text-[#67716b]">
               {category.examples.join(" · ")}
             </p>
           </Link>

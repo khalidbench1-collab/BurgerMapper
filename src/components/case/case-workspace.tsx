@@ -354,7 +354,7 @@ export function CaseWorkspace({
           {showQuestion && !isBusy ? (
             <div dir={builderResult.analysis.outputLanguage === "ar" ? "rtl" : "ltr"} lang={builderResult.analysis.outputLanguage}>
               <ClarificationCard analysis={builderResult.analysis} onAnswer={handleClarification} />
-              <p className="mt-3 text-sm leading-6 text-[#68736d]" dir="ltr">{builderResult.analysis.isMock ? "Mock mode uses one deterministic route-changing question. It has not interpreted your goal or evidence." : "OpenAI identified one question whose answer can change the route."}</p>
+              <p className="mt-3 text-sm leading-6 text-[#68736d]" dir="ltr">{builderResult.analysis.isMock ? "Demo mode uses one deterministic route-changing question. It has not interpreted your goal or evidence." : "OpenAI identified one question whose answer can change the route."}</p>
             </div>
           ) : null}
           {builderResult.profile.sufficiency.state === "sufficient" && !isBusy ? (
@@ -363,16 +363,16 @@ export function CaseWorkspace({
         </div>
       ) : (
         <>
-          <GoalInputPanel value={caseState.goalInput} error={goalError} onChange={handleGoalChange} disabled={isBusy} />
+          <GoalInputPanel value={caseState.goalInput} error={goalError} onChange={handleGoalChange} disabled={isBusy} mode={analysisMode} />
           <CategorySelector value={caseState.category} onChange={handleCategoryChange} disabled={isBusy} />
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,0.75fr)]">
             <section aria-labelledby="evidence-heading" className="rounded-[1.5rem] border border-[#d6dbd7] bg-white p-5 shadow-[0_14px_45px_rgba(29,47,38,0.06)] sm:p-7">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#237b59]">Optional evidence</p>
               <h2 id="evidence-heading" className="mt-2 text-xl font-semibold text-[#1d2b24]">Add context if you have it</h2>
-              <p className="mt-2 text-sm leading-6 text-[#68736d]">Continue with your goal alone, paste a message, upload a PDF or image, or use the fictional sample.</p>
+              <p className="mt-2 text-sm leading-6 text-[#68736d]">Continue with your goal alone, paste a message, upload a PDF or image, or use the example letter.</p>
               <div className="mt-6"><InputMethodSelector value={caseState.inputKind} onChange={handleInputModeChange} disabled={isBusy} /></div>
               <div className="mt-6 border-t border-[#e0e4e0] pt-6">
-                {caseState.inputKind === "none" ? <p className="rounded-xl bg-[#f3f7f4] p-4 text-sm leading-6 text-[#58655e]">No document is required. BurgerMapper can build a fictional mock route from your goal.</p> : null}
+                {caseState.inputKind === "none" ? <p className="rounded-xl bg-[#f3f7f4] p-4 text-sm leading-6 text-[#58655e]">No document is required. BurgerMapper can build a route from your goal alone.</p> : null}
                 {caseState.inputKind === "text" ? <TextInputPanel value={caseState.textInput} error={caseState.validationError} onChange={handleTextChange} disabled={isBusy} /> : null}
                 {caseState.inputKind === "file" ? (caseState.document ? <SelectedDocumentCard document={caseState.document} onRemove={handleRemoveDocument} disabled={isBusy} /> : <DocumentDropzone disabled={isBusy} error={caseState.validationError} onFileSelected={handleFileSelected} />) : null}
                 {caseState.inputKind === "sample" ? <SampleInputPanel selected={Boolean(caseState.sampleId)} onSelect={handleSampleSelected} disabled={isBusy} /> : null}
@@ -389,8 +389,8 @@ export function CaseWorkspace({
                   </label>
                 ) : null}
                 {requestError ? <div role="alert" data-testid="analysis-api-error" className="mb-4 rounded-xl border border-[#e3b4a8] bg-[#fff7f4] p-4 text-sm text-[#7d3325]"><p className="font-semibold">{requestError.message}</p><p className="mt-1 text-xs">Error code: {requestError.code}{requestError.requestId ? ` · Request reference: ${requestError.requestId}` : ""}</p></div> : null}
-                {caseState.status === "mock-analyzing" ? <AnalysisLoadingState mode={analysisMode} /> : <button type="button" disabled={!canAnalyze} onClick={handleAnalyze} className="w-full rounded-xl bg-[#1d664b] px-5 py-3.5 text-sm font-semibold text-white shadow-sm outline-none hover:bg-[#15523c] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:cursor-not-allowed disabled:bg-[#aeb8b2]">{caseState.status === "error" ? "Try analysis again" : analysisMode === "mock" ? "Build mock case" : "Analyze case"}</button>}
-                <p className="mt-3 text-center text-xs leading-5 text-[#737d77]">{analysisMode === "mock" ? "The application server validates and discards inputs in memory. Mock mode makes no AI-provider call." : "The server validates input in memory, sends the minimum required case content to OpenAI only after consent, and does not intentionally store it."}</p>
+                {caseState.status === "mock-analyzing" ? <AnalysisLoadingState mode={analysisMode} /> : <button type="button" disabled={!canAnalyze} onClick={handleAnalyze} className="w-full rounded-xl bg-[#1d664b] px-5 py-3.5 text-sm font-semibold text-white shadow-sm outline-none hover:bg-[#15523c] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:cursor-not-allowed disabled:bg-[#aeb8b2]">{caseState.status === "error" ? "Try analysis again" : analysisMode === "mock" ? "Build demo case" : "Analyze case"}</button>}
+                <p className="mt-3 text-center text-xs leading-5 text-[#737d77]">{analysisMode === "mock" ? "The application server validates and discards inputs in memory. Demo mode makes no AI-provider call." : "The server validates input in memory, sends the minimum required case content to OpenAI only after consent, and does not intentionally store it."}</p>
               </div>
             </aside>
           </div>
@@ -430,9 +430,9 @@ function getLiveMessage(state: CaseState, mode: "mock" | "openai"): string {
     case "validating": return "Validating the selected file.";
     case "file-selected": return "Evidence selected.";
     case "ready": return "Case context ready.";
-    case "mock-analyzing": return mode === "mock" ? "Building the structured mock case profile." : "Analyzing the case with OpenAI.";
+    case "mock-analyzing": return mode === "mock" ? "Building the structured case profile." : "Analyzing the case with OpenAI.";
     case "needs-clarification": return "One route-changing detail is needed.";
-    case "analysis-complete": return "Mock route ready.";
+    case "analysis-complete": return "Route ready.";
     case "error": return state.validationError ?? "An error occurred.";
   }
 }

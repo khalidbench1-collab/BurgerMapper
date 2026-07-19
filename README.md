@@ -51,6 +51,18 @@ Real mode maps goal and pasted content to `input_text`, verified PDFs to `input_
 
 The current official-source provider is a deterministic server-side snapshot inspected on 2026-07-18. It covers the fictional residence-permit renewal, Berlin address registration, and freelance tax-registration routes. Allowed domains are limited to `service.berlin.de`, `www.berlin.de`, `www.gesetze-im-internet.de`, and `www.elster.de`. Other topics retain an honest no-source or unverified state. Automated tests do not depend on live web availability, and the application does not yet refresh sources at request time.
 
+## Phase 7 experience polish
+
+- The homepage and case screen now describe the active analysis mode truthfully: mock configurations state that nothing is sent to an AI provider, and real configurations state that input goes to OpenAI only after explicit consent on the case screen.
+- The final route now opens with the deadline/urgency card and a "Your first action" card before the extracted facts and long summary, so the most consequential information is first in reading, print, and export order.
+- A "Download route" button saves the already rendered structured route as a local plain-text file (`burgermapper-route.txt`) assembled entirely in the browser from `src/lib/route-export.ts`. Nothing is uploaded or persisted, and the fixed file name cannot contain personal data. Printing remains available.
+- A persistent header note and shared footer state that BurgerMapper is an independent guide, not an official government service, and provides legal information rather than legal advice. No official logo, seal, or authority branding is used.
+- A skip-to-content link precedes the header on every page, and both pages expose a `main-content` landmark target.
+- User-facing source status copy no longer references internal build-phase names in any language.
+- The PWA manifest describes the goal-first product, declares the favicon as an installability icon, and makes no offline claim.
+- The Build Week phase label was removed from the header in favor of the permanent independent-guide identity.
+- All user-visible copy now uses customer vocabulary: "Demo mode", "demo route", and "example letter"/"example case" replace the internal "mock" and "fictional sample" terms, and no rendered text references Build Week, prototypes, or build phases. Internal identifiers (`ENABLE_MOCK_AI`, `isMock`, mock providers, sample IDs) are unchanged. Every honesty obligation remains in product language: demo routes state that they come from an example case, were not interpreted by AI, are not legal advice, and cite unverified sources as such.
+
 ## Mock configuration
 
 - `ENABLE_MOCK_AI=true` selects the server-side mock provider and makes no external AI request.
@@ -125,9 +137,9 @@ No API key is required for mock mode. To test real mode, configure the key priva
 
 ## Current implementation status
 
-Phase 6 is complete. A user can start with a goal alone or add pasted text, PDF/image evidence, the trusted sample, an optional category, and an output language. The analysis boundary returns `CaseAnalysis` plus an optional structured `CaseProfile`; after sufficiency, the source-research boundary returns atomic claims, official evidence, and step mappings. Real analysis remains consent-gated and mock analysis remains fully operational without a key. Process-local anonymous limits, safe source-outage behavior, content-free cost/latency metrics, and machine-checkable synthetic release blockers now guard these paths.
+Phases 6 and 7 are complete. The experience now leads with the deadline and first action, keeps a visible non-government identity, and offers local print and plain-text export of the route. A user can start with a goal alone or add pasted text, PDF/image evidence, the trusted sample, an optional category, and an output language. The analysis boundary returns `CaseAnalysis` plus an optional structured `CaseProfile`; after sufficiency, the source-research boundary returns atomic claims, official evidence, and step mappings. Real analysis remains consent-gated and mock analysis remains fully operational without a key. Process-local anonymous limits, safe source-outage behavior, content-free cost/latency metrics, and machine-checkable synthetic release blockers now guard these paths.
 
-The automated suite contains 139 passing tests across 18 files. `npm run eval` separately passes 5 release-evaluation tests over 11 versioned synthetic cases. Automated provider and evaluation tests use injected or deterministic synthetic data and cannot spend API credit. One separately authorized, bounded synthetic Luna smoke request succeeded during Phase 5 on 2026-07-18 with 77 total tokens and an estimated cost of USD 0.000227; Phase 6 made no OpenAI call and recorded no prompt or output content.
+The automated suite contains 155 passing tests across 22 files. `npm run eval` separately passes 5 release-evaluation tests over 11 versioned synthetic cases. Automated provider and evaluation tests use injected or deterministic synthetic data and cannot spend API credit. One separately authorized, bounded synthetic Luna smoke request succeeded during Phase 5 on 2026-07-18 with 77 total tokens and an estimated cost of USD 0.000227; Phase 6 made no OpenAI call and recorded no prompt or output content.
 
 The remaining Build Week work is governed by a permanent phase-gated execution system. [AGENTS.md](AGENTS.md) contains canonical repository rules, [INSTRUCTIONS.md](INSTRUCTIONS.md) explains safe operation, and [docs/MASTER_BUILD_PLAN.md](docs/MASTER_BUILD_PLAN.md) contains standalone prompts for Phases 3–8. [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md) is the authoritative state record.
 
@@ -137,7 +149,7 @@ To begin the next eligible phase in a fresh Codex session, use exactly:
 Read AGENTS.md, docs/MASTER_BUILD_PLAN.md, and docs/PHASE_STATUS.md. Execute the first phase marked NOT STARTED whose prerequisites are complete. Follow its full prompt. Stop after its commit and final report. Never automatically begin the next phase.
 ```
 
-Phase 7 is next: final user-experience and accessibility polish. It must not begin automatically.
+Phase 8 is next: GitHub, deployment, release candidate, and submission handoff. It pauses at external authentication and ownership gates and must not begin automatically.
 
 Current limitations:
 
@@ -146,7 +158,7 @@ Current limitations:
 - The successful live Luna smoke established project/model/schema access only. It did not evaluate real document quality, legal accuracy, multilingual quality, source research, or production behavior.
 - No login, database, local storage, analytics, tracking, or deployment.
 - Anonymous endpoint limits are bounded, in-memory, and per process, so a multi-instance public deployment still needs platform-level abuse protection.
-- The Phase 6 in-app visual browser could not initialize; full mobile/desktop visual and assistive-technology checks remain a Phase 7 release requirement.
+- A real-browser review was completed on 2026-07-19 with Chrome DevTools against the production build: 320 px and desktop layouts, keyboard and skip-link behavior, Arabic RTL with LTR URLs, and Lighthouse accessibility/best-practices/SEO scores of 100 on the homepage and a completed route. Automated checks cannot replace human assistive technology, so a screen-reader walkthrough is still recommended before submission.
 - A model can be wrong, miss text, or misread a deadline; outputs remain legal information rather than legal advice.
 
 The request planner now feeds the real server provider: pasted text and the trusted sample become `input_text`, PDFs become `input_file`, images become `input_image`, and a separate context block carries category, language, clarification answers, and reusable prompt-injection protections. A client-side API key is never used.
@@ -165,7 +177,7 @@ The BurgerMapper concept and an earlier, unrelated prototype predated OpenAI Bui
 
 ## How Codex contributed
 
-Codex established the Phase 0 repository and helped implement Phases 1 through 6: typed contracts, validation, in-memory boundaries, multimodal intake, structured `CaseProfile`, guided builder, server-only Responses integration, consent, prompt-injection controls, official-domain allowlisting, atomic claim-to-source mappings, cited-route rendering, synthetic release evaluations, abuse/cost controls, audits, verification, and documentation. The only live Luna evidence is the content-free Phase 5 synthetic smoke metadata; Phase 6 was fully offline and no real personal document was used.
+Codex established the Phase 0 repository and helped implement Phases 1 through 6: typed contracts, validation, in-memory boundaries, multimodal intake, structured `CaseProfile`, guided builder, server-only Responses integration, consent, prompt-injection controls, official-domain allowlisting, atomic claim-to-source mappings, cited-route rendering, synthetic release evaluations, abuse/cost controls, audits, verification, and documentation. The only live Luna evidence is the content-free Phase 5 synthetic smoke metadata; Phase 6 was fully offline and no real personal document was used. Phase 7 experience polish was implemented by Claude (Anthropic's coding agent) under the same phase protocol after Codex reached a usage limit; Codex remains the agent that creates and verifies the phase commits.
 
 ## Codex `/feedback` Session ID
 

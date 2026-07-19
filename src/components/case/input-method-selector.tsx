@@ -22,8 +22,8 @@ const methods: Array<{
   },
   {
     value: "sample",
-    label: "Try sample",
-    description: "Fictional residence-renewal letter",
+    label: "Try example",
+    description: "Example residence-renewal letter",
   },
 ];
 

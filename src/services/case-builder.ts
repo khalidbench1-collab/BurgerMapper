@@ -18,7 +18,7 @@ const DEFAULT_GOALS: Record<CaseInput["kind"], string> = {
   goal: "Understand what needs to happen and build the next-step route.",
   text: "Understand the pasted official message and work out what to do next.",
   file: "Understand the uploaded official document and work out what to do next.",
-  sample: "Understand the fictional residence-renewal sample and prepare the next steps.",
+  sample: "Understand the example residence-renewal letter and prepare the next steps.",
 };
 
 export class ServerCaseBuilderService implements CaseBuilderService {
@@ -206,7 +206,7 @@ function evidenceFromInput(input: CaseInput): CaseEvidenceReference[] {
     return [
       {
         kind: "sample",
-        label: "Trusted fictional residence-renewal sample",
+        label: "Built-in example residence-renewal letter",
         contentRetained: false,
       },
     ];

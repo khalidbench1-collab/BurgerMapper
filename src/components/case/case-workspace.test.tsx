@@ -29,13 +29,13 @@ async function selectEvidence(user: ReturnType<typeof userEvent.setup>, label: s
 }
 
 async function selectSample(user: ReturnType<typeof userEvent.setup>) {
-  await selectEvidence(user, "Try sample");
-  await user.click(screen.getByRole("button", { name: "Use fictional sample" }));
-  await waitFor(() => expect(screen.getByRole("button", { name: "Build mock case" })).toBeEnabled());
+  await selectEvidence(user, "Try example");
+  await user.click(screen.getByRole("button", { name: "Use example letter" }));
+  await waitFor(() => expect(screen.getByRole("button", { name: "Build demo case" })).toBeEnabled());
 }
 
 async function buildUntilQuestion(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole("button", { name: "Build mock case" }));
+  await user.click(screen.getByRole("button", { name: "Build demo case" }));
   return screen.findByRole("heading", { name: /Are you currently|Sind Sie derzeit|هل تعمل حاليًا|Is this address|Will you freelance/ });
 }
 
@@ -63,7 +63,7 @@ describe("CaseWorkspace", () => {
     await user.type(goal, "Too short");
 
     expect(screen.getByRole("alert")).toHaveTextContent("Add at least 10 non-whitespace characters");
-    expect(screen.getByRole("button", { name: "Build mock case" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Build demo case" })).toBeDisabled();
   });
 
   it("builds a goal-only profile through the server boundary", async () => {
@@ -99,7 +99,7 @@ describe("CaseWorkspace", () => {
     for (const heading of ["What this letter says", "Deadline and urgency", "What the authority wants", "Documents to prepare", "Your next steps", "Official sources", "Important limitation"]) {
       expect(screen.getByRole("heading", { name: heading })).toBeInTheDocument();
     }
-    expect(screen.getByText("Profile sufficient for this fictional mock route.")).toBeInTheDocument();
+    expect(screen.getByText("Profile sufficient for this demo route.")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Are you currently employed, self-employed, or both?" })).not.toBeInTheDocument();
   });
 
@@ -172,7 +172,7 @@ describe("CaseWorkspace", () => {
     await selectEvidence(user, "Upload document");
     const file = new File(["test bytes"], "fictional-letter.pdf", { type: "application/pdf" });
     await user.upload(screen.getByLabelText("Choose a PDF or image letter"), file);
-    await waitFor(() => expect(screen.getByRole("button", { name: "Build mock case" })).toBeEnabled());
+    await waitFor(() => expect(screen.getByRole("button", { name: "Build demo case" })).toBeEnabled());
 
     await buildUntilQuestion(user);
 
@@ -250,7 +250,7 @@ describe("CaseWorkspace", () => {
     fetchMock.mockResolvedValueOnce({ ok: false, json: async () => ({ error: { code: "FILE_SIGNATURE_MISMATCH", message: "<script>raw server exception</script>", requestId: "request-ui-safe-001" } }) } as Response);
     render(<CaseWorkspace />);
     await user.type(screen.getByLabelText("What do you need to get done?"), VALID_GOAL);
-    await user.click(screen.getByRole("button", { name: "Build mock case" }));
+    await user.click(screen.getByRole("button", { name: "Build demo case" }));
 
     const alert = await screen.findByTestId("analysis-api-error");
     expect(alert).toHaveTextContent("The file contents do not match the selected document type.");
@@ -265,7 +265,7 @@ describe("CaseWorkspace", () => {
     fetchMock.mockImplementationOnce(() => new Promise<Response>((resolve) => { resolveRequest = resolve; }));
     render(<CaseWorkspace />);
     await user.type(screen.getByLabelText("What do you need to get done?"), VALID_GOAL);
-    const button = screen.getByRole("button", { name: "Build mock case" });
+    const button = screen.getByRole("button", { name: "Build demo case" });
     fireEvent.click(button);
     fireEvent.click(button);
 

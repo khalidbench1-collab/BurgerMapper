@@ -20,6 +20,7 @@ interface ResultCopy {
   urgency: string;
   summary: string;
   deadlineAndUrgency: string;
+  firstAction: string;
   authorityWants: string;
   documents: string;
   clarification: string;
@@ -41,7 +42,7 @@ interface ResultCopy {
 
 export const RESULT_COPY: Record<SupportedLanguage, ResultCopy> = {
   en: {
-    mockBadge: "Mock analysis",
+    mockBadge: "Demo analysis",
     extractedFacts: "Extracted document facts",
     issuingAuthority: "Issuing authority",
     documentType: "Document type",
@@ -50,6 +51,7 @@ export const RESULT_COPY: Record<SupportedLanguage, ResultCopy> = {
     urgency: "Urgency",
     summary: "What this letter says",
     deadlineAndUrgency: "Deadline and urgency",
+    firstAction: "Your first action",
     authorityWants: "What the authority wants",
     documents: "Documents to prepare",
     clarification: "One question before the route is final",
@@ -59,7 +61,7 @@ export const RESULT_COPY: Record<SupportedLanguage, ResultCopy> = {
     whyWeAsk: "Why this changes the route",
     routeUpdated: "Route updated for your answer",
     placeholderSource: "Placeholder — not verified",
-    sourceNotAccessed: "Not accessed or verified in Phase 2",
+    sourceNotAccessed: "Not accessed or verified yet",
     supports: "Intended to support",
     responsible: "Responsible",
     timing: "Timing",
@@ -82,6 +84,7 @@ export const RESULT_COPY: Record<SupportedLanguage, ResultCopy> = {
     urgency: "Dringlichkeit",
     summary: "Was in diesem Schreiben steht",
     deadlineAndUrgency: "Frist und Dringlichkeit",
+    firstAction: "Ihr erster Schritt",
     authorityWants: "Was die Behörde verlangt",
     documents: "Vorzubereitende Unterlagen",
     clarification: "Eine Frage, bevor der Weg feststeht",
@@ -91,7 +94,7 @@ export const RESULT_COPY: Record<SupportedLanguage, ResultCopy> = {
     whyWeAsk: "Warum diese Antwort den Weg verändert",
     routeUpdated: "Der Weg wurde an Ihre Antwort angepasst",
     placeholderSource: "Platzhalter — nicht verifiziert",
-    sourceNotAccessed: "In Phase 2 nicht aufgerufen oder verifiziert",
+    sourceNotAccessed: "Noch nicht aufgerufen oder verifiziert",
     supports: "Soll später belegen",
     responsible: "Verantwortlich",
     timing: "Zeitpunkt",
@@ -114,6 +117,7 @@ export const RESULT_COPY: Record<SupportedLanguage, ResultCopy> = {
     urgency: "درجة الاستعجال",
     summary: "ماذا يقول هذا الخطاب",
     deadlineAndUrgency: "المهلة ودرجة الاستعجال",
+    firstAction: "خطوتك الأولى",
     authorityWants: "ماذا تطلب الجهة",
     documents: "المستندات المطلوب تجهيزها",
     clarification: "سؤال واحد قبل تثبيت المسار",
@@ -123,7 +127,7 @@ export const RESULT_COPY: Record<SupportedLanguage, ResultCopy> = {
     whyWeAsk: "لماذا تغيّر هذه الإجابة المسار",
     routeUpdated: "تم تحديث المسار وفق إجابتك",
     placeholderSource: "مصدر مؤقت — غير متحقق منه",
-    sourceNotAccessed: "لم تتم زيارته أو التحقق منه في المرحلة الثانية",
+    sourceNotAccessed: "لم تتم زيارته أو التحقق منه بعد",
     supports: "مخصص لاحقًا لدعم",
     responsible: "المسؤول",
     timing: "التوقيت",

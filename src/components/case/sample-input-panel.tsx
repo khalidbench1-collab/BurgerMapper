@@ -12,7 +12,7 @@ export function SampleInputPanel({
   return (
     <div className="rounded-2xl border border-[#cdd5d0] bg-[#f8fbf9] p-5">
       <p className="text-xs font-semibold uppercase tracking-[0.13em] text-[#237b59]">
-        Fictional test case
+        Example case
       </p>
       <h3 className="mt-2 text-base font-semibold text-[#1b2922]">
         Residence permit renewal follow-up
@@ -26,7 +26,7 @@ export function SampleInputPanel({
         onClick={onSelect}
         className="mt-4 rounded-xl bg-[#1d664b] px-4 py-2.5 text-sm font-semibold text-white outline-none hover:bg-[#15523c] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:cursor-default disabled:bg-[#8ca99b]"
       >
-        {selected ? "Sample selected" : "Use fictional sample"}
+        {selected ? "Example selected" : "Use example letter"}
       </button>
     </div>
   );

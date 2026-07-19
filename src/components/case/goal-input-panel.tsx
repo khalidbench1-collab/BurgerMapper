@@ -8,11 +8,13 @@ export function GoalInputPanel({
   error,
   onChange,
   disabled = false,
+  mode = "mock",
 }: {
   value: string;
   error: string | null;
   onChange: (value: string) => void;
   disabled?: boolean;
+  mode?: "mock" | "openai";
 }) {
   return (
     <section className="rounded-[1.5rem] border border-[#bfcfc6] bg-white p-5 shadow-[0_14px_45px_rgba(29,47,38,0.06)] sm:p-7">
@@ -55,8 +57,10 @@ export function GoalInputPanel({
       </p>
       <p id="goal-help" className="mt-1 text-sm leading-6 text-[#68736d]">
         Use at least {MIN_GOAL_MEANINGFUL_CHARACTERS} non-whitespace characters.
-        Your goal stays in browser/request memory, is not logged or stored, and
-        is not sent to an AI provider in mock mode.
+        Your goal stays in browser/request memory and is not logged or stored.{" "}
+        {mode === "mock"
+          ? "Demo mode does not send it to an AI provider."
+          : "It is sent to OpenAI only after you agree below."}
       </p>
     </section>
   );

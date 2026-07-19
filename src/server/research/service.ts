@@ -100,18 +100,18 @@ function deduplicateClaims(claims: ResearchCaseResult["claims"]): ResearchCaseRe
 function limitationsFor(status: ResearchCaseResult["summary"]["status"], language: SupportedLanguage): string[] {
   const messages = {
     en: {
-      verified: "Sources support only the claims cited beside the route; they do not verify the fictional letter or personal eligibility.",
-      fallback: "No adequate current official source was available for this mock topic. Keep the route as unverified guidance.",
+      verified: "Sources support only the claims cited beside the route; they do not verify the original letter or personal eligibility.",
+      fallback: "No adequate current official source was available for this topic. Keep the route as unverified guidance.",
       conflict: "Official sources conflict or differ in scope. Confirm the route with the responsible authority.",
     },
     de: {
-      verified: "Die Quellen belegen nur die direkt am Weg zitierten Aussagen; sie bestätigen weder das fiktive Schreiben noch die persönliche Berechtigung.",
-      fallback: "Für dieses Demo-Thema war keine ausreichende aktuelle offizielle Quelle verfügbar. Der Weg bleibt unverifiziert.",
+      verified: "Die Quellen belegen nur die direkt am Weg zitierten Aussagen; sie bestätigen weder das Originalschreiben noch die persönliche Berechtigung.",
+      fallback: "Für dieses Thema war keine ausreichende aktuelle offizielle Quelle verfügbar. Der Weg bleibt unverifiziert.",
       conflict: "Offizielle Quellen widersprechen sich oder haben einen anderen Geltungsbereich. Klären Sie den Weg mit der zuständigen Behörde.",
     },
     ar: {
-      verified: "تدعم المصادر الادعاءات المذكورة بجانب المسار فقط، ولا تتحقق من الخطاب الخيالي أو الأهلية الشخصية.",
-      fallback: "لم يتوفر مصدر رسمي حالي وكافٍ لهذا الموضوع التجريبي. يبقى المسار غير متحقق منه.",
+      verified: "تدعم المصادر الادعاءات المذكورة بجانب المسار فقط، ولا تتحقق من الخطاب الأصلي أو الأهلية الشخصية.",
+      fallback: "لم يتوفر مصدر رسمي حالي وكافٍ لهذا الموضوع. يبقى المسار غير متحقق منه.",
       conflict: "تتعارض المصادر الرسمية أو تختلف في نطاقها. تحقق من المسار لدى الجهة المختصة.",
     },
   }[language];

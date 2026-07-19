@@ -36,24 +36,24 @@ const CATEGORY_VARIANTS: Record<
 > = {
   en: {
     "arrival-registration": {
-      documentTitle: "Request to complete address registration — fictional sample",
-      issuingAuthority: "Bürgeramt Berlin (fictional mock)",
+      documentTitle: "Request to complete address registration — example case",
+      issuingAuthority: "Bürgeramt Berlin (example)",
       documentType: "Anmeldung follow-up",
       summary:
-        "This fictional route demonstrates a follow-up message about completing an address registration. No pasted text or uploaded file was interpreted.",
+        "This example route demonstrates a follow-up message about completing an address registration. No pasted text or uploaded file was interpreted.",
       authorityWants:
         "Prepare identity, housing confirmation, and registration details, then confirm whether the Berlin address is the primary or a secondary residence.",
       documents: [
         {
           id: "identity-document",
           title: "Passport or identity document",
-          description: "A valid identity document for the fictional registration route.",
+          description: "A valid identity document for the example registration route.",
           status: "required",
         },
         {
           id: "housing-confirmation",
           title: "Landlord confirmation",
-          description: "A fictional Wohnungsgeberbestätigung for the address being registered.",
+          description: "An example Wohnungsgeberbestätigung for the address being registered.",
           status: "required",
         },
         {
@@ -63,7 +63,7 @@ const CATEGORY_VARIANTS: Record<
           status: "depends-on-answer",
         },
       ],
-      uncertainty: "The mock does not know whether this is a primary or secondary residence.",
+      uncertainty: "The demo does not know whether this is a primary or secondary residence.",
       question: "Is this address your primary residence, a secondary residence, or are you unsure?",
       questionReason: "The answer changes which residence details the registration route highlights.",
       options: [
@@ -91,7 +91,7 @@ const CATEGORY_VARIANTS: Record<
       ],
       stepDescriptions: [
         "Compare the address, date, and any reference details with the original message.",
-        "Answer the residence question so the mock route can highlight the right details.",
+        "Answer the residence question so the demo route can highlight the right details.",
         "Collect identity, housing-confirmation, and registration details.",
         "Check the original message and current official service information before acting.",
       ],
@@ -100,18 +100,18 @@ const CATEGORY_VARIANTS: Record<
       sourceSupports: ["Registration documents", "Appointment process"],
     },
     "work-business": {
-      documentTitle: "Request to clarify freelance registration — fictional sample",
-      issuingAuthority: "Finanzamt Berlin (fictional mock)",
+      documentTitle: "Request to clarify freelance registration — example case",
+      issuingAuthority: "Finanzamt Berlin (example)",
       documentType: "Freelance tax-registration follow-up",
       summary:
-        "This fictional route demonstrates a follow-up about registering freelance work. No pasted text or uploaded file was interpreted.",
+        "This example route demonstrates a follow-up about registering freelance work. No pasted text or uploaded file was interpreted.",
       authorityWants:
         "Prepare identity, a short description of the freelance activity, and basic financial information, then clarify whether freelancing is the only work or alongside employment.",
       documents: [
         {
           id: "identity-document",
           title: "Identity document",
-          description: "A valid identity document for the fictional registration route.",
+          description: "A valid identity document for the example registration route.",
           status: "required",
         },
         {
@@ -127,7 +127,7 @@ const CATEGORY_VARIANTS: Record<
           status: "depends-on-answer",
         },
       ],
-      uncertainty: "The mock does not know whether freelance work is the only work or alongside employment.",
+      uncertainty: "The demo does not know whether freelance work is the only work or alongside employment.",
       question: "Will you freelance only, freelance alongside employment, or are you unsure?",
       questionReason: "The answer changes which work and income details the route highlights.",
       options: [
@@ -155,7 +155,7 @@ const CATEGORY_VARIANTS: Record<
       ],
       stepDescriptions: [
         "Compare the activity, date, and any reference details with the original message.",
-        "Answer the work question so the mock route can highlight the right evidence.",
+        "Answer the work question so the demo route can highlight the right evidence.",
         "Collect identity, activity-description, and work-arrangement details.",
         "Check the original message and current official tax information before acting.",
       ],
@@ -166,24 +166,24 @@ const CATEGORY_VARIANTS: Record<
   },
   de: {
     "arrival-registration": {
-      documentTitle: "Aufforderung zur Ergänzung der Anmeldung — fiktives Beispiel",
-      issuingAuthority: "Bürgeramt Berlin (fiktive Demo)",
+      documentTitle: "Aufforderung zur Ergänzung der Anmeldung — Beispielfall",
+      issuingAuthority: "Bürgeramt Berlin (Beispiel)",
       documentType: "Rückfrage zur Anmeldung",
       summary:
-        "Dieser fiktive Weg zeigt eine Rückfrage zur Vervollständigung einer Wohnsitzanmeldung. Eingefügter Text und hochgeladene Dateien wurden nicht interpretiert.",
+        "Dieser Beispielweg zeigt eine Rückfrage zur Vervollständigung einer Wohnsitzanmeldung. Eingefügter Text und hochgeladene Dateien wurden nicht interpretiert.",
       authorityWants:
         "Identitätsnachweis, Wohnungsgeberbestätigung und Meldedaten vorbereiten und klären, ob die Berliner Adresse Haupt- oder Nebenwohnung ist.",
       documents: [
         {
           id: "identity-document",
           title: "Reisepass oder Ausweisdokument",
-          description: "Ein gültiges Identitätsdokument für den fiktiven Anmeldeweg.",
+          description: "Ein gültiges Identitätsdokument für den Beispiel-Anmeldeweg.",
           status: "required",
         },
         {
           id: "housing-confirmation",
           title: "Wohnungsgeberbestätigung",
-          description: "Eine fiktive Bestätigung für die anzumeldende Adresse.",
+          description: "Eine Beispielbestätigung für die anzumeldende Adresse.",
           status: "required",
         },
         {
@@ -230,18 +230,18 @@ const CATEGORY_VARIANTS: Record<
       sourceSupports: ["Anmeldeunterlagen", "Terminverfahren"],
     },
     "work-business": {
-      documentTitle: "Rückfrage zur steuerlichen Erfassung freiberuflicher Arbeit — fiktives Beispiel",
-      issuingAuthority: "Finanzamt Berlin (fiktive Demo)",
+      documentTitle: "Rückfrage zur steuerlichen Erfassung freiberuflicher Arbeit — Beispielfall",
+      issuingAuthority: "Finanzamt Berlin (Beispiel)",
       documentType: "Rückfrage zur freiberuflichen Steueranmeldung",
       summary:
-        "Dieser fiktive Weg zeigt eine Rückfrage zur Anmeldung freiberuflicher Arbeit. Eingefügter Text und hochgeladene Dateien wurden nicht interpretiert.",
+        "Dieser Beispielweg zeigt eine Rückfrage zur Anmeldung freiberuflicher Arbeit. Eingefügter Text und hochgeladene Dateien wurden nicht interpretiert.",
       authorityWants:
         "Identitätsnachweis, kurze Tätigkeitsbeschreibung und grundlegende Finanzangaben vorbereiten und klären, ob die freiberufliche Arbeit allein oder neben einer Anstellung erfolgt.",
       documents: [
         {
           id: "identity-document",
           title: "Identitätsdokument",
-          description: "Ein gültiges Identitätsdokument für den fiktiven Anmeldeweg.",
+          description: "Ein gültiges Identitätsdokument für den Beispiel-Anmeldeweg.",
           status: "required",
         },
         {
@@ -296,11 +296,11 @@ const CATEGORY_VARIANTS: Record<
   },
   ar: {
     "arrival-registration": {
-      documentTitle: "طلب استكمال تسجيل العنوان — نموذج خيالي",
-      issuingAuthority: "مكتب خدمات المواطنين في برلين (نموذج خيالي)",
+      documentTitle: "طلب استكمال تسجيل العنوان — حالة مثال",
+      issuingAuthority: "مكتب خدمات المواطنين في برلين (مثال توضيحي)",
       documentType: "متابعة تسجيل السكن",
       summary:
-        "يعرض هذا المسار الخيالي رسالة متابعة لاستكمال تسجيل العنوان. لم تتم قراءة النص الملصق أو الملف المرفوع أو تفسيره.",
+        "يعرض مسار المثال هذا رسالة متابعة لاستكمال تسجيل العنوان. لم تتم قراءة النص الملصق أو الملف المرفوع أو تفسيره.",
       authorityWants:
         "تجهيز إثبات الهوية وتأكيد المؤجر وبيانات التسجيل، ثم تحديد ما إذا كان عنوان برلين سكنًا رئيسيًا أم ثانويًا.",
       documents: [
@@ -313,7 +313,7 @@ const CATEGORY_VARIANTS: Record<
         {
           id: "housing-confirmation",
           title: "تأكيد المؤجر",
-          description: "تأكيد خيالي للعنوان المطلوب تسجيله.",
+          description: "تأكيد توضيحي للعنوان المطلوب تسجيله.",
           status: "required",
         },
         {
@@ -360,11 +360,11 @@ const CATEGORY_VARIANTS: Record<
       sourceSupports: ["مستندات التسجيل", "إجراءات الموعد"],
     },
     "work-business": {
-      documentTitle: "طلب توضيح تسجيل العمل الحر — نموذج خيالي",
-      issuingAuthority: "مكتب الضرائب في برلين (نموذج خيالي)",
+      documentTitle: "طلب توضيح تسجيل العمل الحر — حالة مثال",
+      issuingAuthority: "مكتب الضرائب في برلين (مثال توضيحي)",
       documentType: "متابعة التسجيل الضريبي للعمل الحر",
       summary:
-        "يعرض هذا المسار الخيالي رسالة متابعة حول تسجيل العمل الحر. لم تتم قراءة النص الملصق أو الملف المرفوع أو تفسيره.",
+        "يعرض مسار المثال هذا رسالة متابعة حول تسجيل العمل الحر. لم تتم قراءة النص الملصق أو الملف المرفوع أو تفسيره.",
       authorityWants:
         "تجهيز إثبات الهوية ووصف مختصر للنشاط ومعلومات مالية أساسية، ثم توضيح ما إذا كان العمل الحر هو العمل الوحيد أم إلى جانب وظيفة.",
       documents: [

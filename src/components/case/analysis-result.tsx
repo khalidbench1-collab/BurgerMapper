@@ -10,6 +10,7 @@ import type {
   ClarificationAnswerId,
 } from "@/domain/case";
 import { RESULT_COPY } from "@/i18n/case-copy";
+import { buildRouteExportText, ROUTE_EXPORT_FILE_NAME } from "@/lib/route-export";
 
 export function AnalysisResult({
   analysis,
@@ -25,11 +26,32 @@ export function AnalysisResult({
   const copy = RESULT_COPY[analysis.outputLanguage];
   const direction = analysis.outputLanguage === "ar" ? "rtl" : "ltr";
 
+  function handleDownload() {
+    const blob = new Blob([buildRouteExportText(analysis)], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = ROUTE_EXPORT_FILE_NAME;
+    anchor.rel = "noopener";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden" dir="ltr">
-        <p className="text-sm font-medium text-[#5f6c65]">{analysis.isMock ? "Your mock route is ready." : "Your analyzed route is ready."}</p>
+        <p className="text-sm font-medium text-[#5f6c65]">{analysis.isMock ? "Your demo route is ready." : "Your analyzed route is ready."}</p>
         <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="rounded-xl border border-[#bfc7c2] bg-white px-4 py-2.5 text-sm font-semibold text-[#35443c] outline-none hover:border-[#75847b] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35"
+          >
+            Download route
+            <span className="sr-only"> as a plain-text file saved by your browser</span>
+          </button>
           <button
             type="button"
             onClick={() => window.print()}
@@ -54,8 +76,9 @@ export function AnalysisResult({
         aria-label={analysis.isMock ? copy.mockBadge : "OpenAI analysis"}
         className="print-surface space-y-5 rounded-[1.5rem] border border-[#d6dbd7] bg-[#fbfbf8] p-4 shadow-[0_18px_60px_rgba(29,47,38,0.08)] sm:p-7"
       >
-        <AnalysisSummary analysis={analysis} />
         <DeadlineCard analysis={analysis} />
+        <FirstActionCard analysis={analysis} />
+        <AnalysisSummary analysis={analysis} />
 
         <section aria-labelledby="authority-wants-heading" className="rounded-2xl border border-[#d8ddd9] bg-white p-5 sm:p-6">
           <h2 id="authority-wants-heading" className="text-xl font-semibold text-[#202d26]">
@@ -75,5 +98,24 @@ export function AnalysisResult({
         <Disclaimer analysis={analysis} />
       </article>
     </div>
+  );
+}
+
+function FirstActionCard({ analysis }: { analysis: CaseAnalysis }) {
+  const copy = RESULT_COPY[analysis.outputLanguage];
+  const firstStep = analysis.nextSteps[0];
+  if (!firstStep) return null;
+
+  return (
+    <section aria-labelledby="first-action-heading" className="rounded-2xl border border-[#bfd3c8] bg-[#eef7f2] p-5 sm:p-6">
+      <h2 id="first-action-heading" className="text-xl font-semibold text-[#1c3a2c]">
+        {copy.firstAction}
+      </h2>
+      <p className="mt-3 text-base font-semibold leading-7 text-[#20402f]">{firstStep.title}</p>
+      <p className="mt-1 text-sm leading-6 text-[#42584c]">{firstStep.description}</p>
+      <p className="mt-3 text-xs font-medium leading-5 text-[#537263]">
+        {copy.responsible}: {firstStep.responsibleParty} — {copy.timing}: {firstStep.timing}
+      </p>
+    </section>
   );
 }

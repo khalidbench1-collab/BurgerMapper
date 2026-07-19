@@ -137,3 +137,16 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Estimate Luna cost from provider-reported token usage | Content-free usage supports the USD 0.10 per-case planning ceiling while keeping `OPENAI_MODEL` configurable and avoiding a second billing/logging service. Pricing must be reverified before deployment. |
 | Map source-retriever failure to an explicit unavailable state | A temporary source outage must not look like verified guidance or leak internal exceptions. The route remains usable only with visible uncertainty and authority escalation. |
 | Use a 10-second test ceiling for UI interaction tests | Two jsdom tests passed alone but exceeded 5 seconds under full constrained parallel execution. A test-only ceiling removes infrastructure flakiness without changing the 20-second production provider timeout. |
+
+## Phase 7 experience decisions
+
+| Decision | Reason |
+| --- | --- |
+| Open the route with the deadline/urgency card followed by a first-action card | A stressed reader needs the date and the single next thing to do before facts and summaries. The same order applies on screen, in print, and in the exported file. |
+| Export as a browser-built plain-text file with a fixed name | Plain text prints, mails, and archives everywhere; building it client-side from the already rendered `CaseAnalysis` avoids any upload or persistence; the constant `burgermapper-route.txt` name cannot leak a goal or personal detail. |
+| Show the non-government identity persistently in the header and footer | The per-route disclaimer only appears after analysis; an official-looking landing page must never imply authority status, so the identity moved into permanent chrome without seals or authority styling. |
+| Make homepage and goal-help copy mode-aware | The Phase 3 "never sent to an AI provider" wording became false once real mode existed. Each configuration now states only what it actually does, keeping consent copy accurate but concise. |
+| Remove internal phase names from user-facing source status | "Not verified in Phase 2" is developer vocabulary; users need the plain status "not accessed or verified yet" in all three languages. |
+| Add a skip link and keep the Build Week label out of the header | Keyboard and screen-reader users get a direct path to content; a permanent product identity replaces a stale internal phase label. |
+| Keep category and evidence visible rather than collapsing them | Progressive disclosure is already achieved by ordering (goal first, optional panels after); hiding the six categories or evidence methods behind extra interactions would reduce discoverability for exactly the users the product serves. |
+| Present demo honesty in product language (user decision, 2026-07-19) | The user directed that the app read as a real customer product. All rendered "mock/fictional/Build Week prototype" vocabulary became "demo/example" wording, while every honesty obligation — example-case basis, no AI interpretation in demo mode, not legal advice, unverified sources, non-government identity — remains in the copy. Internal contracts and configuration keep the mock naming to avoid breaking stable boundaries. |

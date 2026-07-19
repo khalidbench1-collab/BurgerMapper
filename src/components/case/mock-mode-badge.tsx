@@ -1,5 +1,5 @@
 export function MockModeBadge({
-  label = "Mock mode",
+  label = "Demo mode",
   mode = "mock",
 }: {
   label?: string;

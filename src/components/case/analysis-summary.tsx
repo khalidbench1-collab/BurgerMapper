@@ -29,7 +29,7 @@ export function AnalysisSummary({ analysis }: { analysis: CaseAnalysis }) {
           <span className="font-semibold text-[#2a3931]">
             Case category: {category?.label ?? "Not selected"}
           </span>
-          <span className="rounded-full bg-[#f0f2ef] px-2 py-0.5 text-[0.68rem] font-semibold text-[#68736d]">
+          <span className="rounded-full bg-[#f0f2ef] px-2 py-0.5 text-[0.68rem] font-semibold text-[#5d6862]">
             Orientation only
           </span>
         </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { AppFooter } from "@/components/app-footer";
 import { AppHeader } from "@/components/app-header";
 import { CaseWorkspace } from "@/components/case/case-workspace";
 import { isBureaucracyCategory } from "@/domain/categories";
@@ -24,9 +25,9 @@ export default async function CasePage({
   const analysisMode = process.env.ENABLE_MOCK_AI?.trim().toLowerCase() === "false" ? "openai" : "mock";
 
   return (
-    <div className="min-h-screen bg-[#f5f2eb] text-[#17231d]">
+    <div className="flex min-h-screen flex-col bg-[#f5f2eb] text-[#17231d]">
       <AppHeader mode={analysisMode} />
-      <main className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-12">
+      <main id="main-content" className="mx-auto w-full max-w-7xl flex-1 px-5 py-8 sm:px-8 sm:py-12">
         <header className="mb-8 max-w-3xl print:hidden">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#237b59]">
             New case
@@ -36,12 +37,13 @@ export default async function CasePage({
           </h1>
           <p className="mt-3 text-base leading-7 text-[#5f6c65]">
             {analysisMode === "mock"
-              ? "Start in your own words, then add an optional category, pasted message, PDF, image, or fictional sample. Mock mode validates inputs in memory but does not interpret them or contact an AI provider."
+              ? "Start in your own words, then add an optional category, pasted message, PDF, image, or example letter. Demo mode validates inputs in memory but does not interpret them or contact an AI provider."
               : "Start in your own words, then add optional context. Before analysis, you decide whether to send the case securely from BurgerMapper to OpenAI."}
           </p>
         </header>
         <CaseWorkspace initialCategory={initialCategory} analysisMode={analysisMode} />
       </main>
+      <AppFooter />
     </div>
   );
 }

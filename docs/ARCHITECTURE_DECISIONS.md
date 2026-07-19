@@ -233,3 +233,11 @@ These dated records capture durable technical choices. Product-level choices and
 - **Reason:** This materially limits accidental abuse and makes spend/failure behavior observable without persisting content, a recoverable user identifier, or an unbounded in-memory event log.
 - **Tradeoff:** State resets on restart and is not coordinated across serverless instances; metrics are ephemeral and unsuitable for production incident history.
 - **Revisit when:** Phase 8 deployment architecture is known and can provide shared edge rate limiting plus privacy-reviewed aggregate monitoring.
+
+## 2026-07-19 — Browser-side route export boundary
+
+- **Context:** Phase 7 requires a practical, privacy-preserving route export. The route is already fully rendered in the client from the structured `CaseAnalysis`, and the product must not add server persistence, cloud storage, or a new endpoint for export.
+- **Decision:** Build the export as a pure function (`src/lib/route-export.ts`) that converts the `CaseAnalysis` the user is viewing into localized plain text, downloaded through a temporary in-browser Blob URL with the fixed file name `burgermapper-route.txt`.
+- **Reason:** The pure function keeps export content testable outside components and reuses the existing localized labels, claim/source indices, and deadline ordering; the browser-only download guarantees no new data flow leaves the tab, and the constant file name prevents personal data in filesystem metadata.
+- **Tradeoff:** Plain text drops visual structure and hyperlinks compared with PDF generation, and the file reflects only the analysis state at download time.
+- **Revisit when:** A later phase adds a deliberate richer export (for example print-to-PDF guidance or structured JSON) with its own privacy review.

@@ -85,15 +85,15 @@ export const SAFE_ERROR_MESSAGES: Record<CaseAnalysisErrorCode, string> = {
   UNSUPPORTED_FILE_TYPE: "Choose a PDF, PNG, JPEG, or WebP document.",
   FILE_SIGNATURE_MISMATCH:
     "The file contents do not match the selected document type.",
-  UNKNOWN_SAMPLE: "Choose the built-in fictional sample.",
+  UNKNOWN_SAMPLE: "Choose the built-in example letter.",
   INVALID_CATEGORY: "Choose a supported category or clear the selection.",
   INVALID_LANGUAGE: "Choose English, German, or Arabic.",
   GOAL_REQUIRED: "Describe what you need to get done.",
   GOAL_TOO_SHORT: "Add at least 10 non-whitespace characters to your goal.",
   GOAL_TOO_LONG: "Keep your goal to 1,000 characters or fewer.",
-  MOCK_PROVIDER_ERROR: "The mock route could not be created. Try again.",
+  MOCK_PROVIDER_ERROR: "The demo route could not be created. Try again.",
   API_NOT_CONFIGURED:
-    "Real analysis is not configured. Enable mock mode to continue.",
+    "AI analysis is not configured. Enable demo mode to continue.",
   CONSENT_REQUIRED:
     "Confirm consent before sending this case to OpenAI for analysis.",
   PROVIDER_TIMEOUT:

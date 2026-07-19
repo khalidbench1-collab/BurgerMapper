@@ -35,11 +35,11 @@ export interface RouteVariant {
 
 const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
   en: {
-    documentTitle: "Request for additional documents — fictional sample",
+    documentTitle: "Request for additional documents — example case",
     documentType: "Residence permit renewal follow-up",
     documentLanguage: "German",
     summary:
-      "This fictional letter says that Samira Haddad's residence permit renewal cannot be completed until additional documents are provided. It appears to set a 14-day response window from the letter date.",
+      "This example letter says that Samira Haddad's residence permit renewal cannot be completed until additional documents are provided. It appears to set a 14-day response window from the letter date.",
     authorityWants:
       "Provide a current passport copy, proof of health insurance, and recent evidence of income. The right income evidence depends on whether Samira is employed, self-employed, or both.",
     documents: [
@@ -63,7 +63,7 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
       },
     ],
     missingInformation: [
-      "The fictional sample does not say whether Samira is employed, self-employed, or both.",
+      "The example letter does not say whether Samira is employed, self-employed, or both.",
       "The accepted submission channel has not been verified against an official source.",
     ],
     question: "Are you currently employed, self-employed, or both?",
@@ -156,14 +156,14 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
       },
     ],
     disclaimer:
-      "This is fictional mock output for a Build Week prototype. It is not legal advice. The input was validated only by the BurgerMapper application server and was not interpreted by AI; the source placeholders have not been verified. Check the original letter and current official guidance before acting.",
+      "This demo route is based on an example case, not on an analysis of your own documents, and it is not legal advice. Your input was validated by the BurgerMapper server but was not interpreted by AI, and the listed sources have not been verified. Check your original letter and current official guidance before acting.",
   },
   de: {
-    documentTitle: "Anforderung weiterer Unterlagen — fiktives Beispiel",
+    documentTitle: "Anforderung weiterer Unterlagen — Beispielfall",
     documentType: "Nachforderung zur Verlängerung eines Aufenthaltstitels",
     documentLanguage: "Deutsch",
     summary:
-      "Dieses fiktive Schreiben besagt, dass die Verlängerung des Aufenthaltstitels von Samira Haddad erst nach Eingang weiterer Unterlagen abgeschlossen werden kann. Offenbar gilt eine Antwortfrist von 14 Tagen ab dem Briefdatum.",
+      "Dieses Beispielschreiben besagt, dass die Verlängerung des Aufenthaltstitels von Samira Haddad erst nach Eingang weiterer Unterlagen abgeschlossen werden kann. Offenbar gilt eine Antwortfrist von 14 Tagen ab dem Briefdatum.",
     authorityWants:
       "Einzureichen sind eine aktuelle Passkopie, ein Nachweis der Krankenversicherung und aktuelle Einkommensnachweise. Welche Einkommensnachweise passen, hängt davon ab, ob Samira angestellt, selbstständig oder beides ist.",
     documents: [
@@ -187,7 +187,7 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
       },
     ],
     missingInformation: [
-      "Im fiktiven Beispiel steht nicht, ob Samira angestellt, selbstständig oder beides ist.",
+      "Im Beispielschreiben steht nicht, ob Samira angestellt, selbstständig oder beides ist.",
       "Der zulässige Einreichungsweg wurde noch nicht anhand einer offiziellen Quelle geprüft.",
     ],
     question: "Sind Sie derzeit angestellt, selbstständig oder beides?",
@@ -280,14 +280,14 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
       },
     ],
     disclaimer:
-      "Dies ist eine fiktive Demo-Ausgabe für einen Build-Week-Prototyp und keine Rechtsberatung. Die Eingabe wurde nur vom BurgerMapper-Anwendungsserver validiert und nicht durch KI interpretiert; die Quellenplatzhalter wurden nicht verifiziert. Prüfen Sie vor jedem Schritt das Originalschreiben und aktuelle offizielle Hinweise.",
+      "Diese Demo-Route basiert auf einem Beispielfall und nicht auf einer Analyse Ihrer eigenen Unterlagen; sie ist keine Rechtsberatung. Ihre Eingabe wurde vom BurgerMapper-Server validiert, aber nicht durch KI interpretiert; die angegebenen Quellen wurden nicht verifiziert. Prüfen Sie vor jedem Schritt das Originalschreiben und aktuelle offizielle Hinweise.",
   },
   ar: {
-    documentTitle: "طلب مستندات إضافية — نموذج خيالي",
+    documentTitle: "طلب مستندات إضافية — حالة مثال",
     documentType: "متابعة تجديد تصريح الإقامة",
     documentLanguage: "الألمانية",
     summary:
-      "يفيد هذا الخطاب الخيالي بأن طلب تجديد تصريح إقامة سميرة حداد لا يمكن استكماله قبل تقديم مستندات إضافية. ويبدو أنه يحدد مهلة للرد مدتها 14 يومًا من تاريخ الخطاب.",
+      "يفيد خطاب المثال هذا بأن طلب تجديد تصريح إقامة سميرة حداد لا يمكن استكماله قبل تقديم مستندات إضافية. ويبدو أنه يحدد مهلة للرد مدتها 14 يومًا من تاريخ الخطاب.",
     authorityWants:
       "المطلوب تقديم نسخة حديثة من جواز السفر، وإثبات التأمين الصحي، وإثبات حديث للدخل. ويعتمد نوع إثبات الدخل المناسب على ما إذا كانت سميرة موظفة أو تعمل لحسابها الخاص أو تجمع بينهما.",
     documents: [
@@ -311,7 +311,7 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
       },
     ],
     missingInformation: [
-      "لا يوضح النموذج الخيالي ما إذا كانت سميرة موظفة أو تعمل لحسابها الخاص أو تجمع بينهما.",
+      "لا يوضح خطاب المثال ما إذا كانت سميرة موظفة أو تعمل لحسابها الخاص أو تجمع بينهما.",
       "لم يتم التحقق من طريقة التقديم المقبولة من مصدر رسمي.",
     ],
     question: "هل تعمل حاليًا كموظف، أم لحسابك الخاص، أم تجمع بينهما؟",
@@ -402,7 +402,7 @@ const MOCK_CONTENT: Record<SupportedLanguage, MockContent> = {
       },
     ],
     disclaimer:
-      "هذه نتيجة خيالية تجريبية لنموذج أولي ضمن Build Week، وليست استشارة قانونية. تحقّق خادم تطبيق BurgerMapper من المدخلات فقط، ولم يفسرها أي نظام ذكاء اصطناعي، كما لم يتم التحقق من المصادر المؤقتة. راجع الخطاب الأصلي والإرشادات الرسمية الحالية قبل اتخاذ أي إجراء.",
+      "هذا المسار التجريبي مبني على حالة مثال وليس على تحليل مستنداتك الخاصة، وهو ليس استشارة قانونية. تحقّق خادم BurgerMapper من مدخلاتك، لكن لم يفسرها أي نظام ذكاء اصطناعي، ولم يتم التحقق من المصادر المذكورة. راجع الخطاب الأصلي والإرشادات الرسمية الحالية قبل اتخاذ أي إجراء.",
   },
 };
 
@@ -591,22 +591,22 @@ const MOCK_CONTEXT: Record<
   Record<CaseInput["kind"], string>
 > = {
   en: {
-    goal: "Mock mode is demonstrating a goal-based route. The goal was validated in memory by the application server but was not interpreted or understood by AI.",
-    text: "Mock mode is demonstrating the expected route format. The pasted text was validated in memory by the application server but was not interpreted or understood by AI.",
-    file: "Mock mode is demonstrating the expected route format. The selected file was signature-checked in memory by the application server but was not interpreted by AI.",
-    sample: "Mock mode is using a fictional sample and does not represent a verified legal assessment.",
+    goal: "Demo mode is demonstrating a goal-based route. The goal was validated in memory by the application server but was not interpreted or understood by AI.",
+    text: "Demo mode is demonstrating the expected route format. The pasted text was validated in memory by the application server but was not interpreted or understood by AI.",
+    file: "Demo mode is demonstrating the expected route format. The selected file was signature-checked in memory by the application server but was not interpreted by AI.",
+    sample: "Demo mode is using an example letter and does not represent a verified legal assessment.",
   },
   de: {
     goal: "Der Demo-Modus zeigt einen zielbasierten Weg. Das Ziel wurde im Arbeitsspeicher des Anwendungsservers validiert, aber nicht durch KI interpretiert oder verstanden.",
     text: "Der Demo-Modus zeigt das erwartete Routenformat. Der eingefügte Text wurde im Arbeitsspeicher des Anwendungsservers validiert, aber nicht durch KI interpretiert oder verstanden.",
     file: "Der Demo-Modus zeigt das erwartete Routenformat. Die Signatur der ausgewählten Datei wurde im Arbeitsspeicher des Anwendungsservers geprüft, aber die Datei wurde nicht durch KI interpretiert.",
-    sample: "Der Demo-Modus verwendet ein fiktives Beispiel und stellt keine verifizierte rechtliche Bewertung dar.",
+    sample: "Der Demo-Modus verwendet ein Beispielschreiben und stellt keine verifizierte rechtliche Bewertung dar.",
   },
   ar: {
     goal: "يعرض الوضع التجريبي مسارًا مبنيًا على الهدف. تحقّق خادم التطبيق من الهدف في الذاكرة، لكن لم يفسره أو يفهمه أي نظام ذكاء اصطناعي.",
     text: "يعرض الوضع التجريبي شكل المسار المتوقع. تحقّق خادم التطبيق من النص الملصق في الذاكرة، لكن لم يفسره أو يفهمه أي نظام ذكاء اصطناعي.",
     file: "يعرض الوضع التجريبي شكل المسار المتوقع. تحقّق خادم التطبيق من توقيع الملف في الذاكرة، لكن لم يفسره أي نظام ذكاء اصطناعي.",
-    sample: "يستخدم الوضع التجريبي نموذجًا خياليًا ولا يمثل تقييمًا قانونيًا متحققًا منه.",
+    sample: "يستخدم الوضع التجريبي خطاب مثال ولا يمثل تقييمًا قانونيًا متحققًا منه.",
   },
 };
 

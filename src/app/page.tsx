@@ -1,13 +1,16 @@
 import Link from "next/link";
 
+import { AppFooter } from "@/components/app-footer";
 import { AppHeader } from "@/components/app-header";
 import { CategoryShortcuts } from "@/components/category-shortcuts";
 
 export default function Home() {
+  const analysisMode = process.env.ENABLE_MOCK_AI?.trim().toLowerCase() === "false" ? "openai" : "mock";
+
   return (
-    <div className="min-h-screen bg-[#f5f2eb] text-[#17231d]">
-      <AppHeader />
-      <main className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-18 lg:py-24">
+    <div className="flex min-h-screen flex-col bg-[#f5f2eb] text-[#17231d]">
+      <AppHeader mode={analysisMode} />
+      <main id="main-content" className="mx-auto w-full max-w-7xl flex-1 px-5 py-12 sm:px-8 sm:py-18 lg:py-24">
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.9fr)] lg:gap-18">
           <section>
             <p className="inline-flex rounded-full border border-[#c9d8d0] bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#24644a]">
@@ -17,7 +20,9 @@ export default function Home() {
               Start with what you need to get done.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-[#536159] sm:text-xl sm:leading-9">
-              Describe your goal in everyday language. Add a letter only if you have one, then build a clear fictional mock route.
+              {analysisMode === "mock"
+                ? "Describe your goal in everyday language. Add a letter only if you have one, then build a clear demo route."
+                : "Describe your goal in everyday language. Add a letter only if you have one, then build a clear route with official-source citations."}
             </p>
             <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
               <Link
@@ -27,8 +32,10 @@ export default function Home() {
                 Describe your goal
                 <span aria-hidden="true" className="ms-2">→</span>
               </Link>
-              <p className="max-w-xs text-sm leading-6 text-[#68736d]">
-                Mock mode only. Inputs are validated in memory by the BurgerMapper server, never sent to an AI provider, and discarded after the request.
+              <p className="max-w-xs text-sm leading-6 text-[#5d6862]">
+                {analysisMode === "mock"
+                  ? "Demo mode. Inputs are validated in memory by the BurgerMapper server, never sent to an AI provider, and discarded after the request."
+                  : "Inputs stay in memory and are sent to OpenAI for analysis only after you explicitly agree on the case screen."}
               </p>
             </div>
           </section>
@@ -40,12 +47,13 @@ export default function Home() {
             <ol className="mt-5 space-y-5">
               <RoutePreview number="1" title="Describe the outcome" description="Start without knowing the official procedure name." />
               <RoutePreview number="2" title="Clarify what matters" description="Answer one question only when it can change the route." />
-              <RoutePreview number="3" title="Follow a structured route" description="See deadlines, documents, uncertainty, and source placeholders in one plan." />
+              <RoutePreview number="3" title="Follow a structured route" description="See the deadline, first action, documents, uncertainty, and official-source citations in one plan." />
             </ol>
           </aside>
         </div>
         <CategoryShortcuts />
       </main>
+      <AppFooter />
     </div>
   );
 }
