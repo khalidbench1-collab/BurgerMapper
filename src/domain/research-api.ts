@@ -57,6 +57,8 @@ export const RESEARCH_ERROR_CODES = [
   "INVALID_CATEGORY",
   "INVALID_LANGUAGE",
   "RESEARCH_UNAVAILABLE",
+  "RATE_LIMIT_EXCEEDED",
+  "CONCURRENCY_LIMIT_REACHED",
   "INTERNAL_ERROR",
 ] as const;
 
@@ -73,6 +75,8 @@ export const SAFE_RESEARCH_ERROR_MESSAGES: Record<ResearchErrorCode, string> = {
   INVALID_CATEGORY: "Choose a supported category or clear the selection.",
   INVALID_LANGUAGE: "Choose English, German, or Arabic.",
   RESEARCH_UNAVAILABLE: "Official-source research is temporarily unavailable. Verify the route with the responsible authority.",
+  RATE_LIMIT_EXCEEDED: "Too many source-research requests were sent. Wait a moment and try again.",
+  CONCURRENCY_LIMIT_REACHED: "Source research is already running for this client. Wait for it to finish.",
   INTERNAL_ERROR: "Official-source research could not be completed safely.",
 };
 

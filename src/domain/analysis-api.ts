@@ -41,6 +41,8 @@ export const CASE_ANALYSIS_ERROR_CODES = [
   "PROVIDER_UNAVAILABLE",
   "PROVIDER_RESPONSE_INVALID",
   "REQUEST_LIMIT_REACHED",
+  "RATE_LIMIT_EXCEEDED",
+  "CONCURRENCY_LIMIT_REACHED",
   "INTERNAL_ERROR",
 ] as const;
 
@@ -108,6 +110,10 @@ export const SAFE_ERROR_MESSAGES: Record<CaseAnalysisErrorCode, string> = {
     "The analysis response could not be validated safely. Try again.",
   REQUEST_LIMIT_REACHED:
     "This case reached its analysis request limit. Start a new case to continue.",
+  RATE_LIMIT_EXCEEDED:
+    "Too many analysis requests were sent. Wait a moment and try again.",
+  CONCURRENCY_LIMIT_REACHED:
+    "An analysis is already running for this client. Wait for it to finish.",
   INTERNAL_ERROR: "The request could not be completed. Try again.",
 };
 

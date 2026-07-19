@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { handleResearchCaseRequest } from "@/server/research/handle-request";
+import { InMemoryRequestGuard } from "@/server/operations/request-guard";
 
 const URL = "http://localhost/api/cases/research";
 const OPTIONS = {
@@ -55,5 +56,25 @@ describe("POST /api/cases/research", () => {
     expect(payload.research.summary.status).toBe("no-sources");
     expect(payload.research.sources).toEqual([]);
     expect(payload.research.summary.escalation).toBeTruthy();
+  });
+
+  it("maps a retriever outage to a typed fallback without exposing internals", async () => {
+    const response = await handleResearchCaseRequest(
+      request({ topic: "address-registration", category: "arrival-registration", outputLanguage: "en", profileSufficiency: "sufficient" }),
+      { ...OPTIONS, retriever: { retrieve: async () => { throw new Error("private source failure"); } } },
+    );
+    const text = await response.text();
+    expect(response.status).toBe(503);
+    expect(JSON.parse(text).error.code).toBe("RESEARCH_UNAVAILABLE");
+    expect(text).not.toContain("private source failure");
+  });
+
+  it("rate-limits research with a safe typed response", async () => {
+    const guard = new InMemoryRequestGuard({ maxRequests: 1, windowMs: 60_000, maxConcurrent: 1 });
+    const body = { topic: "unsupported", category: null, outputLanguage: "en", profileSufficiency: "sufficient" };
+    expect((await handleResearchCaseRequest(request(body), { ...OPTIONS, requestGuard: guard })).status).toBe(200);
+    const response = await handleResearchCaseRequest(request(body), { ...OPTIONS, requestGuard: guard });
+    expect(response.status).toBe(429);
+    expect((await response.json()).error.code).toBe("RATE_LIMIT_EXCEEDED");
   });
 });

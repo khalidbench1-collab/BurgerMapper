@@ -217,3 +217,19 @@ These dated records capture durable technical choices. Product-level choices and
 - **Reason:** Official-domain status narrows provenance but does not eliminate prompt injection or content-integrity risk.
 - **Tradeoff:** Useful page changes may be ignored until the curated claim record is refreshed and reviewed.
 - **Revisit when:** A live retrieval/parser implementation is evaluated against adversarial official-page fixtures and content-change monitoring.
+
+## 2026-07-18 — Versioned synthetic release-evaluation boundary
+
+- **Context:** Provider, profile, evidence, multilingual, and failure behavior need repeatable release evidence without private cases or routine paid calls.
+- **Decision:** Keep versioned synthetic evaluation contracts and fixtures in the repository, run them through pure invariant checks, and fail the release gate on any critical check.
+- **Reason:** Deterministic evidence is reviewable in commits and covers question quality, sufficiency, route/citation/deadline completeness, injection, RTL, fallback, latency, and cost.
+- **Tradeoff:** Synthetic invariants do not measure real-model accuracy distributions or real document quality.
+- **Revisit when:** A privacy-approved, budgeted evaluation program can add sampled real-model evidence without replacing deterministic regressions.
+
+## 2026-07-18 — Process-local abuse protection and content-free telemetry
+
+- **Context:** Anonymous expensive endpoints need basic abuse and cost visibility, but the MVP has no identity, database, analytics, or retention system.
+- **Decision:** Use salted in-memory client hashes for fixed-window request limits, endpoint-wide concurrency limits, and a 2,048-entry cap with expiry pruning; collect only aggregate counts, outcomes, latency bands, token/retry totals, and estimated cost.
+- **Reason:** This materially limits accidental abuse and makes spend/failure behavior observable without persisting content, a recoverable user identifier, or an unbounded in-memory event log.
+- **Tradeoff:** State resets on restart and is not coordinated across serverless instances; metrics are ephemeral and unsuitable for production incident history.
+- **Revisit when:** Phase 8 deployment architecture is known and can provide shared edge rate limiting plus privacy-reviewed aggregate monitoring.

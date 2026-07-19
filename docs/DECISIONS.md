@@ -125,3 +125,15 @@ These decisions define the starting constraints for BurgerMapper. They can chang
 | Display conflicts and downgrade missing evidence | BurgerMapper does not silently select among official conflicts. Stale, unavailable, incomplete, redirected, or non-allowlisted evidence cannot support a certain route instruction and triggers limitation/escalation copy. |
 | Treat a letter deadline as a document fact by default | A date detected in the user's letter comes from that document, not from web research. The UI requires confirmation against the original unless separate official evidence supports the deadline. |
 | Use a dated curated provider for the Phase 5 demo | The server boundary, validation, claim synthesis, and rendering are fully replaceable and deterministic offline. Runtime live refresh and unrestricted web search are deferred until evaluation proves their reliability and privacy behavior. |
+
+## Phase 6 reliability decisions
+
+| Decision | Reason |
+| --- | --- |
+| Make deterministic synthetic checks release blocking | A hackathon demo still needs repeatable evidence for question quality, profile/route completeness, citations, deadlines, RTL, injection, fallback, latency, and cost without spending API credit or transmitting private data. |
+| Require 100% pass rates on the versioned synthetic critical set | The compact set represents invariants rather than statistical model quality; accepting a known failure would weaken the safety contract. Larger probabilistic real-model samples remain separate future evidence. |
+| Use aggregate-only operational metrics | Request counts, outcomes, latency bands, token totals, retries, and estimated cost support reliability decisions without retaining prompts, files, names, answers, identifiers, or responses. |
+| Add a salted process-local anonymous guard now | The anonymous MVP needs immediate request and endpoint-wide concurrency ceilings without a database. Expired inactive client windows are pruned and client-hash state is capped at 2,048 entries; serverless/multi-instance protection still requires a shared platform limiter before public release. |
+| Estimate Luna cost from provider-reported token usage | Content-free usage supports the USD 0.10 per-case planning ceiling while keeping `OPENAI_MODEL` configurable and avoiding a second billing/logging service. Pricing must be reverified before deployment. |
+| Map source-retriever failure to an explicit unavailable state | A temporary source outage must not look like verified guidance or leak internal exceptions. The route remains usable only with visible uncertainty and authority escalation. |
+| Use a 10-second test ceiling for UI interaction tests | Two jsdom tests passed alone but exceeded 5 seconds under full constrained parallel execution. A test-only ceiling removes infrastructure flakiness without changing the 20-second production provider timeout. |

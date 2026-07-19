@@ -2,7 +2,7 @@
 
 This file is the authoritative execution state for the Build Week plan. Update it only with verified Git and external-gate evidence. Never place secret values here.
 
-Last verified: 2026-07-18
+Last verified: 2026-07-19
 
 | Phase | Title | Status | Commit / blocker | Prerequisites |
 | --- | --- | --- | --- | --- |
@@ -12,8 +12,8 @@ Last verified: 2026-07-18
 | 2 | Secure multimodal analysis boundary | COMPLETE | `c6369e91a505e8d97ce2a7a6bbd460492b5dda9b` | Phase 1.5 |
 | 3 | Goal-based Case Builder Agent in mock mode | COMPLETE | `f72589e7102403ca9fa8b78c16f46c401b6c934b` | Phase 2 COMPLETE |
 | 4 | Real OpenAI multimodal and structured-output integration | COMPLETE | `4d0b20d73defbb72ed8af9efeecd07b58ff041be` | Phase 3 COMPLETE and API gate resolved |
-| 5 | Official-source research and cited personalized routes | COMPLETE | Commit created by this phase with exact message `feat: add official-source route research`; full hash is reported after commit and backfilled by the next authorized phase | Phase 4 COMPLETE |
-| 6 | Reliability, safety, evaluation, and cost controls | NOT STARTED | Exact future commit: `test: harden BurgerMapper reliability` | Phase 5 COMPLETE |
+| 5 | Official-source research and cited personalized routes | COMPLETE | `8c24cb60476ff8bf88e199bdf45685e7fab777ce` | Phase 4 COMPLETE |
+| 6 | Reliability, safety, evaluation, and cost controls | COMPLETE | `test: harden BurgerMapper reliability`; hash pending final report | Phase 5 COMPLETE |
 | 7 | Final user-experience and accessibility polish | NOT STARTED | Exact future commit: `feat: polish the BurgerMapper experience` | Phase 6 COMPLETE |
 | 8 | GitHub, deployment, release candidate, and submission handoff | NOT STARTED | Exact future commit: `chore: prepare Build Week release candidate` | Phase 7 COMPLETE plus GitHub, visibility, Vercel, and production-variable gates |
 
@@ -39,6 +39,14 @@ Last verified: 2026-07-18
 - The current provider is a dated deterministic snapshot for three fictional demo topics. It is not a live source-refresh system.
 - Phase 5 gates passed: 16 files and 128 tests, lint, strict production build, 0-vulnerability audit, and required local HTTP/API checks.
 
+## Implemented Phase 6 reliability boundary
+
+- Eleven versioned synthetic cases cover routine, ambiguous, missing-data, high-risk, multilingual, correction, and adversarial goal/text/PDF/image/source behavior.
+- Machine-checkable release blockers require schema validity, useful non-repeated questions, “I don't know”, correction memory, sufficient profiles, complete routes/deadlines/escalation/citations, injection containment, serious tone, Arabic RTL/LTR, and latency/cost budgets.
+- Analysis and research enforce typed process-local anonymous request limits and endpoint-wide concurrency limits; their salted client-hash maps are bounded and provider/source failures remain safe.
+- Operational metrics are aggregate-only in-memory counters: counts, outcomes, latency bands, mode, tokens, retries, and estimated cost—never content, identifiers, or per-request events.
+- Phase 6 gates passed: 18 files and 139 tests, 5 evaluation tests over 11 cases, lint, strict production build, 0-vulnerability audit, license review, and required local HTTP/API checks. The visual browser was unavailable, so full visual accessibility review remains required in Phase 7.
+
 ## Status meanings
 
 - `NOT STARTED`: prerequisites are recorded but no implementation for this phase has begun.
@@ -48,7 +56,7 @@ Last verified: 2026-07-18
 
 ## Next executable phase
 
-Phase 6 is the first phase marked `NOT STARTED` whose prerequisites are complete. Do not begin it in the Phase 5 run.
+Phase 7 is the first phase marked `NOT STARTED` whose prerequisites are complete. Do not begin it in the Phase 6 run.
 
 Run exactly:
 
@@ -56,4 +64,4 @@ Run exactly:
 Read AGENTS.md, docs/MASTER_BUILD_PLAN.md, and docs/PHASE_STATUS.md. Execute the first phase marked NOT STARTED whose prerequisites are complete. Follow its full prompt. Stop after its commit and final report. Never automatically begin the next phase.
 ```
 
-Autonomous execution stops after the Phase 5 commit and report. A future run may begin Phase 6 reliability, safety, evaluation, and cost-control work. Any future real API request remains separately permission-gated unless the user grants a new exact authorization.
+Autonomous execution stops after the Phase 6 commit and report. A future run may begin Phase 7 final user-experience and accessibility polish. Any future real API request remains separately permission-gated unless the user grants a new exact authorization.

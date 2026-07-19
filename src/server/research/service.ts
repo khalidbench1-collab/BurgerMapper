@@ -27,7 +27,12 @@ export async function researchOfficialSources(
   if (input.profileSufficiency !== "sufficient") {
     throw new ResearchServiceError("PROFILE_NOT_SUFFICIENT", 409);
   }
-  const retrieved = await retriever.retrieve(input.topic, input.outputLanguage);
+  let retrieved: Awaited<ReturnType<OfficialSourceRetriever["retrieve"]>>;
+  try {
+    retrieved = await retriever.retrieve(input.topic, input.outputLanguage);
+  } catch {
+    throw new ResearchServiceError("RESEARCH_UNAVAILABLE", 503);
+  }
   const researchedAt = now();
   const records = retrieved.records.filter((record) =>
     isAllowedOfficialUrl(record.source.url) &&

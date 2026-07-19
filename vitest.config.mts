@@ -9,6 +9,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
-    testTimeout: 5_000,
+    // UI interaction tests can exceed five seconds on constrained CI runners.
+    // The production provider still has its independent 20-second timeout.
+    testTimeout: 10_000,
   },
 });

@@ -7,9 +7,11 @@ import { MAX_CLARIFICATION_QUESTIONS, MAX_PROVIDER_REQUESTS_PER_CASE, OPENAI_REQ
 import { buildInitialOpenAIRequest, buildVerificationOpenAIRequest, type PlannedOpenAIRequest } from "@/server/cases/openai/request";
 import { ModelCaseOutputSchema, ModelVerificationOutputSchema, type ModelCaseOutput } from "@/server/cases/openai/schemas";
 import type { NormalizedCaseInput } from "@/server/cases/types";
+import { estimateLunaCostUsd } from "@/server/operations/cost";
 
 export interface OpenAITransportResult {
   outputParsed: unknown;
+  usage?: { inputTokens: number; outputTokens: number };
 }
 
 export interface OpenAIResponsesTransport {
@@ -27,6 +29,13 @@ export interface ProviderCaseResult {
   analysis: CaseAnalysis;
   profile?: CaseProfile;
   processingMode: "mock" | "openai";
+  operationalUsage?: {
+    inputTokens: number;
+    outputTokens: number;
+    retryCount: number;
+    verificationCount: number;
+    estimatedCostUsd: number;
+  };
 }
 
 const ALLOWED_VERIFICATION_TRIGGERS = new Set([
@@ -54,14 +63,22 @@ export class OpenAICaseBuilderProvider {
       () => this.transport.parse(buildInitialOpenAIRequest(input, this.options.model), signal),
       signal,
     );
-    let parsed = ModelCaseOutputSchema.safeParse(primary.outputParsed);
+    let parsed = ModelCaseOutputSchema.safeParse(primary.result.outputParsed);
+    let verificationCount = 0;
+    let retryCount = primary.retryCount;
+    let inputTokens = primary.result.usage?.inputTokens ?? 0;
+    let outputTokens = primary.result.usage?.outputTokens ?? 0;
 
     if (!parsed.success) {
       const verification = await executeWithBoundedRetry(
-        () => this.transport.parse(buildVerificationOpenAIRequest(primary.outputParsed, this.options.model, "failed-validation"), signal),
+        () => this.transport.parse(buildVerificationOpenAIRequest(primary.result.outputParsed, this.options.model, "failed-validation"), signal),
         signal,
       );
-      const verified = ModelVerificationOutputSchema.safeParse(verification.outputParsed);
+      verificationCount = 1;
+      retryCount += verification.retryCount;
+      inputTokens += verification.result.usage?.inputTokens ?? 0;
+      outputTokens += verification.result.usage?.outputTokens ?? 0;
+      const verified = ModelVerificationOutputSchema.safeParse(verification.result.outputParsed);
       if (!verified.success) throw new CaseRequestError("PROVIDER_RESPONSE_INVALID", 502);
       parsed = ModelCaseOutputSchema.safeParse(verified.data.correctedOutput);
     } else if (shouldRunVerification(parsed.data)) {
@@ -69,7 +86,11 @@ export class OpenAICaseBuilderProvider {
         () => this.transport.parse(buildVerificationOpenAIRequest(parsed.data, this.options.model), signal),
         signal,
       );
-      const verified = ModelVerificationOutputSchema.safeParse(verification.outputParsed);
+      verificationCount = 1;
+      retryCount += verification.retryCount;
+      inputTokens += verification.result.usage?.inputTokens ?? 0;
+      outputTokens += verification.result.usage?.outputTokens ?? 0;
+      const verified = ModelVerificationOutputSchema.safeParse(verification.result.outputParsed);
       if (!verified.success) throw new CaseRequestError("PROVIDER_RESPONSE_INVALID", 502);
       parsed = ModelCaseOutputSchema.safeParse(verified.data.correctedOutput);
     }
@@ -78,7 +99,17 @@ export class OpenAICaseBuilderProvider {
       throw new CaseRequestError("PROVIDER_RESPONSE_INVALID", 502);
     }
     const artifacts = toCaseArtifacts(parsed.data, input);
-    return { ...artifacts, processingMode: "openai" };
+    return {
+      ...artifacts,
+      processingMode: "openai",
+      operationalUsage: {
+        inputTokens,
+        outputTokens,
+        retryCount,
+        verificationCount,
+        estimatedCostUsd: estimateLunaCostUsd(inputTokens, outputTokens),
+      },
+    };
   }
 }
 
@@ -94,7 +125,13 @@ function createOpenAITransport(apiKey: string): OpenAIResponsesTransport {
         request as Parameters<typeof client.responses.parse>[0],
         { signal },
       );
-      return { outputParsed: response.output_parsed };
+      return {
+        outputParsed: response.output_parsed,
+        usage: response.usage ? {
+          inputTokens: response.usage.input_tokens,
+          outputTokens: response.usage.output_tokens,
+        } : undefined,
+      };
     },
   };
 }
@@ -102,12 +139,12 @@ function createOpenAITransport(apiKey: string): OpenAIResponsesTransport {
 async function executeWithBoundedRetry(
   operation: () => Promise<OpenAITransportResult>,
   signal?: AbortSignal,
-): Promise<OpenAITransportResult> {
+): Promise<{ result: OpenAITransportResult; retryCount: number }> {
   let lastError: unknown;
   for (let attempt = 1; attempt <= 2; attempt += 1) {
     if (signal?.aborted) throw new CaseRequestError("PROVIDER_UNAVAILABLE", 503);
     try {
-      return await operation();
+      return { result: await operation(), retryCount: attempt - 1 };
     } catch (error) {
       lastError = error;
       if (attempt === 2 || !isTransientProviderError(error)) break;

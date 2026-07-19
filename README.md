@@ -8,7 +8,7 @@ The Build Week target is to let a user state a goal, optionally add an official 
 
 Phase 5 adds official-source research after the structured case profile is sufficient. The route—not search results—remains the product: supported changing claims are connected to official Berlin or German federal evidence beside the relevant step, while document facts, inference, conflict, and uncertainty remain distinct.
 
-## Phase 5 cited-route workflow
+## Phase 6 reliability-hardened workflow
 
 - Goal-first landing page at `/` and case workspace at `/case`, led by “What do you need to get done?”.
 - Goal-only cases are supported. Pasted text, PDF/image upload, and the fictional sample remain optional evidence through the same route flow.
@@ -31,6 +31,8 @@ Phase 5 adds official-source research after the structured case profile is suffi
 - Atomic route claims distinguish federal law, official service guidance, Berlin administrative practice, document facts, inference, and unresolved uncertainty.
 - Citations appear beside the exact supported route step. Source cards show publisher, title, canonical URL, domain, access date, jurisdiction, support relationship, verification status, and conflict state.
 - Deadlines detected in a letter are labelled as document facts and must be confirmed against the original unless an official source separately supports them.
+- Anonymous analysis and research boundaries now have typed process-local request and endpoint-wide concurrency limits, safe `Retry-After` responses, bounded client-hash state, and aggregate-only in-memory operational metrics.
+- A versioned synthetic evaluation gate covers routine, ambiguous, missing-data, high-risk, multilingual, correction, prompt-injection, citation, deadline, fallback, latency, and cost behavior. See [docs/RELIABILITY_REPORT.md](docs/RELIABILITY_REPORT.md).
 
 Six visible orientation categories are available on the landing page and in the case workflow:
 
@@ -101,12 +103,14 @@ Prerequisites: Node.js 20.9 or newer and npm.
 
 4. Open `http://localhost:3000`.
 
-Run the Phase 5 checks with:
+Run the Phase 6 checks with:
 
 ```bash
 npm test
+npm run eval
 npm run lint
 npm run build
+npm audit
 ```
 
 The safe environment template contains:
@@ -121,9 +125,9 @@ No API key is required for mock mode. To test real mode, configure the key priva
 
 ## Current implementation status
 
-Phase 5 is complete. A user can start with a goal alone or add pasted text, PDF/image evidence, the trusted sample, an optional category, and an output language. The analysis boundary returns `CaseAnalysis` plus an optional structured `CaseProfile`; after sufficiency, the source-research boundary returns atomic claims, official evidence, and step mappings. Real analysis remains consent-gated and mock analysis remains fully operational without a key.
+Phase 6 is complete. A user can start with a goal alone or add pasted text, PDF/image evidence, the trusted sample, an optional category, and an output language. The analysis boundary returns `CaseAnalysis` plus an optional structured `CaseProfile`; after sufficiency, the source-research boundary returns atomic claims, official evidence, and step mappings. Real analysis remains consent-gated and mock analysis remains fully operational without a key. Process-local anonymous limits, safe source-outage behavior, content-free cost/latency metrics, and machine-checkable synthetic release blockers now guard these paths.
 
-The automated suite contains 128 passing tests across 16 files. Automated OpenAI provider tests use an injected synthetic transport and cannot spend API credit. One separately authorized, bounded synthetic Luna smoke request succeeded on 2026-07-18 with 77 total tokens and an estimated cost of USD 0.000227; no prompt or output content was recorded.
+The automated suite contains 139 passing tests across 18 files. `npm run eval` separately passes 5 release-evaluation tests over 11 versioned synthetic cases. Automated provider and evaluation tests use injected or deterministic synthetic data and cannot spend API credit. One separately authorized, bounded synthetic Luna smoke request succeeded during Phase 5 on 2026-07-18 with 77 total tokens and an estimated cost of USD 0.000227; Phase 6 made no OpenAI call and recorded no prompt or output content.
 
 The remaining Build Week work is governed by a permanent phase-gated execution system. [AGENTS.md](AGENTS.md) contains canonical repository rules, [INSTRUCTIONS.md](INSTRUCTIONS.md) explains safe operation, and [docs/MASTER_BUILD_PLAN.md](docs/MASTER_BUILD_PLAN.md) contains standalone prompts for Phases 3–8. [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md) is the authoritative state record.
 
@@ -133,7 +137,7 @@ To begin the next eligible phase in a fresh Codex session, use exactly:
 Read AGENTS.md, docs/MASTER_BUILD_PLAN.md, and docs/PHASE_STATUS.md. Execute the first phase marked NOT STARTED whose prerequisites are complete. Follow its full prompt. Stop after its commit and final report. Never automatically begin the next phase.
 ```
 
-Phase 6 is next: reliability, safety, evaluation, and cost controls. It must not begin automatically.
+Phase 7 is next: final user-experience and accessibility polish. It must not begin automatically.
 
 Current limitations:
 
@@ -141,6 +145,8 @@ Current limitations:
 - Official sources are a narrow dated snapshot, not a live crawler. Only three fictional route topics have curated cited evidence; other categories retain an honest no-source or placeholder state.
 - The successful live Luna smoke established project/model/schema access only. It did not evaluate real document quality, legal accuracy, multilingual quality, source research, or production behavior.
 - No login, database, local storage, analytics, tracking, or deployment.
+- Anonymous endpoint limits are bounded, in-memory, and per process, so a multi-instance public deployment still needs platform-level abuse protection.
+- The Phase 6 in-app visual browser could not initialize; full mobile/desktop visual and assistive-technology checks remain a Phase 7 release requirement.
 - A model can be wrong, miss text, or misread a deadline; outputs remain legal information rather than legal advice.
 
 The request planner now feeds the real server provider: pasted text and the trusted sample become `input_text`, PDFs become `input_file`, images become `input_image`, and a separate context block carries category, language, clarification answers, and reusable prompt-injection protections. A client-side API key is never used.
@@ -151,7 +157,7 @@ Before analysis, the goal, answers, optional text, and selected `File` remain in
 
 ## Security
 
-AI calls are server-side only. Local `.env*` files are ignored except for the safe `.env.example`; never commit credentials or expose an OpenAI API key to browser code. The public endpoints revalidate browser input, reject private fields at the research boundary, require real-transfer consent, return safe typed errors without stack traces or raw provider messages, and mark responses `no-store`. Goals, documents, and retrieved pages are untrusted evidence that cannot override application instructions or trigger link following. Canonical URLs must remain HTTPS and on the allowlist; cross-domain redirects and stale, unavailable, or incomplete evidence are downgraded. No chain of thought is requested or retained. The app has no analytics, tracking, remote font, remote application asset, or `dangerouslySetInnerHTML`.
+AI calls are server-side only. Local `.env*` files are ignored except for the safe `.env.example`; never commit credentials or expose an OpenAI API key to browser code. The public endpoints revalidate browser input, reject private fields at the research boundary, require real-transfer consent, enforce process-local anonymous request and endpoint-wide concurrency limits with bounded client-hash state, return safe typed errors without stack traces or raw provider messages, and mark responses `no-store`, `nosniff`, and no-referrer. Goals, documents, and retrieved pages are untrusted evidence that cannot override application instructions or trigger link following. Canonical URLs must remain HTTPS and on the allowlist; cross-domain redirects and stale, unavailable, or incomplete evidence are downgraded. Aggregate operational metrics contain counts, latency bands, token/retry totals, and estimated cost only—never content or identifiers. No chain of thought is requested or retained. The app has no analytics, tracking, remote font, remote application asset, or `dangerouslySetInnerHTML`.
 
 ## Build Week provenance
 
@@ -159,7 +165,7 @@ The BurgerMapper concept and an earlier, unrelated prototype predated OpenAI Bui
 
 ## How Codex contributed
 
-Codex established the Phase 0 repository and helped implement Phases 1 through 5: typed contracts, validation, in-memory boundaries, multimodal intake, structured `CaseProfile`, guided builder, server-only Responses integration, consent, prompt-injection controls, official-domain allowlisting, atomic claim-to-source mappings, cited-route rendering, synthetic tests, audits, verification, and documentation. The only live Luna evidence is the content-free Phase 5 synthetic smoke metadata; no real personal document was used.
+Codex established the Phase 0 repository and helped implement Phases 1 through 6: typed contracts, validation, in-memory boundaries, multimodal intake, structured `CaseProfile`, guided builder, server-only Responses integration, consent, prompt-injection controls, official-domain allowlisting, atomic claim-to-source mappings, cited-route rendering, synthetic release evaluations, abuse/cost controls, audits, verification, and documentation. The only live Luna evidence is the content-free Phase 5 synthetic smoke metadata; Phase 6 was fully offline and no real personal document was used.
 
 ## Codex `/feedback` Session ID
 

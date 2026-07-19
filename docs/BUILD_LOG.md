@@ -472,3 +472,41 @@ The one standing-authorized synthetic Responses request was made before implemen
 Codex verified official OpenAI model/pricing documentation, ran the single authorized content-free smoke request, inspected current official government pages, designed the privacy-minimal research boundary, implemented evidence contracts and cited-route UI, wrote synthetic adversarial and regression tests, and reconciled all Build Week records. No real letter, private document, live research query, stored page, unrestricted web search, deployment, or Phase 6 evaluation work was added.
 
 Phase 6 should build the representative synthetic evaluation set and release-blocking reliability, safety, citation, latency, cost, outage, abuse, multilingual, RTL, accessibility, dependency, and privacy controls defined in the master plan. Do not begin it automatically.
+
+## 2026-07-18 — Phase 6 reliability, safety, evaluation, and cost controls
+
+### Objective and starting evidence
+
+Harden the complete goal/document/profile/research route with deterministic synthetic evaluations, release-blocking criteria, safe provider/retrieval failure behavior, anonymous abuse controls, aggregate-only cost/latency metrics, and security, privacy, performance, dependency, license, and accessibility reviews. The worktree was clean at `8c24cb60476ff8bf88e199bdf45685e7fab777ce`, the Phase 5 commit, before implementation.
+
+No OpenAI request or live research request was made. All new evaluation data is synthetic and versioned.
+
+### Implementation and architecture
+
+- Added 11 synthetic cases covering routine, ambiguous, missing-data, high-risk, English/German/Arabic, correction handling, and prompt injection through a goal, pasted text, PDF, image, and source.
+- Added machine-checkable checks for structured output, one useful question, no repetition, “I don't know”, correction memory, sufficiency, route/deadline/escalation/citation completeness, injection containment, false reassurance, filler, RTL/LTR, latency, and estimated Luna cost.
+- Added `npm run eval` and strict release thresholds. Any failed check is a release blocker; high/critical audit findings and critical accessibility/privacy/source failures also block release.
+- Added salted in-memory anonymous request and endpoint-wide concurrency guards: 20 analysis requests/minute with 2 concurrent; 30 research requests/minute with 3 concurrent. Expired inactive client windows are pruned and the client-hash map is capped at 2,048 entries. Typed `429`, `Retry-After`, no-store, no-referrer, and `nosniff` behavior is tested.
+- Added aggregate-only in-memory operational metrics for counts, outcomes, latency bands, mode, token totals, retries, and estimated cost. Counters retain no per-request events, content, filenames, goals, answers, sources, identifiers, or API responses.
+- Added real transport usage accounting against verified Luna planning prices. Mock mode remains zero-cost, and routine verification/tone calls remain prohibited.
+- Mapped retriever exceptions to typed `RESEARCH_UNAVAILABLE` instead of a generic internal error. Corrected the provider prompt to describe post-sufficiency source research accurately without allowing invented citations.
+- Increased the test timeout from 5 to 10 seconds after full parallel jsdom execution exposed constrained-runner timing flakiness; the production provider retains its separate 20-second limit.
+
+### Verification and review results
+
+- `npm run lint` — passed with no findings.
+- `npm run eval` — passed: 1 file, 5 tests, 11 synthetic cases, zero blockers; the command exercises injected provider and deterministic retrieval boundaries without network traffic.
+- `npm test` — passed: 18 files and 139 tests. The first full run had two 5-second jsdom interaction timeouts; both passed in isolation, and the CI-safe 10-second test ceiling removed the resource-contention flake.
+- `npm run build` — passed with strict TypeScript and all existing static/dynamic routes.
+- `npm audit --audit-level=moderate` — passed with 0 vulnerabilities.
+- Local production HTTP — `/`, `/case?category=visa-immigration`, and the manifest returned `200`; mock analysis returned `200` with discard and rate headers; a too-short goal returned typed `422`; unsupported research returned an honest `no-sources` result. A fixed synthetic-client burst produced 20 `200` analysis responses followed by 30 typed `429` responses plus `Retry-After`.
+- Direct licenses checked locally: Next.js, React, React DOM, Zod, Vitest, ESLint, and Tailwind are MIT; OpenAI SDK is Apache-2.0. Several undeclared optional WASM packages appeared as extraneous in the local install and are recorded for clean-install confirmation in Phase 8.
+- The in-app visual browser failed to initialize because the browser runtime did not receive sandbox-policy metadata. Semantic source inspection and existing component, keyboard, focus, live-region, RTL, print, and error tests passed, but a browser accessibility claim is intentionally deferred to Phase 7.
+
+Detailed thresholds, reviews, and limitations are in [RELIABILITY_REPORT.md](RELIABILITY_REPORT.md).
+
+### Codex contribution and next phase
+
+Codex inspected the existing contracts, implemented the deterministic evaluation and operational boundaries, added adversarial/fallback/rate/cost coverage, performed the local audits, reconciled all evidence, and used no private data or live provider traffic.
+
+Phase 7 should perform final stress-friendly UX and visual accessibility polish across 320 px/mobile, desktop, English/German/Arabic, mixed RTL URLs, keyboard/focus/error/loading/empty/print/export/PWA behavior. Do not begin it automatically.

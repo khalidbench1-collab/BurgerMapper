@@ -9,6 +9,7 @@ import {
 } from "@/domain/analysis-api";
 import { MAX_PASTED_TEXT_CHARACTERS } from "@/lib/text-validation";
 import { handleAnalyzeCaseRequest } from "@/server/cases/handle-request";
+import { InMemoryRequestGuard } from "@/server/operations/request-guard";
 import { createSyntheticModelCaseOutput } from "@/server/cases/openai/fixtures.test-data";
 
 const SUCCESS_OPTIONS = {
@@ -229,6 +230,20 @@ describe("POST /api/cases/analyze", () => {
     expect(response.status).toBe(400);
     expect(payload.error.code).toBe("INVALID_REQUEST");
     expect(JSON.stringify(payload)).not.toContain("private synthetic body");
+  });
+
+  it("rate-limits the anonymous endpoint with a safe typed response", async () => {
+    const guard = new InMemoryRequestGuard({ maxRequests: 1, windowMs: 60_000, maxConcurrent: 1 });
+    const firstForm = baseForm("goal");
+    firstForm.set(CASE_FORM_FIELDS.goal, "Complete a synthetic registration case safely.");
+    expect((await handleAnalyzeCaseRequest(createRequest(firstForm), { ...SUCCESS_OPTIONS, requestGuard: guard })).status).toBe(200);
+    const secondForm = baseForm("goal");
+    secondForm.set(CASE_FORM_FIELDS.goal, "Complete another synthetic registration case safely.");
+    const response = await handleAnalyzeCaseRequest(createRequest(secondForm), { ...SUCCESS_OPTIONS, requestGuard: guard });
+    const payload = (await response.json()) as AnalyzeCaseErrorResponse;
+    expect(response.status).toBe(429);
+    expect(payload.error.code).toBe("RATE_LIMIT_EXCEEDED");
+    expect(response.headers.get("retry-after")).toBeTruthy();
   });
 });
 

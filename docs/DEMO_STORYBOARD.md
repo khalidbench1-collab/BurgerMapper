@@ -1,6 +1,6 @@
-# Three-minute demo storyboard — Phase 5 draft
+# Three-minute demo storyboard — Phase 6 draft
 
-> Draft based on the Phase 5 implementation. Mock mode and the post-sufficiency cited route are fully working. The one authorized synthetic Luna smoke check passed, but it did not analyze a document or verify route quality. The source catalog is a dated, narrow official snapshot rather than live web research; keep that limitation visible.
+> Draft based on the Phase 6 implementation. Mock mode, consent-gated real mode, and post-sufficiency cited routes are implemented. Phase 6 adds offline synthetic release gates and safe operational controls; it made no API call. The source catalog is a dated, narrow official snapshot rather than live web research, and final visual polish is still pending.
 
 The storyboard stays limited to behavior that actually exists after Phase 3 and will be updated by every later product phase.
 
@@ -38,4 +38,4 @@ After the profile becomes sufficient, show verified official sources connected b
 
 ## 2:47–3:00 — Engineering evidence
 
-Show `POST /api/cases/analyze`, privacy-minimal `POST /api/cases/research`, strict `CaseProfile`, atomic claim/source mappings, the exact official-domain allowlist, 128 passing tests, dated commits, and prior-work disclosure. Credit Codex for evidenced implementation. Describe the Luna smoke only as project/model/schema access evidence; do not claim it produced or verified the demonstrated route.
+Show `POST /api/cases/analyze`, privacy-minimal `POST /api/cases/research`, strict `CaseProfile`, atomic claim/source mappings, the exact official-domain allowlist, 139 passing tests, the 11-case synthetic release gate, dated commits, and prior-work disclosure. Briefly mention typed outage/rate fallback and content-free cost accounting. Credit Codex for evidenced implementation. Describe the Luna smoke only as project/model/schema access evidence; do not claim it produced or verified the demonstrated route.
