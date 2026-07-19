@@ -66,12 +66,9 @@ Last verified: 2026-07-19
 - Local gates re-verified on 2026-07-19 after the deployment: lint clean, 155/155 tests in 22 files, 5/5 release evaluations, strict production build, `npm audit` 0 vulnerabilities.
 - Codex resolved the GitHub/Vercel gates and began release verification, but probed a protected deployment-specific URL (Vercel authentication interstitial caused the HTML responses it saw) and then hit its usage limit; Claude re-ran the verification against the public production domain and completed the release documentation without git mutations.
 
-## Pending Phase 8 release actions
+## Phase 8 release actions
 
-1. Done 2026-07-19: an MIT `LICENSE` file was added to the working tree on the user's instruction; it ships with the release commit.
-2. Stage all working-tree changes, inspect the staged list and `git diff --check`, verify no secret or unintended file, then create exactly one commit with the exact message `chore: prepare Build Week release candidate`, set the Phase 8 row to `COMPLETE` with `hash pending final report` immediately before committing per the `AGENTS.md` rule, and push normally (no force) to `origin main`.
-3. The push will trigger the GitHub-connected Vercel production redeploy; re-check `https://burger-mapper.vercel.app` afterward.
-4. Remaining user-owned submission steps (never agent-performed): record and upload the demo video, run Codex `/feedback` and note the Session ID, choose the category, write the Devpost description, and submit before 2026-07-21 17:00 PT.
+The release candidate was committed as `06ffe5f584676bbdd60aedea3236a05fa114e82b` with message `chore: prepare Build Week release candidate`, pushed to `origin/main`, and verified on the public deployment. The worktree and remote branch are synchronized.
 
 ## Status meanings
 
@@ -82,6 +79,6 @@ Last verified: 2026-07-19
 
 ## Next executable phase
 
-Phase 8 is the final autonomous phase and is complete; its external gates and release candidate are recorded, while the user-owned submission steps remain (see "Pending Phase 8 release actions"). No further phase exists after Phase 8 — follow `docs/FINAL_HANDOFF_CHECKLIST.md` for the submission handoff.
+Phase 8 is the final autonomous phase and is complete. No further phase exists after Phase 8.
 
 Any future real API request remains separately permission-gated unless the user grants a new exact authorization.
