@@ -170,7 +170,6 @@ export interface CaseAnalysis {
   inputKind: InputKind;
   category: BureaucracyCategory | null;
   mockContext: string;
-  isMock: boolean;
 }
 
 interface BaseCaseInput {
@@ -180,6 +179,12 @@ interface BaseCaseInput {
   clarificationResolution?: ClarificationResolution;
 }
 
+export interface ClarificationAnswerSummary {
+  questionId: string;
+  questionPrompt: string;
+  answerLabel: string;
+}
+
 export interface ClarificationResolution {
   questionId: string;
   questionPrompt: string;
@@ -187,6 +192,8 @@ export interface ClarificationResolution {
   answerId: ClarificationAnswerId;
   answerLabel: string;
   options: ClarificationOption[];
+  /** Answers given to earlier questions in this case, oldest first. */
+  answerHistory?: ClarificationAnswerSummary[];
 }
 
 export type CaseInput =

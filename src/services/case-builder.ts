@@ -144,6 +144,62 @@ export function answerCaseBuilderQuestion(
   };
 }
 
+export const CUSTOM_CLARIFICATION_ANSWER_ID = "custom-answer";
+
+export function answerCaseBuilderQuestionWithText(
+  result: CaseBuilderResult,
+  answerText: string,
+  answeredAt = new Date().toISOString(),
+): CaseBuilderResult {
+  const question = result.baseAnalysis.clarificationQuestion;
+  const text = answerText.trim();
+  if (!text) return result;
+
+  const previousAnswer = result.profile.answers.find(
+    (answer) => answer.questionId === question.id,
+  );
+  const correctionHistory = [...result.profile.correctionHistory];
+  if (previousAnswer && previousAnswer.label !== text) {
+    correctionHistory.push({
+      id: `correction-answer-${correctionHistory.length + 1}`,
+      field: "clarification-answer",
+      summary: `Clarification answer changed from ${previousAnswer.label} to ${text}.`,
+      correctedAt: answeredAt,
+    });
+  }
+
+  const profile: CaseProfile = {
+    ...result.profile,
+    answers: [
+      {
+        questionId: question.id,
+        answerId: CUSTOM_CLARIFICATION_ANSWER_ID,
+        label: text,
+        routeImpact: "Your typed answer is recorded and used to finalize the route.",
+        answeredAt,
+      },
+    ],
+    correctionHistory,
+    sufficiency: {
+      state: "sufficient",
+      reason: "The consequential clarification is answered with your exact wording, so the route can be finalized.",
+      nextQuestionId: null,
+    },
+    status: "route-ready",
+    updatedAt: answeredAt,
+  };
+
+  const analysis: CaseAnalysis = {
+    ...result.baseAnalysis,
+    clarificationQuestion: {
+      ...result.baseAnalysis.clarificationQuestion,
+      selectedAnswerId: CUSTOM_CLARIFICATION_ANSWER_ID,
+    },
+  };
+
+  return { profile, baseAnalysis: result.baseAnalysis, analysis };
+}
+
 export function buildMockRouteFromProfile(
   profile: CaseProfile,
   baseAnalysis: CaseAnalysis,

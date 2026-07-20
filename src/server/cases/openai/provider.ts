@@ -79,6 +79,7 @@ export class OpenAICaseBuilderProvider {
       inputTokens += verification.result.usage?.inputTokens ?? 0;
       outputTokens += verification.result.usage?.outputTokens ?? 0;
       const verified = ModelVerificationOutputSchema.safeParse(verification.result.outputParsed);
+      // The primary output never parsed, so there is nothing safe to fall back to.
       if (!verified.success) throw new CaseRequestError("PROVIDER_RESPONSE_INVALID", 502);
       parsed = ModelCaseOutputSchema.safeParse(verified.data.correctedOutput);
     } else if (shouldRunVerification(parsed.data)) {
@@ -90,9 +91,14 @@ export class OpenAICaseBuilderProvider {
       retryCount += verification.retryCount;
       inputTokens += verification.result.usage?.inputTokens ?? 0;
       outputTokens += verification.result.usage?.outputTokens ?? 0;
+      // Verification is a quality pass over an output that already satisfied the
+      // strict schema. If the check itself comes back unusable, keep the verified-
+      // by-schema primary result instead of failing the whole case.
       const verified = ModelVerificationOutputSchema.safeParse(verification.result.outputParsed);
-      if (!verified.success) throw new CaseRequestError("PROVIDER_RESPONSE_INVALID", 502);
-      parsed = ModelCaseOutputSchema.safeParse(verified.data.correctedOutput);
+      if (verified.success) {
+        const corrected = ModelCaseOutputSchema.safeParse(verified.data.correctedOutput);
+        if (corrected.success) parsed = corrected;
+      }
     }
 
     if (!parsed.success || !isCoherentOutput(parsed.data)) {
@@ -166,7 +172,10 @@ function mapProviderError(error: unknown): CaseRequestError {
   const status = readErrorStatus(error);
   const code = readErrorCode(error);
   const name = error instanceof Error ? error.name : "";
-  if (name === "APITimeoutError" || status === 408) return new CaseRequestError("PROVIDER_TIMEOUT", 504);
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  if (name === "APITimeoutError" || name === "APIConnectionTimeoutError" || status === 408 || message.includes("timed out")) {
+    return new CaseRequestError("PROVIDER_TIMEOUT", 504);
+  }
   if (status === 401 || status === 403) return new CaseRequestError("PROVIDER_AUTH_ERROR", 503);
   if (code === "insufficient_quota" || code === "billing_hard_limit_reached") return new CaseRequestError("PROVIDER_BILLING_ERROR", 503);
   if (status === 429) return new CaseRequestError("PROVIDER_RATE_LIMITED", 429);
@@ -197,13 +206,38 @@ function isCoherentOutput(output: ModelCaseOutput): boolean {
   if (output.clarification.needed !== Boolean(output.clarification.question)) return false;
   if (output.clarification.question) {
     const ids = output.clarification.question.options.map((option) => option.id);
-    if (!ids.includes("dont-know") || new Set(ids).size !== ids.length) return false;
+    if (new Set(ids).size !== ids.length) return false;
   }
   const orders = output.nextSteps.map((step) => step.order);
   return new Set(orders).size === orders.length;
 }
 
-function toCaseArtifacts(output: ModelCaseOutput, input: NormalizedCaseInput): { analysis: CaseAnalysis; profile: CaseProfile } {
+function toCaseArtifacts(rawOutput: ModelCaseOutput, input: NormalizedCaseInput): { analysis: CaseAnalysis; profile: CaseProfile } {
+  // The model can keep finding "one more" consequential detail. Cap the exchange
+  // deterministically so the user always reaches a route instead of looping.
+  const answeredCount = input.clarificationResolution
+    ? (input.clarificationResolution.answerHistory?.length ?? 0) + 1
+    : 0;
+  const cappedOutput: ModelCaseOutput = answeredCount >= MAX_CLARIFICATION_QUESTIONS
+    ? {
+        ...rawOutput,
+        clarification: {
+          ...rawOutput.clarification,
+          needed: false,
+          question: null,
+          sufficiencyReason: "Enough detail has been gathered to finalize the route. Any remaining uncertainty is listed as an open point rather than another question.",
+        },
+      }
+    : rawOutput;
+  // Once the route is final there is no pending question, so a step must not
+  // tell the user it "needs your answer" — nothing is waiting on them here.
+  const output: ModelCaseOutput = cappedOutput.clarification.needed
+    ? cappedOutput
+    : {
+        ...cappedOutput,
+        nextSteps: cappedOutput.nextSteps.map((step) =>
+          step.status === "needs-answer" ? { ...step, status: "ready" as const } : step),
+      };
   const question = toClarificationQuestion(output, input);
   const profileId = `profile-openai-${input.receivedAt}`;
   const analysis: CaseAnalysis = {
@@ -228,7 +262,6 @@ function toCaseArtifacts(output: ModelCaseOutput, input: NormalizedCaseInput): {
     inputKind: input.kind,
     category: input.category,
     mockContext: "OpenAI interpreted the supplied case content. Official sources have not yet been researched or verified.",
-    isMock: false,
   };
   const knownFacts: CaseProfileField[] = output.profileFacts;
   const profile: CaseProfile = {
@@ -240,13 +273,22 @@ function toCaseArtifacts(output: ModelCaseOutput, input: NormalizedCaseInput): {
     category: input.category,
     evidence: evidenceFromInput(input),
     knownFacts,
-    answers: input.clarificationResolution ? [{
-      questionId: input.clarificationResolution.questionId,
-      answerId: input.clarificationResolution.answerId,
-      label: input.clarificationResolution.answerLabel,
-      routeImpact: "The model rebuilt the structured profile and route using this answer.",
-      answeredAt: input.receivedAt,
-    }] : [],
+    answers: input.clarificationResolution ? [
+      ...(input.clarificationResolution.answerHistory ?? []).map((entry) => ({
+        questionId: entry.questionId,
+        answerId: entry.questionId,
+        label: entry.answerLabel,
+        routeImpact: "An earlier answer that remains part of the case profile.",
+        answeredAt: input.receivedAt,
+      })),
+      {
+        questionId: input.clarificationResolution.questionId,
+        answerId: input.clarificationResolution.answerId,
+        label: input.clarificationResolution.answerLabel,
+        routeImpact: "The model rebuilt the structured profile and route using this answer.",
+        answeredAt: input.receivedAt,
+      },
+    ] : [],
     uncertainties: output.profileUncertainties.map((item) => ({ ...item, status: "unresolved" })),
     outputLanguage: input.outputLanguage,
     sufficiency: {
@@ -254,10 +296,11 @@ function toCaseArtifacts(output: ModelCaseOutput, input: NormalizedCaseInput): {
       reason: output.clarification.sufficiencyReason,
       nextQuestionId: output.clarification.question?.id ?? null,
     },
-    askedQuestionIds: [
+    askedQuestionIds: Array.from(new Set([
+      ...(input.clarificationResolution?.answerHistory ?? []).map((entry) => entry.questionId),
       ...(input.clarificationResolution ? [input.clarificationResolution.questionId] : []),
       ...(output.clarification.question ? [output.clarification.question.id] : []),
-    ].slice(0, MAX_CLARIFICATION_QUESTIONS),
+    ])),
     correctionHistory: [],
     status: output.clarification.needed ? "building" : "route-ready",
     createdAt: input.receivedAt,

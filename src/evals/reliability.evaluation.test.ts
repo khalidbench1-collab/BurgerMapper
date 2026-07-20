@@ -55,7 +55,8 @@ describe("BurgerMapper synthetic release evaluation", () => {
   it("keeps Luna instructions serious, schema-first, and injection-resistant", () => {
     const instruction = `${OPENAI_CASE_BUILDER_INSTRUCTION}\n${UNTRUSTED_DOCUMENT_SECURITY_INSTRUCTION}\n${OFFICIAL_SOURCE_SECURITY_INSTRUCTION}`;
     expect(instruction).toContain("at most one question");
-    expect(instruction).toContain("dont-know");
+    expect(instruction).toContain("custom-answer");
+    expect(instruction).toContain("exactly two answer options");
     expect(instruction).toContain("Never provide or expose hidden reasoning");
     expect(instruction).toContain("never override");
     expect(instruction).toContain("cannot trigger another action");

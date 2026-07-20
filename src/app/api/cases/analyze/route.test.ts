@@ -14,10 +14,15 @@ import { createSyntheticModelCaseOutput } from "@/server/cases/openai/fixtures.t
 
 const SUCCESS_OPTIONS = {
   runtimeConfiguration: {
-    mockEnabled: true,
-    openAiApiKeyConfigured: false,
+    openAiApiKeyConfigured: true,
+    openAiApiKey: "synthetic-test-key",
+    openAiModel: "gpt-5.6-luna",
   },
-  mockDelayMs: 0,
+  openAiTransport: {
+    async parse() {
+      return { outputParsed: createSyntheticModelCaseOutput() };
+    },
+  },
   now: () => new Date("2026-07-18T12:00:00.000Z"),
   createRequestId: () => "request-synthetic-001",
 } as const;
@@ -34,7 +39,6 @@ describe("POST /api/cases/analyze", () => {
     expect(response.status).toBe(200);
     expect(payload.analysis.inputKind).toBe("goal");
     expect(payload.metadata.inputKind).toBe("goal");
-    expect(payload.analysis.mockContext).toContain("goal was validated in memory");
     expect(JSON.stringify(payload)).not.toContain(privateGoal);
   });
 
@@ -57,12 +61,11 @@ describe("POST /api/cases/analyze", () => {
       inputKind: "text",
       category: "arrival-registration",
       outputLanguage: "en",
-      isMock: true,
     });
-    expect(payload.analysis.nextSteps).toHaveLength(4);
+    expect(payload.analysis.nextSteps).toHaveLength(1);
     expect(payload.metadata).toEqual({
       requestId: "request-synthetic-001",
-      processingMode: "mock",
+      processingMode: "openai",
       inputKind: "text",
       receivedAt: "2026-07-18T12:00:00.000Z",
       retentionStatus: "discarded-after-processing",
@@ -160,7 +163,6 @@ describe("POST /api/cases/analyze", () => {
     const response = await handleAnalyzeCaseRequest(createRequest(formData), {
       ...SUCCESS_OPTIONS,
       runtimeConfiguration: {
-        mockEnabled: false,
         openAiApiKeyConfigured: false,
       },
     });
@@ -174,15 +176,8 @@ describe("POST /api/cases/analyze", () => {
   it("requires explicit consent before a configured real transfer", async () => {
     const formData = baseForm("goal");
     formData.set(CASE_FORM_FIELDS.goal, "Renew a fictional residence permit safely.");
-    const response = await handleAnalyzeCaseRequest(createRequest(formData), {
-      ...SUCCESS_OPTIONS,
-      runtimeConfiguration: {
-        mockEnabled: false,
-        openAiApiKeyConfigured: true,
-        openAiApiKey: "synthetic-test-key",
-        openAiModel: "gpt-5.6-luna",
-      },
-    });
+    formData.delete(CASE_FORM_FIELDS.consentToOpenAI);
+    const response = await handleAnalyzeCaseRequest(createRequest(formData), SUCCESS_OPTIONS);
     const payload = (await response.json()) as AnalyzeCaseErrorResponse;
     expect(response.status).toBe(403);
     expect(payload.error.code).toBe("CONSENT_REQUIRED");
@@ -196,7 +191,6 @@ describe("POST /api/cases/analyze", () => {
     const response = await handleAnalyzeCaseRequest(createRequest(formData), {
       ...SUCCESS_OPTIONS,
       runtimeConfiguration: {
-        mockEnabled: false,
         openAiApiKeyConfigured: true,
         openAiApiKey: "synthetic-test-key",
         openAiModel: "gpt-5.6-luna",
@@ -210,7 +204,6 @@ describe("POST /api/cases/analyze", () => {
     const payload = (await response.json()) as AnalyzeCaseSuccessResponse;
     expect(response.status).toBe(200);
     expect(payload.metadata.processingMode).toBe("openai");
-    expect(payload.analysis.isMock).toBe(false);
     expect(payload.profile?.sufficiency.state).toBe("needs-clarification");
     expect(response.headers.get("x-burgermapper-retention")).toBe("discarded-after-processing");
     expect(JSON.stringify(payload)).not.toContain(privateGoal);
@@ -251,6 +244,7 @@ function baseForm(kind: string): FormData {
   const formData = new FormData();
   formData.set(CASE_FORM_FIELDS.kind, kind);
   formData.set(CASE_FORM_FIELDS.outputLanguage, "en");
+  formData.set(CASE_FORM_FIELDS.consentToOpenAI, "true");
   return formData;
 }
 

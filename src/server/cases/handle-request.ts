@@ -73,16 +73,15 @@ export async function handleAnalyzeCaseRequest(
     );
     const configuration =
       options.runtimeConfiguration ?? readAnalysisRuntimeConfiguration();
-    if (!configuration.mockEnabled && (!configuration.openAiApiKeyConfigured || !configuration.openAiApiKey?.trim())) {
+    if (!configuration.openAiApiKeyConfigured || !configuration.openAiApiKey?.trim()) {
       throw new CaseRequestError("API_NOT_CONFIGURED", 503);
     }
-    if (!configuration.mockEnabled && formData.get(CASE_FORM_FIELDS.consentToOpenAI) !== "true") {
+    if (formData.get(CASE_FORM_FIELDS.consentToOpenAI) !== "true") {
       throw new CaseRequestError("CONSENT_REQUIRED", 403);
     }
     const providerResult = await runConfiguredAnalysis(
       normalizedInput,
       configuration,
-      options.mockDelayMs,
       { transport: options.openAiTransport, signal: request.signal },
     );
 

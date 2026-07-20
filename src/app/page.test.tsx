@@ -55,18 +55,21 @@ describe("Home", () => {
     );
   });
 
-  it("describes mock mode honestly when mock analysis is enabled", () => {
+  it("always describes the real analysis route with no demo variant", () => {
     process.env.ENABLE_MOCK_AI = "true";
     render(<Home />);
 
-    expect(screen.getByText(/never sent to an AI provider/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/official-source citations/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/demo route/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Demo mode/i)).not.toBeInTheDocument();
   });
 
-  it("describes consent-gated OpenAI analysis when real mode is enabled", () => {
+  it("keeps the hero free of the privacy paragraph and shows the Beta badge", () => {
     process.env.ENABLE_MOCK_AI = "false";
     render(<Home />);
 
-    expect(screen.getByText(/sent to OpenAI for analysis only after you explicitly agree/i)).toBeInTheDocument();
+    expect(screen.queryByText(/sent to OpenAI for analysis only after you explicitly agree/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/never sent to an AI provider/i)).not.toBeInTheDocument();
+    expect(screen.getByText("Beta")).toBeInTheDocument();
   });
 });

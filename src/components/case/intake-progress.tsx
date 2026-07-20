@@ -2,7 +2,7 @@ import type { WorkflowStatus } from "@/domain/case";
 
 const steps = [
   { id: "understanding", label: "Understanding your goal" },
-  { id: "clarification", label: "Need one detail" },
+  { id: "clarification", label: "Gathering context" },
   { id: "route", label: "Route ready" },
 ];
 

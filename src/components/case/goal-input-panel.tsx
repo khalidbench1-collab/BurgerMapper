@@ -1,21 +1,34 @@
-import {
-  MAX_GOAL_CHARACTERS,
-  MIN_GOAL_MEANINGFUL_CHARACTERS,
-} from "@/lib/goal-validation";
+"use client";
+
+import { useRef, type ReactNode } from "react";
+
+import type { UploadedDocument } from "@/domain/case";
+import { FILE_PICKER_ACCEPT, formatFileSize } from "@/lib/file-validation";
+import { MAX_GOAL_CHARACTERS } from "@/lib/goal-validation";
 
 export function GoalInputPanel({
   value,
   error,
   onChange,
   disabled = false,
-  mode = "mock",
+  document = null,
+  uploadError = null,
+  onFileSelected,
+  onRemoveDocument,
+  action,
 }: {
   value: string;
   error: string | null;
   onChange: (value: string) => void;
   disabled?: boolean;
-  mode?: "mock" | "openai";
+  document?: UploadedDocument | null;
+  uploadError?: string | null;
+  onFileSelected?: (file: File) => void;
+  onRemoveDocument?: () => void;
+  action?: ReactNode;
 }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   return (
     <section className="rounded-[1.5rem] border border-[#bfcfc6] bg-white p-5 shadow-[0_14px_45px_rgba(29,47,38,0.06)] sm:p-7">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#237b59]">
@@ -38,30 +51,86 @@ export function GoalInputPanel({
       <label htmlFor="case-goal" className="sr-only">
         What do you need to get done?
       </label>
-      <textarea
-        id="case-goal"
-        value={value}
-        maxLength={MAX_GOAL_CHARACTERS}
-        rows={4}
-        disabled={disabled}
-        aria-describedby="goal-help goal-character-count goal-validation-error"
-        aria-invalid={Boolean(error)}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder="For example: I need to renew my residence permit and understand what documents are missing."
-        className={`mt-5 w-full resize-y rounded-2xl border bg-[#fcfcfa] px-4 py-3 text-base leading-7 text-[#27352e] outline-none placeholder:text-[#87918b] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:cursor-not-allowed disabled:opacity-60 ${
-          error ? "border-[#bd5b42]" : "border-[#aebdb5]"
-        }`}
-      />
+      <div className="relative mt-5">
+        <textarea
+          id="case-goal"
+          value={value}
+          maxLength={MAX_GOAL_CHARACTERS}
+          rows={4}
+          disabled={disabled}
+          aria-describedby="goal-character-count goal-validation-error"
+          aria-invalid={Boolean(error)}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder="For example: I need to renew my residence permit and understand what documents are missing."
+          className={`w-full resize-y rounded-2xl border bg-[#fcfcfa] px-4 py-3 pe-14 text-base leading-7 text-[#27352e] outline-none placeholder:text-[#87918b] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:cursor-not-allowed disabled:opacity-60 ${
+            error ? "border-[#bd5b42]" : "border-[#aebdb5]"
+          }`}
+        />
+        {onFileSelected ? (
+          <>
+            <input
+              ref={fileInputRef}
+              id="goal-document-file"
+              type="file"
+              aria-label="Attach a PDF or image"
+              accept={FILE_PICKER_ACCEPT}
+              disabled={disabled}
+              className="sr-only"
+              onChange={(event) => {
+                const file = event.target.files?.item(0);
+                if (file) onFileSelected(file);
+                event.target.value = "";
+              }}
+            />
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => fileInputRef.current?.click()}
+              aria-label="Attach a PDF or image (optional)"
+              title="Attach a PDF or image (optional)"
+              className="absolute bottom-3 end-3 flex h-9 w-9 items-center justify-center rounded-lg text-[#9aa6a0] outline-none hover:bg-[#f0f4f1] hover:text-[#5d6862] focus-visible:ring-3 focus-visible:ring-[#176b4d]/35 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <svg
+                aria-hidden="true"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 16V4" />
+                <path d="m7 9 5-5 5 5" />
+                <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
+              </svg>
+            </button>
+          </>
+        ) : null}
+      </div>
+      {document && onRemoveDocument ? (
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-[#cdd5d0] bg-[#f8fbf9] px-4 py-2.5">
+          <p className="min-w-0 truncate text-sm text-[#31413a]">
+            <span className="font-semibold">{document.metadata.name}</span>
+            <span className="ms-2 text-[#68736d]">
+              {formatFileSize(document.metadata.sizeBytes)} · in memory only
+            </span>
+          </p>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={onRemoveDocument}
+            className="shrink-0 rounded-lg px-2.5 py-1.5 text-sm font-semibold text-[#8c3b2c] outline-none hover:bg-[#f9e9e5] focus-visible:ring-3 focus-visible:ring-[#a94d36]/30 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Remove
+          </button>
+        </div>
+      ) : null}
       <p id="goal-validation-error" role="alert" className="mt-2 min-h-6 text-sm font-medium text-[#a33f2d]">
-        {error}
+        {[error, uploadError].filter(Boolean).join(" ")}
       </p>
-      <p id="goal-help" className="mt-1 text-sm leading-6 text-[#68736d]">
-        Use at least {MIN_GOAL_MEANINGFUL_CHARACTERS} non-whitespace characters.
-        Your goal stays in browser/request memory and is not logged or stored.{" "}
-        {mode === "mock"
-          ? "Demo mode does not send it to an AI provider."
-          : "It is sent to OpenAI only after you agree below."}
-      </p>
+      {action ? <div className="mt-1">{action}</div> : null}
     </section>
   );
 }

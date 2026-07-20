@@ -58,7 +58,7 @@ export function SourceList({ analysis }: { analysis: CaseAnalysis }) {
 function sourceStatusCopy(language: CaseAnalysis["outputLanguage"]) {
   return {
     en: {
-      summary: { "not-started": "Official research has not started.", verified: "Verified official sources are linked only to the claims they support.", partial: "Some route claims have official support; unresolved claims remain clearly marked.", "no-sources": "No adequate official source was found for this mock topic.", conflict: "Official sources conflict or differ in scope.", unavailable: "Official-source research is temporarily unavailable." },
+      summary: { "not-started": "Official research has not started.", verified: "Verified official sources are linked only to the claims they support.", partial: "Some route claims have official support; unresolved claims remain clearly marked.", "no-sources": "No adequate official source was found for this topic.", conflict: "Official sources conflict or differ in scope.", unavailable: "Official-source research is temporarily unavailable." },
       verification: { "placeholder-unverified": "Not verified", "needs-review": "Needs review", verified: "Verified official source", unavailable: "Unavailable", conflicting: "Conflict" },
       supports: "Supports", accessed: "Accessed", escalation: "Verify next",
     },

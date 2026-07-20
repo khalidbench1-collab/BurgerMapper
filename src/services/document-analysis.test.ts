@@ -30,7 +30,6 @@ describe("MockDocumentAnalysisService", () => {
         outputLanguage,
         inputKind: "sample",
         category: null,
-        isMock: true,
       });
       expect(result.summary).toEqual(expect.any(String));
       expect(result.mockContext).toEqual(expect.any(String));

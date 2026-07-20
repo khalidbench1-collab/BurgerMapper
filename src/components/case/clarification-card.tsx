@@ -1,18 +1,35 @@
+"use client";
+
+import { useState } from "react";
+
 import type {
   CaseAnalysis,
   ClarificationAnswerId,
 } from "@/domain/case";
 import { RESULT_COPY } from "@/i18n/case-copy";
 
+export const CUSTOM_CLARIFICATION_ANSWER_ID = "custom-answer";
+const VISIBLE_OPTION_COUNT = 2;
+
 export function ClarificationCard({
   analysis,
   onAnswer,
+  onAnswerText,
 }: {
   analysis: CaseAnalysis;
   onAnswer: (answer: ClarificationAnswerId) => void;
+  onAnswerText?: (text: string) => void;
 }) {
   const copy = RESULT_COPY[analysis.outputLanguage];
   const question = analysis.clarificationQuestion;
+  const options = question.options.slice(0, VISIBLE_OPTION_COUNT);
+  const customSelected = question.selectedAnswerId === CUSTOM_CLARIFICATION_ANSWER_ID;
+  const [customText, setCustomText] = useState("");
+
+  function submitCustomAnswer() {
+    const text = customText.trim();
+    if (text && onAnswerText) onAnswerText(text);
+  }
 
   return (
     <section aria-labelledby="clarification-heading" className="rounded-2xl border-2 border-[#e3b276] bg-[#fffaf0] p-5 sm:p-6">
@@ -29,8 +46,8 @@ export function ClarificationCard({
 
       <fieldset className="mt-5">
         <legend className="sr-only">{question.prompt}</legend>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {question.options.map((option) => {
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {options.map((option) => {
             const selected = question.selectedAnswerId === option.id;
             return (
               <label
@@ -59,6 +76,42 @@ export function ClarificationCard({
               </label>
             );
           })}
+          {onAnswerText ? (
+            <div
+              className={`rounded-xl border p-4 ${
+                customSelected
+                  ? "border-[#9b6728] bg-white shadow-sm"
+                  : "border-[#e2cfad] bg-[#fffdf8]"
+              }`}
+            >
+              <label htmlFor="clarification-custom-answer" className="font-semibold text-[#3d3020]">
+                {copy.typeAnswerLabel}
+              </label>
+              <input
+                id="clarification-custom-answer"
+                type="text"
+                maxLength={500}
+                value={customText}
+                onChange={(event) => setCustomText(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    submitCustomAnswer();
+                  }
+                }}
+                placeholder={copy.typeAnswerPlaceholder}
+                className="mt-3 w-full rounded-lg border border-[#dcc69c] bg-white px-3 py-2 text-sm text-[#3d3020] outline-none placeholder:text-[#a89877] focus-visible:ring-3 focus-visible:ring-[#9b6728]/30"
+              />
+              <button
+                type="button"
+                disabled={!customText.trim()}
+                onClick={submitCustomAnswer}
+                className="mt-3 rounded-lg bg-[#8b5a20] px-4 py-2 text-sm font-semibold text-white outline-none hover:bg-[#744a19] focus-visible:ring-3 focus-visible:ring-[#9b6728]/40 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {copy.typeAnswerSubmit}
+              </button>
+            </div>
+          ) : null}
         </div>
       </fieldset>
 

@@ -49,6 +49,11 @@ describe("cited route rendering", () => {
   it("labels the detected deadline as an unverified document fact", () => {
     render(<DeadlineCard analysis={researchedArabicAnalysis()} />);
     expect(screen.getByText(/حقيقة من المستند/)).toBeInTheDocument();
-    expect(screen.getByText(/أكّد هذا التاريخ من الخطاب الأصلي/)).toBeInTheDocument();
+    expect(screen.getByText(/أكّد هذا التاريخ من وثيقتك الأصلية/)).toBeInTheDocument();
+  });
+
+  it("hides the confirm-this-date note when no deadline was detected", () => {
+    render(<DeadlineCard analysis={{ ...researchedArabicAnalysis(), detectedDeadline: "" }} />);
+    expect(screen.queryByText(/حقيقة من المستند/)).not.toBeInTheDocument();
   });
 });

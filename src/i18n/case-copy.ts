@@ -19,16 +19,21 @@ interface ResultCopy {
   deadline: string;
   urgency: string;
   summary: string;
+  summaryFromGoal: string;
   deadlineAndUrgency: string;
   firstAction: string;
   authorityWants: string;
   documents: string;
   clarification: string;
+  openPoints: string;
   nextSteps: string;
   sources: string;
   limitation: string;
   whyWeAsk: string;
   routeUpdated: string;
+  typeAnswerLabel: string;
+  typeAnswerPlaceholder: string;
+  typeAnswerSubmit: string;
   placeholderSource: string;
   sourceNotAccessed: string;
   supports: string;
@@ -50,16 +55,21 @@ export const RESULT_COPY: Record<SupportedLanguage, ResultCopy> = {
     deadline: "Detected deadline",
     urgency: "Urgency",
     summary: "What this letter says",
+    summaryFromGoal: "What this means for your case",
     deadlineAndUrgency: "Deadline and urgency",
     firstAction: "Your first action",
     authorityWants: "What the authority wants",
     documents: "Documents to prepare",
     clarification: "One question before the route is final",
+    openPoints: "Open points to confirm",
     nextSteps: "Your next steps",
     sources: "Official sources",
     limitation: "Important limitation",
     whyWeAsk: "Why this changes the route",
     routeUpdated: "Route updated for your answer",
+    typeAnswerLabel: "Neither — type your answer",
+    typeAnswerPlaceholder: "For example: my permit visa is …",
+    typeAnswerSubmit: "Use this answer",
     placeholderSource: "Placeholder — not verified",
     sourceNotAccessed: "Not accessed or verified yet",
     supports: "Intended to support",
@@ -83,16 +93,21 @@ export const RESULT_COPY: Record<SupportedLanguage, ResultCopy> = {
     deadline: "Erkannte Frist",
     urgency: "Dringlichkeit",
     summary: "Was in diesem Schreiben steht",
+    summaryFromGoal: "Was das für Ihren Fall bedeutet",
     deadlineAndUrgency: "Frist und Dringlichkeit",
     firstAction: "Ihr erster Schritt",
     authorityWants: "Was die Behörde verlangt",
     documents: "Vorzubereitende Unterlagen",
     clarification: "Eine Frage, bevor der Weg feststeht",
+    openPoints: "Offene Punkte zur Klärung",
     nextSteps: "Ihre nächsten Schritte",
     sources: "Offizielle Quellen",
     limitation: "Wichtige Einschränkung",
     whyWeAsk: "Warum diese Antwort den Weg verändert",
     routeUpdated: "Der Weg wurde an Ihre Antwort angepasst",
+    typeAnswerLabel: "Keins davon — Antwort eingeben",
+    typeAnswerPlaceholder: "Zum Beispiel: Mein Aufenthaltstitel ist …",
+    typeAnswerSubmit: "Antwort verwenden",
     placeholderSource: "Platzhalter — nicht verifiziert",
     sourceNotAccessed: "Noch nicht aufgerufen oder verifiziert",
     supports: "Soll später belegen",
@@ -116,16 +131,21 @@ export const RESULT_COPY: Record<SupportedLanguage, ResultCopy> = {
     deadline: "المهلة المكتشفة",
     urgency: "درجة الاستعجال",
     summary: "ماذا يقول هذا الخطاب",
+    summaryFromGoal: "ماذا يعني هذا لحالتك",
     deadlineAndUrgency: "المهلة ودرجة الاستعجال",
     firstAction: "خطوتك الأولى",
     authorityWants: "ماذا تطلب الجهة",
     documents: "المستندات المطلوب تجهيزها",
     clarification: "سؤال واحد قبل تثبيت المسار",
+    openPoints: "نقاط مفتوحة بحاجة إلى تأكيد",
     nextSteps: "خطواتك التالية",
     sources: "المصادر الرسمية",
     limitation: "تنبيه مهم",
     whyWeAsk: "لماذا تغيّر هذه الإجابة المسار",
     routeUpdated: "تم تحديث المسار وفق إجابتك",
+    typeAnswerLabel: "لا شيء مما سبق — اكتب إجابتك",
+    typeAnswerPlaceholder: "مثال: تصريح إقامتي هو …",
+    typeAnswerSubmit: "استخدام هذه الإجابة",
     placeholderSource: "مصدر مؤقت — غير متحقق منه",
     sourceNotAccessed: "لم تتم زيارته أو التحقق منه بعد",
     supports: "مخصص لاحقًا لدعم",

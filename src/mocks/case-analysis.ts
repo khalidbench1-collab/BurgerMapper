@@ -648,7 +648,6 @@ export function buildMockCaseAnalysis(input: CaseInput): CaseAnalysis {
     inputKind: input.kind,
     category: input.category ?? null,
     mockContext: MOCK_CONTEXT[outputLanguage][input.kind],
-    isMock: true,
   };
 }
 

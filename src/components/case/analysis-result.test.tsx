@@ -43,7 +43,8 @@ describe("AnalysisResult", () => {
 
     const deadlineHeading = screen.getByRole("heading", { name: RESULT_COPY.en.deadlineAndUrgency });
     const firstActionHeading = screen.getByRole("heading", { name: RESULT_COPY.en.firstAction });
-    const summaryHeading = screen.getByRole("heading", { name: RESULT_COPY.en.summary });
+    // The fixture is a goal-only case, so the summary heading must not claim a letter.
+    const summaryHeading = screen.getByRole("heading", { name: RESULT_COPY.en.summaryFromGoal });
 
     expect(deadlineHeading.compareDocumentPosition(firstActionHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(firstActionHeading.compareDocumentPosition(summaryHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();

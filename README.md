@@ -61,13 +61,13 @@ The current official-source provider is a deterministic server-side snapshot ins
 - User-facing source status copy no longer references internal build-phase names in any language.
 - The PWA manifest describes the goal-first product, declares the favicon as an installability icon, and makes no offline claim.
 - The Build Week phase label was removed from the header in favor of the permanent independent-guide identity.
-- All user-visible copy now uses customer vocabulary: "Demo mode", "demo route", and "example letter"/"example case" replace the internal "mock" and "fictional sample" terms, and no rendered text references Build Week, prototypes, or build phases. Internal identifiers (`ENABLE_MOCK_AI`, `isMock`, mock providers, sample IDs) are unchanged. Every honesty obligation remains in product language: demo routes state that they come from an example case, were not interpreted by AI, are not legal advice, and cite unverified sources as such.
+- All user-visible copy uses customer vocabulary and no rendered text references Build Week, prototypes, or build phases. Every honesty obligation remains in product language: routes are orientation only, are not legal advice, and cite unverified sources as such.
 
-## Mock configuration
+## Analysis configuration
 
-- `ENABLE_MOCK_AI=true` selects the server-side mock provider and makes no external AI request.
-- `ENABLE_MOCK_AI=false` selects the server-side OpenAI provider. A non-empty private `OPENAI_API_KEY` is required or the endpoint returns `API_NOT_CONFIGURED`.
-- If `ENABLE_MOCK_AI` is unset, mock mode defaults on only outside production. An unset production configuration is disabled to avoid accidental mock behavior.
+- BurgerMapper runs **real OpenAI analysis only**. There is no demo or mock mode: a missing key returns `API_NOT_CONFIGURED` rather than silently serving an example case that does not reflect the user's input.
+- `OPENAI_API_KEY` is required. A non-empty private key must be configured or the endpoint returns `API_NOT_CONFIGURED`.
+- `ENABLE_MOCK_AI` is no longer read by the application. Any value it holds is ignored.
 - `OPENAI_MODEL` defaults to `gpt-5.6-luna` and remains configurable on the server.
 - `OPENAI_API_KEY` remains server-only. No `NEXT_PUBLIC` secret or model credential exists.
 - Real analysis requires an explicit checkbox immediately before transfer. A configured key or funded balance alone never triggers a request.
@@ -130,14 +130,13 @@ The safe environment template contains:
 ```text
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-5.6-luna
-ENABLE_MOCK_AI=true
 ```
 
-No API key is required for mock mode. To test real mode, configure the key privately in `.env.local`, set `ENABLE_MOCK_AI=false`, and leave the key out of source, browser code, logs, screenshots, and conversation. Never commit `.env.local`.
+A private `OPENAI_API_KEY` is required to analyze anything. Configure it privately in `.env.local` and leave the key out of source, browser code, logs, screenshots, and conversation. Never commit `.env.local`.
 
 ## Current implementation status
 
-Phases 6 and 7 are complete. The experience now leads with the deadline and first action, keeps a visible non-government identity, and offers local print and plain-text export of the route. A user can start with a goal alone or add pasted text, PDF/image evidence, the trusted sample, an optional category, and an output language. The analysis boundary returns `CaseAnalysis` plus an optional structured `CaseProfile`; after sufficiency, the source-research boundary returns atomic claims, official evidence, and step mappings. Real analysis remains consent-gated and mock analysis remains fully operational without a key. Process-local anonymous limits, safe source-outage behavior, content-free cost/latency metrics, and machine-checkable synthetic release blockers now guard these paths.
+Phases 6 and 7 are complete. The experience now leads with the deadline and first action, keeps a visible non-government identity, and offers local print and plain-text export of the route. A user can start with a goal alone or add pasted text, PDF/image evidence, the trusted sample, an optional category, and an output language. The analysis boundary returns `CaseAnalysis` plus an optional structured `CaseProfile`; after sufficiency, the source-research boundary returns atomic claims, official evidence, and step mappings. Real analysis is the only mode and remains consent-gated; without a configured key the endpoint fails closed with `API_NOT_CONFIGURED`. Process-local anonymous limits, safe source-outage behavior, content-free cost/latency metrics, and machine-checkable synthetic release blockers now guard these paths.
 
 The automated suite contains 155 passing tests across 22 files. `npm run eval` separately passes 5 release-evaluation tests over 11 versioned synthetic cases. Automated provider and evaluation tests use injected or deterministic synthetic data and cannot spend API credit. One separately authorized, bounded synthetic Luna smoke request succeeded during Phase 5 on 2026-07-18 with 77 total tokens and an estimated cost of USD 0.000227; Phase 6 made no OpenAI call and recorded no prompt or output content.
 

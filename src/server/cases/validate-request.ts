@@ -1,6 +1,6 @@
 import { CASE_FORM_FIELDS } from "@/domain/analysis-api";
 import { isBureaucracyCategory } from "@/domain/categories";
-import type { InputKind, SupportedLanguage } from "@/domain/case";
+import type { ClarificationAnswerSummary, InputKind, SupportedLanguage } from "@/domain/case";
 import { isKnownSampleId } from "@/domain/samples";
 import {
   MAX_FILE_SIZE_BYTES,
@@ -14,6 +14,7 @@ import {
   MAX_GOAL_CHARACTERS,
   validateCaseGoal,
 } from "@/lib/goal-validation";
+import { MAX_CLARIFICATION_QUESTIONS } from "@/server/cases/openai/config";
 import { CaseRequestError } from "@/server/cases/errors";
 import type {
   NormalizedCaseInput,
@@ -169,7 +170,7 @@ export async function normalizeAnalyzeCaseFormData(
 
 function parseClarificationResolution(value: string | null) {
   if (!value) return null;
-  if (value.length > 2_000) throw new CaseRequestError("INVALID_REQUEST", 400);
+  if (value.length > 6_000) throw new CaseRequestError("INVALID_REQUEST", 400);
   try {
     const parsed: unknown = JSON.parse(value);
     if (!parsed || typeof parsed !== "object") throw new Error("invalid");
@@ -186,7 +187,9 @@ function parseClarificationResolution(value: string | null) {
       return { id: item.id.trim(), label: item.label.trim(), routeImpact: item.routeImpact.trim() };
     });
     if (new Set(options.map((option) => option.id)).size !== options.length) throw new Error("invalid");
+    const answerHistory = parseAnswerHistory(candidate.answerHistory);
     return {
+      answerHistory,
       questionId: (candidate.questionId as string).trim(),
       questionPrompt: (candidate.questionPrompt as string).trim(),
       questionReason: (candidate.questionReason as string).trim(),
@@ -197,6 +200,23 @@ function parseClarificationResolution(value: string | null) {
   } catch {
     throw new CaseRequestError("INVALID_REQUEST", 400);
   }
+}
+
+function parseAnswerHistory(value: unknown): ClarificationAnswerSummary[] {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value) || value.length > MAX_CLARIFICATION_QUESTIONS) throw new Error("invalid");
+  return value.map((entry) => {
+    if (!entry || typeof entry !== "object") throw new Error("invalid");
+    const item = entry as Record<string, unknown>;
+    const fields = ["questionId", "questionPrompt", "answerLabel"] as const;
+    if (fields.some((field) => typeof item[field] !== "string" || !(item[field] as string).trim())) throw new Error("invalid");
+    if (fields.some((field) => (item[field] as string).length > 500)) throw new Error("invalid");
+    return {
+      questionId: (item.questionId as string).trim(),
+      questionPrompt: (item.questionPrompt as string).trim(),
+      answerLabel: (item.answerLabel as string).trim(),
+    };
+  });
 }
 
 function getSingleString(

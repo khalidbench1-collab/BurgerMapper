@@ -20,7 +20,7 @@ export function buildRouteExportText(analysis: CaseAnalysis): string {
 
   lines.push("BurgerMapper");
   lines.push(analysis.documentTitle);
-  lines.push(analysis.isMock ? copy.mockBadge : "OpenAI analysis");
+  lines.push("OpenAI analysis");
   lines.push("");
 
   lines.push(`${copy.deadlineAndUrgency}`);

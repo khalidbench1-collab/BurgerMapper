@@ -8,7 +8,7 @@ import { buildInitialOpenAIRequest } from "@/server/cases/openai/request";
 import { OPENAI_CASE_BUILDER_INSTRUCTION } from "@/server/cases/openai/prompts";
 import type { ModelCaseOutput } from "@/server/cases/openai/schemas";
 import type { NormalizedCaseInput, SupportedFileMimeType } from "@/server/cases/types";
-import { readAnalysisRuntimeConfiguration } from "@/server/cases/provider";
+import { readAnalysisRuntimeConfiguration, runConfiguredAnalysis } from "@/server/cases/provider";
 
 const VALID_OUTPUT: ModelCaseOutput = {
   profileGoal: "Renew a fictional residence permit.",
@@ -66,7 +66,7 @@ describe("OpenAICaseBuilderProvider", () => {
     const result = await provider(transport).analyze(goalInput());
 
     expect(result.processingMode).toBe("openai");
-    expect(result.analysis).toMatchObject({ isMock: false, inputKind: "goal", officialSources: [] });
+    expect(result.analysis).toMatchObject({ inputKind: "goal", officialSources: [] });
     expect(result.profile).toMatchObject({ status: "building", sufficiency: { state: "needs-clarification" } });
     expect(transport.requests).toHaveLength(1);
   });
@@ -99,9 +99,95 @@ describe("OpenAICaseBuilderProvider", () => {
     expect(result.profile?.answers[0]).toMatchObject({ questionId: "employment-status", answerId: "employed" });
   });
 
+  it("stops asking once the clarification cap is reached even if the model wants another question", async () => {
+    const input = goalInput();
+    input.clarificationResolution = {
+      questionId: "permit-status",
+      questionPrompt: "Is your permit still valid?",
+      questionReason: "The answer changes urgency.",
+      answerId: "still-valid",
+      answerLabel: "It is still valid",
+      options: VALID_OUTPUT.clarification.question!.options,
+      answerHistory: [
+        { questionId: "permit-expiry", questionPrompt: "When does it expire?", answerLabel: "2026-11-30" },
+        { questionId: "activity-wording", questionPrompt: "What wording is on the permit?", answerLabel: "Freiberufliche Tätigkeit" },
+      ],
+    };
+    // VALID_OUTPUT still carries clarification.needed = true with a question.
+    const result = await provider(new SequenceTransport([VALID_OUTPUT])).analyze(input);
+
+    expect(result.profile?.sufficiency).toMatchObject({ state: "sufficient", nextQuestionId: null });
+    expect(result.profile?.status).toBe("route-ready");
+    expect(result.profile?.answers.map((answer) => answer.label)).toEqual([
+      "2026-11-30",
+      "Freiberufliche Tätigkeit",
+      "It is still valid",
+    ]);
+  });
+
+  it("carries every earlier answer into the prompt so the model cannot repeat a question", () => {
+    const input = goalInput();
+    input.clarificationResolution = {
+      questionId: "permit-status",
+      questionPrompt: "Is your permit still valid?",
+      questionReason: "The answer changes urgency.",
+      answerId: "still-valid",
+      answerLabel: "It is still valid",
+      options: VALID_OUTPUT.clarification.question!.options,
+      answerHistory: [
+        { questionId: "permit-expiry", questionPrompt: "When does it expire?", answerLabel: "2026-11-30" },
+      ],
+    };
+    const serialized = JSON.stringify(buildInitialOpenAIRequest(input, "gpt-5.6-luna").input);
+    expect(serialized).toContain("When does it expire?");
+    expect(serialized).toContain("2026-11-30");
+    expect(serialized).toContain("never ask any of these again");
+  });
+
+  it("clears needs-answer step status once the route is final so no step implies a pending question", async () => {
+    const output = structuredClone(VALID_OUTPUT);
+    output.clarification = { needed: false, question: null, sufficiencyReason: "The profile is sufficient." };
+    output.nextSteps[0].status = "needs-answer";
+    const result = await provider(new SequenceTransport([output])).analyze(goalInput());
+
+    expect(result.analysis.nextSteps.map((step) => step.status)).not.toContain("needs-answer");
+  });
+
+  it("keeps needs-answer while a question is still open", async () => {
+    const output = structuredClone(VALID_OUTPUT);
+    output.nextSteps[0].status = "needs-answer";
+    const result = await provider(new SequenceTransport([output])).analyze(goalInput());
+
+    expect(result.analysis.nextSteps[0].status).toBe("needs-answer");
+  });
+
+  it("tells the model how much question budget remains so it neither loops nor finalizes early", () => {
+    const fresh = JSON.stringify(buildInitialOpenAIRequest(goalInput(), "gpt-5.6-luna").input);
+    expect(fresh).toContain("you have asked 0 of 3 allowed questions");
+    expect(fresh).toContain("While budget remains, spend it");
+
+    const input = goalInput();
+    input.clarificationResolution = {
+      questionId: "citizenship",
+      questionPrompt: "Are you an EU citizen?",
+      questionReason: "It changes the route.",
+      answerId: "non-eu",
+      answerLabel: "No, I hold a German residence permit",
+      options: VALID_OUTPUT.clarification.question!.options,
+      answerHistory: [
+        { questionId: "a", questionPrompt: "First?", answerLabel: "One" },
+        { questionId: "b", questionPrompt: "Second?", answerLabel: "Two" },
+      ],
+    };
+    const exhausted = JSON.stringify(buildInitialOpenAIRequest(input, "gpt-5.6-luna").input);
+    expect(exhausted).toContain("you have asked 3 of 3 allowed questions");
+    expect(exhausted).toContain("must finalize the route now");
+  });
+
   it("rejects incoherent question output after one bounded validation pass", async () => {
     const incoherent = structuredClone(VALID_OUTPUT);
-    incoherent.clarification.question!.options = incoherent.clarification.question!.options.filter((option) => option.id !== "dont-know");
+    const [first, second] = incoherent.clarification.question!.options;
+    incoherent.clarification.question!.options = [first, { ...second, id: first.id }];
     const transport = new SequenceTransport([incoherent]);
 
     await expect(provider(transport).analyze(goalInput())).rejects.toMatchObject({ code: "PROVIDER_RESPONSE_INVALID" });
@@ -128,6 +214,18 @@ describe("OpenAICaseBuilderProvider", () => {
     expect(transport.requests).toHaveLength(2);
   });
 
+  it("keeps a schema-valid primary result when the optional verification pass returns nothing usable", async () => {
+    const highRisk = structuredClone(VALID_OUTPUT);
+    highRisk.verification = { required: true, trigger: "high-risk", reasons: ["Deadline conflict"] };
+    // The verification call comes back unusable; the primary already passed the
+    // strict schema, so the case must still produce a route.
+    const transport = new SequenceTransport([highRisk, { invalid: true }]);
+    const result = await provider(transport).analyze(goalInput());
+
+    expect(result.analysis.documentTitle).toBe(VALID_OUTPUT.document.title);
+    expect(transport.requests).toHaveLength(2);
+  });
+
   it("uses one structured verification pass only for an allowed high-risk trigger", async () => {
     const highRisk = structuredClone(VALID_OUTPUT);
     highRisk.verification = { required: true, trigger: "high-risk", reasons: ["Deadline conflict"] };
@@ -149,7 +247,7 @@ describe("OpenAICaseBuilderProvider", () => {
   it("retries one transient outage and does not expose the provider exception", async () => {
     const transport = new SequenceTransport([{ throwValue: { status: 503, message: "private provider detail" } }, VALID_OUTPUT]);
     const result = await provider(transport).analyze(goalInput());
-    expect(result.analysis.isMock).toBe(false);
+    expect(result.processingMode).toBe("openai");
     expect(transport.requests).toHaveLength(2);
   });
 
@@ -160,6 +258,13 @@ describe("OpenAICaseBuilderProvider", () => {
   ])("maps provider failures to safe typed errors", async (failure, code) => {
     const transport = new SequenceTransport([{ throwValue: failure }, { throwValue: failure }]);
     await expect(provider(transport).analyze(goalInput())).rejects.toMatchObject({ code });
+  });
+
+  it("maps a plain timeout Error to PROVIDER_TIMEOUT rather than a generic outage", async () => {
+    // The SDK surfaces `new Error("Request timed out.")` with no status, which
+    // previously fell through to PROVIDER_UNAVAILABLE and misreported the cause.
+    const transport = new SequenceTransport([{ throwValue: new Error("Request timed out.") }]);
+    await expect(provider(transport).analyze(goalInput())).rejects.toMatchObject({ code: "PROVIDER_TIMEOUT" });
   });
 
   it("maps SDK timeouts without returning internal messages", async () => {
@@ -226,19 +331,21 @@ describe("verified Responses request planning", () => {
 });
 
 describe("server-only provider configuration", () => {
-  it("defaults development to mock mode and Luna without requiring a key", () => {
+  it("defaults to Luna and reports a missing key without inventing a fallback mode", () => {
     const config = readAnalysisRuntimeConfiguration({ NODE_ENV: "development" });
-    expect(config).toMatchObject({ mockEnabled: true, openAiApiKeyConfigured: false, openAiModel: "gpt-5.6-luna" });
+    expect(config).toMatchObject({ openAiApiKeyConfigured: false, openAiModel: "gpt-5.6-luna" });
   });
 
-  it("selects configured real mode and keeps the model configurable", () => {
-    const config = readAnalysisRuntimeConfiguration({ ENABLE_MOCK_AI: "false", OPENAI_API_KEY: "synthetic-test-key", OPENAI_MODEL: "configured-model" });
-    expect(config).toMatchObject({ mockEnabled: false, openAiApiKeyConfigured: true, openAiModel: "configured-model" });
+  it("reads the configured key and keeps the model configurable", () => {
+    const config = readAnalysisRuntimeConfiguration({ NODE_ENV: "production", OPENAI_API_KEY: "synthetic-test-key", OPENAI_MODEL: "configured-model" });
+    expect(config).toMatchObject({ openAiApiKeyConfigured: true, openAiModel: "configured-model" });
   });
 
-  it("fails safe to mock for an invalid explicit mock setting outside production", () => {
-    const config = readAnalysisRuntimeConfiguration({ NODE_ENV: "development", ENABLE_MOCK_AI: "unexpected" });
-    expect(config.mockEnabled).toBe(true);
+  it("refuses to analyze without a configured key instead of serving an example case", async () => {
+    await expect(runConfiguredAnalysis(
+      { kind: "goal", category: null, outputLanguage: "en", receivedAt: "2026-07-18T12:00:00.000Z", normalizedGoal: "Renew a fictional permit." },
+      readAnalysisRuntimeConfiguration({ NODE_ENV: "development" }),
+    )).rejects.toMatchObject({ code: "API_NOT_CONFIGURED" });
   });
 });
 
